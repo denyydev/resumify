@@ -1,6 +1,7 @@
 "use client"
 
 import { Layout, Typography } from "antd"
+import { useParams } from "next/navigation"
 import { EditorShell } from "@/components/resume/sections/EditorShell"
 import { ResumePreview } from "@/components/resume/ResumePreview"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
@@ -18,12 +19,10 @@ const messages = {
   },
 } as const
 
-export default function EditorPage({
-  params,
-}: {
-  params: { locale: "ru" | "en" }
-}) {
-  const dict = messages[params.locale] ?? messages.ru
+export default function EditorPage() {
+  const params = useParams<{ locale: "ru" | "en" }>()
+  const locale = params?.locale ?? "ru"
+  const dict = messages[locale] ?? messages.ru
 
   return (
     <Layout className="min-h-screen bg-slate-100">
@@ -39,7 +38,7 @@ export default function EditorPage({
           </div>
 
           <div className="py-3">
-            <LanguageSwitcher currentLocale={params.locale} />
+            <LanguageSwitcher currentLocale={locale} />
           </div>
         </div>
       </Layout.Header>

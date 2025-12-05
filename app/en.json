@@ -1,0 +1,12 @@
+{
+  "editor": {
+    "title": "Resume Builder",
+    "subtitle": "Fill the form on the left and see live preview on the right."
+  },
+  "basic": {
+    "sectionTitle": "Basic information",
+    "sectionSubtitle": "This information will appear in the header of your resume.",
+    "fullName": "Full name",
+    "position": "Desired position"
+  }
+}
