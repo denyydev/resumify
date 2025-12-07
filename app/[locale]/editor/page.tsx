@@ -1,12 +1,15 @@
 "use client"
 
+import { useEffect } from "react"
 import { Layout, Typography } from "antd"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { EditorShell } from "@/components/resume/sections/EditorShell"
 import { ResumePreview } from "@/components/resume/ResumePreview"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { DownloadPdfButton } from "@/components/resume/DownloadPdfButton"
 import type { Locale } from "@/lib/useCurrentLocale"
+import { SaveResumeButton } from "@/components/resume/SaveResumeButton"
+import { useResumeStore } from "@/store/useResumeStore"
 
 const { Title, Text } = Typography
 
@@ -28,29 +31,52 @@ export default function EditorPage() {
   const locale: Locale = params?.locale === "en" ? "en" : "ru"
   const dict = messages[locale]
 
-  const resumeId = locale === "en" ? "demo-en" : "demo"
+  const searchParams = useSearchParams()
+  const resumeId = searchParams.get("resumeId")
+
+  const loadResume = useResumeStore((s) => s.loadResume)
+
+
+  useEffect(() => {
+    if (!resumeId) return
+
+    const fetchResume = async () => {
+      try {
+        const res = await fetch(`/api/resumes/${resumeId}`)
+        if (!res.ok) {
+          console.error("Failed to load resume", await res.text())
+          return
+        }
+
+        const json = await res.json()
+        const data = json.resume?.data
+
+        if (!data) {
+          console.error("Resume has no data")
+          return
+        }
+
+        loadResume(data)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    fetchResume()
+  }, [resumeId, loadResume])
+
+
 
   return (
     <Layout className="min-h-screen bg-slate-100">
-      <Layout.Header className="bg-white border-b border-slate-200">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
-          <div className="py-3">
-            <Title level={4} className="!mb-0">
-              {dict.editorTitle}
-            </Title>
-            <Text type="secondary" className="text-xs">
-              {dict.editorSubtitle}
-            </Text>
-          </div>
-
-          <div className="flex items-center gap-3 py-3">
-            <LanguageSwitcher currentLocale={locale} />
-          </div>
-        </div>
-      </Layout.Header>
 
       <Layout.Content className="py-6">
+        <div className="flex items-center gap-5">
+              <SaveResumeButton />
+            <LanguageSwitcher currentLocale={locale} />
+</div>
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 lg:flex-row">
+          
           <div className="w-full lg:w-[52%]">
             <EditorShell />
           </div>
@@ -60,7 +86,7 @@ export default function EditorPage() {
               <span className="text-xs font-medium text-slate-600">
                 {dict.previewTitle}
               </span>
-              <DownloadPdfButton resumeId={resumeId} locale={locale} />
+              <DownloadPdfButton locale={locale} />
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:p-6">

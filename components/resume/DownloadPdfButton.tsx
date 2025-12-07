@@ -4,38 +4,53 @@ import { useState } from "react"
 import { Button, Tooltip } from "antd"
 import { DownloadOutlined } from "@ant-design/icons"
 import { type Locale } from "@/lib/useCurrentLocale"
+import { useResumeStore } from "@/store/useResumeStore"
 
 type Props = {
-  resumeId?: string
   locale: Locale
 }
 
-export function DownloadPdfButton({ resumeId, locale }: Props) {
+export function DownloadPdfButton({ locale }: Props) {
   const [loading, setLoading] = useState(false)
+  const resume = useResumeStore((s) => s.resume)
 
   const handleClick = async () => {
-    if (!resumeId) return
-
     try {
       setLoading(true)
 
-      const res = await fetch("/api/pdf", {
+      // 1) СНАЧАЛА — СОХРАНИТЬ РЕЗЮМЕ В БД
+      const saveRes = await fetch("/api/resumes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: resumeId, locale }),
+        body: JSON.stringify({ data: resume }),
       })
 
-      if (!res.ok) {
-        console.error("Failed to generate PDF")
+      if (!saveRes.ok) {
+        console.error("Failed to save resume", await saveRes.text())
         return
       }
 
-      const blob = await res.blob()
+      const { id } = (await saveRes.json()) as { id: string }
+      console.log("Saved resume id:", id)
+
+      // 2) ПОТОМ — СГЕНЕРИТЬ PDF ПО ЭТОМУ id
+      const pdfRes = await fetch("/api/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, locale }),
+      })
+
+      if (!pdfRes.ok) {
+        console.error("Failed to generate PDF", await pdfRes.text())
+        return
+      }
+
+      const blob = await pdfRes.blob()
       const url = URL.createObjectURL(blob)
 
       const a = document.createElement("a")
       a.href = url
-      a.download = `resume-${resumeId}.pdf`
+      a.download = `resume-${id}.pdf`
       document.body.appendChild(a)
       a.click()
       a.remove()
@@ -53,8 +68,8 @@ export function DownloadPdfButton({ resumeId, locale }: Props) {
   }
 
   const tooltipByLocale: Record<Locale, string> = {
-    ru: "Сгенерировать резюме в формате PDF",
-    en: "Generate resume as PDF",
+    ru: "Сохранить и скачать резюме в PDF",
+    en: "Save and download resume as PDF",
   }
 
   return (
@@ -64,7 +79,6 @@ export function DownloadPdfButton({ resumeId, locale }: Props) {
         size="small"
         icon={<DownloadOutlined />}
         loading={loading}
-        disabled={!resumeId}
         onClick={handleClick}
       >
         {labelByLocale[locale]}

@@ -12,6 +12,8 @@ import {
 
 type ResumeState = {
   resume: Resume;
+  setPhoto: (photo?: string) => void;
+  loadResume: (resume: Resume) => void;
   setFullName: (fullName: string) => void;
   setPosition: (position: string) => void;
   setContacts: (contacts: Partial<ResumeContacts>) => void;
@@ -55,11 +57,18 @@ const emptyResume: Resume = {
   education: [],
   languages: [],
   templateKey: "default",
+  photo: undefined,
 };
 
 export const useResumeStore = create<ResumeState>((set) => ({
   resume: emptyResume,
-
+  setPhoto: (photo) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        photo,
+      },
+    })),
   setFullName: (fullName) =>
     set((state) => ({ resume: { ...state.resume, fullName } })),
 
@@ -73,7 +82,13 @@ export const useResumeStore = create<ResumeState>((set) => ({
         contacts: { ...state.resume.contacts, ...contacts },
       },
     })),
-
+  loadResume: (resume) =>
+    set(() => ({
+      resume: {
+        ...emptyResume, // на всякий случай, чтобы все поля были
+        ...resume,
+      },
+    })),
   setSummary: (summary) =>
     set((state) => ({ resume: { ...state.resume, summary } })),
 
@@ -120,7 +135,6 @@ export const useResumeStore = create<ResumeState>((set) => ({
         experience: state.resume.experience.filter((item) => item.id !== id),
       },
     })),
-
   addProject: () =>
     set((state) => ({
       resume: {

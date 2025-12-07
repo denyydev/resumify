@@ -2,7 +2,17 @@
 
 import { useResumeStore } from "@/store/useResumeStore"
 import { useCurrentLocale } from "@/lib/useCurrentLocale"
-import { Button, Col, Input, Row, Space, Typography } from "antd"
+import {
+  Button,
+  Col,
+  Input,
+  Row,
+  Space,
+  Typography,
+  Upload,
+  UploadProps,
+} from "antd"
+import { CameraOutlined, DeleteOutlined } from "@ant-design/icons"
 
 const { TextArea } = Input
 const { Text } = Typography
@@ -32,6 +42,9 @@ const messages = {
       "2–4 предложения о твоём опыте, стеке и сильных сторонах.",
     reset: "Сбросить все поля",
     next: "Дальше к опыту",
+    photo: "Фото",
+    photoSubtitle: "Опционально, но повышает доверие.",
+    removePhoto: "Удалить фото",
   },
   en: {
     sectionTitle: "Basic information",
@@ -57,6 +70,9 @@ const messages = {
       "2–4 sentences about your experience, stack and strengths.",
     reset: "Reset all fields",
     next: "Next: Experience",
+    photo: "Photo",
+    photoSubtitle: "Optional, but can increase trust.",
+    removePhoto: "Remove photo",
   },
 } as const
 
@@ -64,11 +80,40 @@ export function BasicSection() {
   const locale = useCurrentLocale()
   const t = messages[locale]
 
-  const { resume, setFullName, setPosition, setContacts, setSummary, reset } =
-    useResumeStore()
+  const {
+    resume,
+    setFullName,
+    setPosition,
+    setContacts,
+    setSummary,
+    setPhoto,
+    reset,
+  } = useResumeStore()
+
+  const uploadProps: UploadProps = {
+    beforeUpload: (file) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result
+        if (typeof result === "string") {
+          setPhoto(result) // data:image/...;base64,...
+        }
+      }
+      reader.readAsDataURL(file)
+
+      // отменяем реальный аплоад (мы всё храним в Zustand)
+      return false
+    },
+    showUploadList: false,
+  }
+
+  const handleReset = () => {
+    reset()
+  }
 
   return (
     <div className="space-y-6">
+      {/* Заголовок секции */}
       <Space orientation="vertical" size={4} className="w-full">
         <Text className="text-sm font-semibold text-slate-900">
           {t.sectionTitle}
@@ -79,30 +124,84 @@ export function BasicSection() {
       </Space>
 
       <Space orientation="vertical" size={16} className="w-full">
-        <Space orientation="vertical" size={6} className="w-full">
-          <Text className="text-xs font-medium text-slate-700">
-            {t.fullName}
-          </Text>
-          <Input
-            size="middle"
-            placeholder={t.fullNamePlaceholder}
-            value={resume.fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-        </Space>
+        {/* Блок: фото + ФИО + позиция */}
+        <Row gutter={[16, 16]} align="top">
+          {/* Фото */}
+          <Col xs={24} md={6}>
+            <Space orientation="vertical" size={6} className="w-full">
+              <Text className="text-xs font-medium text-slate-700">
+                {t.photo}
+              </Text>
+              <Text type="secondary" className="text-[11px]">
+                {t.photoSubtitle}
+              </Text>
 
-        <Space orientation="vertical" size={6} className="w-full">
-          <Text className="text-xs font-medium text-slate-700">
-            {t.position}
-          </Text>
-          <Input
-            size="middle"
-            placeholder={t.positionPlaceholder}
-            value={resume.position}
-            onChange={(e) => setPosition(e.target.value)}
-          />
-        </Space>
+              <div className="flex items-center gap-3">
+                <Upload {...uploadProps}>
+                  <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center border border-dashed border-slate-300 cursor-pointer overflow-hidden">
+                    {resume.photo ? (
+                      <img
+                        src={resume.photo}
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center gap-1 text-slate-400 text-[11px]">
+                        <CameraOutlined />
+                        <span>
+                          JPG / PNG
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </Upload>
 
+                {resume.photo && (
+                  <Button
+                    size="small"
+                    type="text"
+                    icon={<DeleteOutlined />}
+                    className="text-[11px]"
+                    onClick={() => setPhoto(undefined)}
+                  >
+                    {t.removePhoto}
+                  </Button>
+                )}
+              </div>
+            </Space>
+          </Col>
+
+          {/* ФИО + позиция */}
+          <Col xs={24} md={18}>
+            <Space orientation="vertical" size={12} className="w-full">
+              <Space orientation="vertical" size={6} className="w-full">
+                <Text className="text-xs font-medium text-slate-700">
+                  {t.fullName}
+                </Text>
+                <Input
+                  size="middle"
+                  placeholder={t.fullNamePlaceholder}
+                  value={resume.fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </Space>
+
+              <Space orientation="vertical" size={6} className="w-full">
+                <Text className="text-xs font-medium text-slate-700">
+                  {t.position}
+                </Text>
+                <Input
+                  size="middle"
+                  placeholder={t.positionPlaceholder}
+                  value={resume.position}
+                  onChange={(e) => setPosition(e.target.value)}
+                />
+              </Space>
+            </Space>
+          </Col>
+        </Row>
+
+        {/* Контакты */}
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12}>
             <Space orientation="vertical" size={6} className="w-full">
@@ -117,6 +216,7 @@ export function BasicSection() {
               />
             </Space>
           </Col>
+
           <Col xs={24} md={12}>
             <Space orientation="vertical" size={6} className="w-full">
               <Text className="text-xs font-medium text-slate-700">
@@ -130,6 +230,7 @@ export function BasicSection() {
               />
             </Space>
           </Col>
+
           <Col xs={24} md={12}>
             <Space orientation="vertical" size={6} className="w-full">
               <Text className="text-xs font-medium text-slate-700">
@@ -143,12 +244,13 @@ export function BasicSection() {
               />
             </Space>
           </Col>
+
           <Col xs={24} md={12}>
             <Space orientation="vertical" size={6} className="w-full">
               <Text className="text-xs font-medium text-slate-700">
                 {t.telegram}
               </Text>
-              <Input
+            <Input
                 size="middle"
                 placeholder={t.telegramPlaceholder}
                 value={resume.contacts.telegram ?? ""}
@@ -156,6 +258,7 @@ export function BasicSection() {
               />
             </Space>
           </Col>
+
           <Col xs={24} md={12}>
             <Space orientation="vertical" size={6} className="w-full">
               <Text className="text-xs font-medium text-slate-700">
@@ -169,6 +272,7 @@ export function BasicSection() {
               />
             </Space>
           </Col>
+
           <Col xs={24} md={12}>
             <Space orientation="vertical" size={6} className="w-full">
               <Text className="text-xs font-medium text-slate-700">
@@ -184,6 +288,7 @@ export function BasicSection() {
           </Col>
         </Row>
 
+        {/* Summary */}
         <Space orientation="vertical" size={6} className="w-full">
           <Text className="text-xs font-medium text-slate-700">
             {t.summary}
@@ -201,7 +306,7 @@ export function BasicSection() {
         <button
           type="button"
           className="text-xs text-slate-400 hover:text-slate-600"
-          onClick={reset}
+          onClick={handleReset}
         >
           {t.reset}
         </button>

@@ -1,3 +1,12 @@
+export type Contacts = {
+  email: string;
+  phone: string;
+  location: string;
+  telegram?: string;
+  github?: string;
+  linkedin?: string;
+};
+
 export type ExperienceItem = {
   id: string;
   company: string;
@@ -21,8 +30,8 @@ export type ProjectItem = {
 export type EducationItem = {
   id: string;
   institution: string;
-  degree: string;
   field: string;
+  degree: string;
   startDate: string;
   endDate: string;
 };
@@ -33,26 +42,16 @@ export type LanguageItem = {
   level: string;
 };
 
-export type ResumeContacts = {
-  email: string;
-  phone: string;
-  location: string;
-  telegram?: string;
-  github?: string;
-  linkedin?: string;
-  website?: string;
-};
-
-export type Resume = {
+export type ResumeData = {
   fullName: string;
   position: string;
-  contacts: ResumeContacts;
+  contacts: Contacts;
   summary: string;
   experience: ExperienceItem[];
   projects: ProjectItem[];
-  skills: string;
-  softSkills: string;
   education: EducationItem[];
   languages: LanguageItem[];
-  templateKey: string;
+  skills: string;
+  softSkills: string;
+  photo?: string;
 };
