@@ -7,6 +7,7 @@ import { ExperienceSection } from "./ExperienceSection"
 import { SkillsSection } from "./SkillsSection"
 import { ProjectsSection } from "./ProjectsSection"
 import { EducationSection } from "./EducationSection"
+import { TemplateSelector } from "./TemplateSelector"
 
 const tabItems: TabsProps["items"] = [
   {
@@ -39,6 +40,7 @@ const tabItems: TabsProps["items"] = [
 export function EditorShell() {
   return (
     <Card className="h-full rounded-2xl border-slate-200 shadow-sm">
+      <TemplateSelector />
       <Tabs
         defaultActiveKey="basic"
         items={tabItems}

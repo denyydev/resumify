@@ -8,6 +8,7 @@ import {
   ProjectItem,
   EducationItem,
   LanguageItem,
+  TemplateKey,
 } from "@/types/resume";
 
 type ResumeState = {
@@ -33,6 +34,7 @@ type ResumeState = {
   updateLanguage: (id: string, patch: Partial<LanguageItem>) => void;
   removeLanguage: (id: string) => void;
   reset: () => void;
+  setTemplateKey: (templateKey: TemplateKey) => void;
 };
 
 const generateId = () => Math.random().toString(36).slice(2, 9);
@@ -80,6 +82,13 @@ export const useResumeStore = create<ResumeState>((set) => ({
       resume: {
         ...state.resume,
         contacts: { ...state.resume.contacts, ...contacts },
+      },
+    })),
+  setTemplateKey: (templateKey) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        templateKey,
       },
     })),
   loadResume: (resume) =>

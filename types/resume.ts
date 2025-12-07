@@ -1,3 +1,5 @@
+export type TemplateKey = "default" | "classic" | "minimal" | "modern";
+
 export type Contacts = {
   email: string;
   phone: string;
@@ -54,4 +56,5 @@ export type ResumeData = {
   skills: string;
   softSkills: string;
   photo?: string;
+  templateKey: TemplateKey;
 };

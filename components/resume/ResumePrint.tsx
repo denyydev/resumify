@@ -1,437 +1,498 @@
-// components/resume/ResumePrint.tsx
+"use client"
 
-import type {
-  Resume,
-  ExperienceItem,
-  ProjectItem,
-  EducationItem,
-  LanguageItem,
-} from "@/types/resume"
+import type { Resume } from "@/types/resume"
+import type { Locale } from "@/lib/useCurrentLocale"
 
-type ResumePrintProps = {
+type ResumeTemplateProps = {
   data: Resume
-  locale: "ru" | "en"
+  locale: Locale
 }
 
-const DICT = {
-  ru: {
-    summary: "О себе",
-    experience: "Опыт работы",
-    projects: "Проекты",
-    skills: "Навыки",
-    softSkills: "Софт скиллы",
-    education: "Образование",
-    languages: "Языки",
-    contacts: "Контакты",
-    present: "по настоящее время",
-  },
-  en: {
-    summary: "Summary",
-    experience: "Experience",
-    projects: "Projects",
-    skills: "Skills",
-    softSkills: "Soft Skills",
-    education: "Education",
-    languages: "Languages",
-    contacts: "Contacts",
-    present: "Present",
-  },
-}
-
-export function ResumePrint({ data, locale }: ResumePrintProps) {
-  const t = DICT[locale] ?? DICT.en
-
-  const {
-    fullName,
-    position,
-    contacts,
-    summary,
-    experience,
-    projects,
-    skills,
-    softSkills,
-    education,
-    languages,
-  } = data
-
-  const hasContacts =
-    contacts.email ||
-    contacts.phone ||
-    contacts.location ||
-    contacts.telegram ||
-    contacts.github ||
-    contacts.linkedin ||
-    contacts.website
-
-  const hasRightColumn =
-    skills ||
-    softSkills ||
-    (languages && languages.length > 0) ||
-    hasContacts
+/** ---------- TEMPLATE 1: CLASSIC (две колонки) ---------- **/
+function ClassicTemplate({ data }: ResumeTemplateProps) {
+  const { fullName, position, contacts, summary, experience, projects, skills, softSkills, education, languages } =
+    data
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <div className="max-w-[800px] mx-auto py-10 px-10 text-[11px] leading-snug">
-        {/* Header */}
-        <header className="border-b border-gray-300 pb-4 mb-4">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            {fullName || (locale === "ru" ? "Имя Фамилия" : "Full Name")}
-          </h1>
-          {position && (
-            <p className="mt-1 text-sm font-medium text-gray-700">
-              {position}
-            </p>
-          )}
+    <div className="w-[794px] min-h-[1123px] bg-white text-slate-900 flex">
+      {/* Левая колонка */}
+      <aside className="w-[260px] bg-slate-50 border-r border-slate-200 px-6 py-6 flex flex-col gap-6">
+        {/* Имя / позиция */}
+        <div>
+          <h1 className="text-xl font-semibold leading-tight">{fullName || "Full Name"}</h1>
+          <p className="text-xs text-slate-600 mt-1">{position || "Position"}</p>
+        </div>
 
-          {hasContacts && (
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-600">
-              {contacts.location && (
-                <span>{contacts.location}</span>
-              )}
-              {contacts.email && (
-                <span>
-                  {contacts.email}
-                </span>
-              )}
-              {contacts.phone && (
-                <span>{contacts.phone}</span>
-              )}
-              {contacts.telegram && (
-                <span>{contacts.telegram}</span>
-              )}
-              {contacts.github && (
-                <span>{contacts.github}</span>
-              )}
-              {contacts.linkedin && (
-                <span>{contacts.linkedin}</span>
-              )}
-              {contacts.website && (
-                <span>{contacts.website}</span>
-              )}
+        {/* Контакты */}
+        <div className="space-y-1 text-[11px]">
+          {contacts.email && <p>{contacts.email}</p>}
+          {contacts.phone && <p>{contacts.phone}</p>}
+          {contacts.location && <p>{contacts.location}</p>}
+          {contacts.telegram && <p>{contacts.telegram}</p>}
+          {contacts.github && <p>{contacts.github}</p>}
+          {contacts.linkedin && <p>{contacts.linkedin}</p>}
+          {contacts.website && <p>{contacts.website}</p>}
+        </div>
+
+        {/* Skills */}
+        {skills && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-wide uppercase text-slate-700 mb-1.5">
+              Skills
+            </h2>
+            <p className="text-[11px] whitespace-pre-line leading-snug">{skills}</p>
+          </section>
+        )}
+
+        {/* Soft skills */}
+        {softSkills && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-wide uppercase text-slate-700 mb-1.5">
+              Soft skills
+            </h2>
+            <p className="text-[11px] whitespace-pre-line leading-snug">{softSkills}</p>
+          </section>
+        )}
+
+        {/* Languages */}
+        {languages?.length > 0 && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-wide uppercase text-slate-700 mb-1.5">
+              Languages
+            </h2>
+            <ul className="space-y-0.5 text-[11px]">
+              {languages.map((lang) => (
+                <li key={lang.id}>
+                  {lang.name} {lang.level && <span className="text-slate-500">· {lang.level}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Education */}
+        {education?.length > 0 && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-wide uppercase text-slate-700 mb-1.5">
+              Education
+            </h2>
+            <ul className="space-y-1 text-[11px]">
+              {education.map((item) => (
+                <li key={item.id}>
+                  <p className="font-medium">{item.degree || item.field}</p>
+                  <p className="text-slate-600">{item.institution}</p>
+                  {(item.startDate || item.endDate) && (
+                    <p className="text-slate-400 text-[10px]">
+                      {item.startDate} — {item.endDate || "now"}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </aside>
+
+      {/* Правая колонка */}
+      <main className="flex-1 px-8 py-8 space-y-6">
+        {/* Summary */}
+        {summary && (
+          <section>
+            <h2 className="text-xs font-semibold tracking-wide uppercase text-slate-700 mb-1.5">
+              Summary
+            </h2>
+            <p className="text-[11px] leading-snug whitespace-pre-line">{summary}</p>
+          </section>
+        )}
+
+        {/* Experience */}
+        {experience?.length > 0 && (
+          <section>
+            <h2 className="text-xs font-semibold tracking-wide uppercase text-slate-700 mb-1.5">
+              Experience
+            </h2>
+            <div className="space-y-3">
+              {experience.map((item) => (
+                <div key={item.id}>
+                  <div className="flex justify-between text-[11px]">
+                    <p className="font-semibold">
+                      {item.position}{" "}
+                      {item.company && <span className="text-slate-600">· {item.company}</span>}
+                    </p>
+                    <p className="text-slate-400">
+                      {item.startDate} — {item.isCurrent ? "Present" : item.endDate}
+                    </p>
+                  </div>
+                  {item.location && (
+                    <p className="text-[10px] text-slate-500 mb-1">{item.location}</p>
+                  )}
+                  {item.description && (
+                    <p className="text-[11px] text-slate-700 whitespace-pre-line leading-snug">
+                      {item.description}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
-        </header>
+          </section>
+        )}
 
-        {/* Main layout */}
-        <div
-          className={
-            hasRightColumn
-              ? "grid grid-cols-[2.2fr,1fr] gap-6"
-              : "grid grid-cols-1"
-          }
-        >
-          {/* LEFT COLUMN – main content */}
-          <div className="space-y-4">
-            {/* Summary */}
-            {summary && (
-              <Section title={t.summary}>
-                <p className="whitespace-pre-line text-[11px]">
-                  {summary}
-                </p>
-              </Section>
-            )}
-
-            {/* Experience */}
-            {experience && experience.length > 0 && (
-              <Section title={t.experience}>
-                <div className="space-y-3">
-                  {experience.map((item) => (
-                    <ExperienceBlock
-                      key={item.id}
-                      item={item}
-                      locale={locale}
-                    />
-                  ))}
+        {/* Projects */}
+        {projects?.length > 0 && (
+          <section>
+            <h2 className="text-xs font-semibold tracking-wide uppercase text-slate-700 mb-1.5">
+              Projects
+            </h2>
+            <div className="space-y-3">
+              {projects.map((p) => (
+                <div key={p.id} className="text-[11px]">
+                  <p className="font-semibold">
+                    {p.name} {p.role && <span className="text-slate-600">· {p.role}</span>}
+                  </p>
+                  {p.stack && (
+                    <p className="text-slate-500 text-[10px] mb-0.5">{p.stack}</p>
+                  )}
+                  {p.link && (
+                    <p className="text-[10px] text-sky-600">{p.link}</p>
+                  )}
+                  {p.description && (
+                    <p className="text-[11px] text-slate-700 whitespace-pre-line leading-snug">
+                      {p.description}
+                    </p>
+                  )}
                 </div>
-              </Section>
-            )}
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+    </div>
+  )
+}
 
-            {/* Projects */}
-            {projects && projects.length > 0 && (
-              <Section title={t.projects}>
-                <div className="space-y-3">
-                  {projects.map((project) => (
-                    <ProjectBlock key={project.id} item={project} />
-                  ))}
-                </div>
-              </Section>
-            )}
+/** ---------- TEMPLATE 2: MINIMAL (одна колонка, акцент на типографику) ---------- **/
+function MinimalTemplate({ data }: ResumeTemplateProps) {
+  const { fullName, position, contacts, summary, experience, projects, skills, education, languages } =
+    data
 
-            {/* Education */}
-            {education && education.length > 0 && (
-              <Section title={t.education}>
-                <div className="space-y-3">
-                  {education.map((edu) => (
-                    <EducationBlock key={edu.id} item={edu} />
-                  ))}
+  return (
+    <div className="w-[794px] min-h-[1123px] bg-white text-slate-900 px-64 py-10">
+      <header className="mb-6 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">{fullName || "Full Name"}</h1>
+        <p className="text-xs text-slate-600 mt-1">{position || "Position"}</p>
+        <div className="mt-2 flex justify-center gap-3 text-[10px] text-slate-500 flex-wrap">
+          {contacts.email && <span>{contacts.email}</span>}
+          {contacts.phone && <span>{contacts.phone}</span>}
+          {contacts.location && <span>{contacts.location}</span>}
+          {contacts.github && <span>{contacts.github}</span>}
+          {contacts.linkedin && <span>{contacts.linkedin}</span>}
+        </div>
+      </header>
+
+      <main className="space-y-5 text-[11px] leading-snug">
+        {summary && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-700 mb-1">
+              Summary
+            </h2>
+            <p className="whitespace-pre-line text-slate-800">{summary}</p>
+          </section>
+        )}
+
+        {experience?.length > 0 && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-700 mb-1">
+              Experience
+            </h2>
+            <div className="space-y-2.5">
+              {experience.map((item) => (
+                <div key={item.id}>
+                  <div className="flex justify-between gap-4">
+                    <p className="font-medium">
+                      {item.position}
+                      {item.company && <span className="text-slate-600"> · {item.company}</span>}
+                    </p>
+                    <p className="text-slate-400 text-[10px] whitespace-nowrap">
+                      {item.startDate} — {item.isCurrent ? "Present" : item.endDate}
+                    </p>
+                  </div>
+                  {item.location && (
+                    <p className="text-[10px] text-slate-500 mb-1">{item.location}</p>
+                  )}
+                  {item.description && (
+                    <p className="text-slate-800 whitespace-pre-line">{item.description}</p>
+                  )}
                 </div>
-              </Section>
-            )}
+              ))}
+            </div>
+          </section>
+        )}
+
+        {projects?.length > 0 && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-700 mb-1">
+              Projects
+            </h2>
+            <div className="space-y-2.5">
+              {projects.map((p) => (
+                <div key={p.id}>
+                  <p className="font-medium">
+                    {p.name}
+                    {p.role && <span className="text-slate-600"> · {p.role}</span>}
+                  </p>
+                  {p.stack && (
+                    <p className="text-[10px] text-slate-500 mb-0.5">{p.stack}</p>
+                  )}
+                  {p.link && (
+                    <p className="text-[10px] text-sky-600 mb-0.5">{p.link}</p>
+                  )}
+                  {p.description && (
+                    <p className="text-slate-800 whitespace-pre-line">{p.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {skills && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-700 mb-1">
+              Skills
+            </h2>
+            <p className="text-slate-800 whitespace-pre-line">{skills}</p>
+          </section>
+        )}
+
+        {(education?.length ?? 0) > 0 && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-700 mb-1">
+              Education
+            </h2>
+            <div className="space-y-1.5">
+              {education.map((e) => (
+                <div key={e.id}>
+                  <p className="font-medium">
+                    {e.degree || e.field}
+                    {e.institution && <span className="text-slate-600"> · {e.institution}</span>}
+                  </p>
+                  {(e.startDate || e.endDate) && (
+                    <p className="text-[10px] text-slate-500">
+                      {e.startDate} — {e.endDate || "now"}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {(languages?.length ?? 0) > 0 && (
+          <section>
+            <h2 className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-700 mb-1">
+              Languages
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {languages.map((l) => (
+                <span key={l.id} className="text-[11px]">
+                  {l.name}
+                  {l.level && <span className="text-slate-500"> · {l.level}</span>}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+    </div>
+  )
+}
+
+/** ---------- TEMPLATE 3: MODERN (цветная шапка, аватар) ---------- **/
+function ModernTemplate({ data }: ResumeTemplateProps) {
+  const { fullName, position, contacts, summary, experience, projects, skills, education, languages, photo } =
+    data
+
+  return (
+    <div className="w-[794px] min-h-[1123px] bg-white text-slate-900 flex flex-col">
+      {/* Цветная шапка */}
+      <header className="bg-slate-900 text-white px-8 py-6 flex items-center gap-4">
+        {photo ? (
+          <img
+            src={photo}
+            alt={fullName}
+            className="w-16 h-16 rounded-full object-cover border-2 border-white/60"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-lg font-semibold">
+            {(fullName || "N").trim().charAt(0).toUpperCase()}
           </div>
+        )}
 
-          {/* RIGHT COLUMN – sidebar */}
-          {hasRightColumn && (
-            <aside className="space-y-4">
-              {/* Contacts as block (для ATS/читаемости) */}
-              {hasContacts && (
-                <Section title={t.contacts}>
-                  <InfoList>
-                    {contacts.email && (
-                      <InfoItem label="Email" value={contacts.email} />
-                    )}
-                    {contacts.phone && (
-                      <InfoItem label={locale === "ru" ? "Телефон" : "Phone"} value={contacts.phone} />
-                    )}
-                    {contacts.location && (
-                      <InfoItem
-                        label={locale === "ru" ? "Город" : "Location"}
-                        value={contacts.location}
-                      />
-                    )}
-                    {contacts.telegram && (
-                      <InfoItem label="Telegram" value={contacts.telegram} />
-                    )}
-                    {contacts.github && (
-                      <InfoItem label="GitHub" value={contacts.github} />
-                    )}
-                    {contacts.linkedin && (
-                      <InfoItem label="LinkedIn" value={contacts.linkedin} />
-                    )}
-                    {contacts.website && (
-                      <InfoItem
-                        label={locale === "ru" ? "Сайт" : "Website"}
-                        value={contacts.website}
-                      />
-                    )}
-                  </InfoList>
-                </Section>
-              )}
+        <div className="flex-1">
+          <h1 className="text-xl font-semibold leading-tight">{fullName || "Full Name"}</h1>
+          <p className="text-xs text-slate-300 mt-1">{position || "Position"}</p>
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-300/90">
+            {contacts.location && <span>{contacts.location}</span>}
+            {contacts.email && <span>{contacts.email}</span>}
+            {contacts.phone && <span>{contacts.phone}</span>}
+          </div>
+        </div>
+      </header>
 
-              {/* Skills */}
-              {skills && (
-                <Section title={t.skills}>
-                  <TagList text={skills} />
-                </Section>
-              )}
+      <main className="flex-1 px-8 py-6 grid grid-cols-[1.1fr,0.9fr] gap-6 text-[11px]">
+        <div className="space-y-4">
+          {summary && (
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 mb-1">
+                Summary
+              </h2>
+              <p className="text-slate-800 whitespace-pre-line leading-snug">{summary}</p>
+            </section>
+          )}
 
-              {/* Soft Skills */}
-              {softSkills && (
-                <Section title={t.softSkills}>
-                  <TagList text={softSkills} />
-                </Section>
-              )}
-
-              {/* Languages */}
-              {languages && languages.length > 0 && (
-                <Section title={t.languages}>
-                  <ul className="space-y-1">
-                    {languages.map((lang: LanguageItem) => (
-                      <li key={lang.id} className="flex justify-between gap-2">
-                        <span className="font-medium">
-                          {lang.name}
-                        </span>
-                        {lang.level && (
-                          <span className="text-[10px] text-gray-600">
-                            {lang.level}
-                          </span>
+          {experience?.length > 0 && (
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 mb-1">
+                Experience
+              </h2>
+              <div className="space-y-2.5">
+                {experience.map((item) => (
+                  <div key={item.id}>
+                    <div className="flex justify-between gap-4">
+                      <p className="font-medium">
+                        {item.position}
+                        {item.company && (
+                          <span className="text-slate-600"> · {item.company}</span>
                         )}
-                      </li>
-                    ))}
-                  </ul>
-                </Section>
-              )}
-            </aside>
+                      </p>
+                      <p className="text-[10px] text-slate-400 whitespace-nowrap">
+                        {item.startDate} — {item.isCurrent ? "Present" : item.endDate}
+                      </p>
+                    </div>
+                    {item.location && (
+                      <p className="text-[10px] text-slate-500 mb-1">{item.location}</p>
+                    )}
+                    {item.description && (
+                      <p className="text-slate-800 whitespace-pre-line leading-snug">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {projects?.length > 0 && (
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 mb-1">
+                Projects
+              </h2>
+              <div className="space-y-2.5">
+                {projects.map((p) => (
+                  <div key={p.id}>
+                    <p className="font-medium">
+                      {p.name}
+                      {p.role && <span className="text-slate-600"> · {p.role}</span>}
+                    </p>
+                    {p.stack && (
+                      <p className="text-[10px] text-slate-500 mb-0.5">{p.stack}</p>
+                    )}
+                    {p.link && (
+                      <p className="text-[10px] text-sky-600 mb-0.5">{p.link}</p>
+                    )}
+                    {p.description && (
+                      <p className="text-slate-800 whitespace-pre-line leading-snug">
+                        {p.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
         </div>
-      </div>
+
+        <aside className="space-y-4">
+          {skills && (
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 mb-1">
+                Skills
+              </h2>
+              <p className="text-slate-800 whitespace-pre-line leading-snug">{skills}</p>
+            </section>
+          )}
+
+          {education?.length > 0 && (
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 mb-1">
+                Education
+              </h2>
+              <div className="space-y-1.5">
+                {education.map((e) => (
+                  <div key={e.id}>
+                    <p className="font-medium">
+                      {e.degree || e.field}
+                      {e.institution && (
+                        <span className="text-slate-600"> · {e.institution}</span>
+                      )}
+                    </p>
+                    {(e.startDate || e.endDate) && (
+                      <p className="text-[10px] text-slate-500">
+                        {e.startDate} — {e.endDate || "now"}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {languages?.length > 0 && (
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 mb-1">
+                Languages
+              </h2>
+              <ul className="space-y-0.5">
+                {languages.map((l) => (
+                  <li key={l.id}>
+                    {l.name}
+                    {l.level && <span className="text-slate-500"> · {l.level}</span>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {(contacts.github || contacts.linkedin || contacts.website || contacts.telegram) && (
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 mb-1">
+                Links
+              </h2>
+              <div className="space-y-0.5 text-[11px]">
+                {contacts.github && <p>{contacts.github}</p>}
+                {contacts.linkedin && <p>{contacts.linkedin}</p>}
+                {contacts.website && <p>{contacts.website}</p>}
+                {contacts.telegram && <p>{contacts.telegram}</p>}
+              </div>
+            </section>
+          )}
+        </aside>
+      </main>
     </div>
   )
 }
 
-/* -------------------- Helpers -------------------- */
+/** ---------- ROUTER ---------- **/
+const templateMap = {
+  default: ClassicTemplate,
+  classic: ClassicTemplate,
+  minimal: MinimalTemplate,
+  modern: ModernTemplate,
+} as const
 
-type SectionProps = {
-  title: string
-  children: React.ReactNode
-}
-
-function Section({ title, children }: SectionProps) {
-  return (
-    <section>
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-700 border-b border-gray-200 pb-1 mb-2">
-        {title}
-      </h2>
-      {children}
-    </section>
-  )
-}
-
-type ExperienceBlockProps = {
-  item: ExperienceItem
-  locale: "ru" | "en"
-}
-
-function ExperienceBlock({ item, locale }: ExperienceBlockProps) {
-  const { company, position, location, startDate, endDate, isCurrent, description } = item
-  const presentLabel = locale === "ru" ? "по настоящее время" : "Present"
-
-  return (
-    <div className="border-l border-gray-200 pl-3">
-      <div className="flex justify-between gap-2">
-        <div>
-          {position && (
-            <p className="text-[11px] font-semibold">
-              {position}
-            </p>
-          )}
-          <p className="text-[11px] text-gray-700">
-            {company}
-            {company && location ? " • " : ""}
-            {location}
-          </p>
-        </div>
-        {(startDate || endDate || isCurrent) && (
-          <p className="text-[10px] text-gray-500 whitespace-nowrap">
-            {startDate}
-            {(endDate || isCurrent) && " — "}
-            {isCurrent ? presentLabel : endDate}
-          </p>
-        )}
-      </div>
-      {description && (
-        <p className="mt-1 text-[11px] text-gray-800 whitespace-pre-line">
-          {description}
-        </p>
-      )}
-    </div>
-  )
-}
-
-type ProjectBlockProps = {
-  item: ProjectItem
-}
-
-function ProjectBlock({ item }: ProjectBlockProps) {
-  const { name, role, stack, link, description } = item
-  return (
-    <div className="border-l border-gray-200 pl-3">
-      <div className="flex justify-between gap-2">
-        <div>
-          {name && (
-            <p className="text-[11px] font-semibold">
-              {name}
-            </p>
-          )}
-          {(role || stack) && (
-            <p className="text-[10px] text-gray-700">
-              {role}
-              {role && stack ? " • " : ""}
-              {stack}
-            </p>
-          )}
-        </div>
-        {link && (
-          <p className="text-[10px] text-gray-500 text-right break-all">
-            {link}
-          </p>
-        )}
-      </div>
-      {description && (
-        <p className="mt-1 text-[11px] text-gray-800 whitespace-pre-line">
-          {description}
-        </p>
-      )}
-    </div>
-  )
-}
-
-type EducationBlockProps = {
-  item: EducationItem
-}
-
-function EducationBlock({ item }: EducationBlockProps) {
-  const { institution, degree, field, startDate, endDate } = item
-  return (
-    <div className="border-l border-gray-200 pl-3">
-      <div className="flex justify-between gap-2">
-        <div>
-          {institution && (
-            <p className="text-[11px] font-semibold">
-              {institution}
-            </p>
-          )}
-          {(degree || field) && (
-            <p className="text-[10px] text-gray-700">
-              {degree}
-              {degree && field ? " • " : ""}
-              {field}
-            </p>
-          )}
-        </div>
-        {(startDate || endDate) && (
-          <p className="text-[10px] text-gray-500 whitespace-nowrap">
-            {startDate}
-            {endDate && " — "}
-            {endDate}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-type InfoItemProps = {
-  label: string
-  value: string
-}
-
-function InfoItem({ label, value }: InfoItemProps) {
-  return (
-    <li className="flex flex-col">
-      <span className="text-[9px] uppercase tracking-[0.16em] text-gray-500">
-        {label}
-      </span>
-      <span className="text-[10px] text-gray-800 break-all">
-        {value}
-      </span>
-    </li>
-  )
-}
-
-type InfoListProps = {
-  children: React.ReactNode
-}
-
-function InfoList({ children }: InfoListProps) {
-  return <ul className="space-y-1">{children}</ul>
-}
-
-type TagListProps = {
-  text: string
-}
-
-/**
- * Ожидаем, что skills / softSkills будут строкой с запятыми
- * или переносами строк. Разбиваем на "теги".
- */
-function TagList({ text }: TagListProps) {
-  const items = text
-    .split(/[,;\n]/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-
-  if (items.length === 0) return null
-
-  return (
-    <div className="flex flex-wrap gap-1">
-      {items.map((item, i) => (
-        <span
-          key={i}
-          className="border border-gray-300 rounded-full px-2 py-[2px] text-[9px] text-gray-800"
-        >
-          {item}
-        </span>
-      ))}
-    </div>
-  )
+export function ResumePrint({ data, locale }: { data: Resume; locale: Locale }) {
+  const key = (data.templateKey as keyof typeof templateMap) || "classic"
+  const Template = templateMap[key] ?? ClassicTemplate
+  return <Template data={data} locale={locale} />
 }
