@@ -25,6 +25,9 @@ const messages = {
     openPdf: "Открыть PDF",
     unauthorized: "Чтобы увидеть свои резюме, войдите в аккаунт.",
     goHome: "На главную",
+    delete: "Удалить",
+    deleting: "Удаление...",
+    confirmDelete: "Точно удалить это резюме? Отменить будет нельзя.",
   },
   en: {
     title: "My resumes",
@@ -38,6 +41,10 @@ const messages = {
     openPdf: "Open PDF",
     unauthorized: "You need to sign in to see your resumes.",
     goHome: "Go to homepage",
+    delete: "Delete",
+    deleting: "Deleting...",
+    confirmDelete:
+      "Are you sure you want to delete this resume? This cannot be undone.",
   },
 } as const
 
@@ -51,6 +58,7 @@ export default function MyResumesPage() {
 
   const [resumes, setResumes] = useState<ResumeListItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === "loading") return
@@ -84,6 +92,37 @@ export default function MyResumesPage() {
 
     load()
   }, [status, session?.user])
+
+  const handleDelete = async (id: string) => {
+    if (!session?.user?.email) return
+
+    const ok = window.confirm(t.confirmDelete)
+    if (!ok) return
+
+    try {
+      setDeletingId(id)
+
+      const res = await fetch(
+        `/api/resumes?id=${encodeURIComponent(
+          id,
+        )}&userEmail=${encodeURIComponent(session.user.email as string)}`,
+        {
+          method: "DELETE",
+        },
+      )
+
+      if (!res.ok) {
+        console.error("Failed to delete resume", await res.text())
+        return
+      }
+
+      setResumes((prev) => prev.filter((r) => r.id !== id))
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   if (status === "loading" || loading) {
     return (
@@ -141,6 +180,8 @@ export default function MyResumesPage() {
                 locale === "ru" ? "ru-RU" : "en-US",
               )
 
+              const isDeleting = deletingId === resume.id
+
               return (
                 <li
                   key={resume.id}
@@ -178,6 +219,15 @@ export default function MyResumesPage() {
                     >
                       {t.openPdf}
                     </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(resume.id)}
+                      disabled={isDeleting}
+                      className="px-2.5 py-1 rounded-full border border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 transition text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {isDeleting ? t.deleting : t.delete}
+                    </button>
                   </div>
                 </li>
               )

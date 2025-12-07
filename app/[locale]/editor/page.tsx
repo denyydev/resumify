@@ -42,7 +42,7 @@ export default function EditorPage() {
 
     const fetchResume = async () => {
       try {
-        const res = await fetch(`/api/resumes/${resumeId}`)
+        const res = await fetch(`/api/resumes?id=${resumeId}`)
         if (!res.ok) {
           console.error("Failed to load resume", await res.text())
           return
