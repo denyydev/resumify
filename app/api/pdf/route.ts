@@ -1,59 +1,48 @@
+// app/api/pdf/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/auth";
+import playwright from "playwright";
 
 export const runtime = "nodejs";
 
-// СОХРАНЕНИЕ РЕЗЮМЕ
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
+    const { id, locale } = await req.json();
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!id || !locale) {
+      return NextResponse.json(
+        { error: "Missing id or locale" },
+        { status: 400 }
+      );
     }
 
-    const { data, locale, title } = await req.json();
+    const url = new URL(req.url);
+    const base = `${url.protocol}//${url.host}`;
+    const target = `${base}/${locale}/print/${id}`;
 
-    const resume = await prisma.resume.create({
-      data: {
-        userEmail: session.user.email,
-        locale: locale ?? "ru",
-        title: title ?? data?.position ?? "",
-        data,
+    console.log("PDF target URL:", target);
+
+    const browser = await playwright.chromium.launch();
+    const page = await browser.newPage();
+
+    await page.goto(target, { waitUntil: "networkidle" });
+
+    const pdf = await page.pdf({
+      format: "A4",
+      printBackground: true,
+    });
+
+    await browser.close();
+
+    return new NextResponse(pdf, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="resume-${id}.pdf"`,
       },
     });
-
-    return NextResponse.json({ id: resume.id });
   } catch (e) {
-    console.error(e);
+    console.error("POST /api/pdf error:", e);
     return NextResponse.json(
-      { error: "Failed to save resume" },
-      { status: 500 }
-    );
-  }
-}
-
-// СПИСОК РЕЗЮМЕ ДЛЯ КОНКРЕТНОГО email
-export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const userEmail = searchParams.get("userEmail");
-
-    if (!userEmail) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const resumes = await prisma.resume.findMany({
-      where: { userEmail },
-      orderBy: { updatedAt: "desc" },
-    });
-
-    return NextResponse.json({ resumes });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json(
-      { error: "Failed to load resumes" },
+      { error: "Failed to generate PDF" },
       { status: 500 }
     );
   }

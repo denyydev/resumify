@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button, Tooltip } from "antd"
 import { DownloadOutlined } from "@ant-design/icons"
+import { useSession } from "next-auth/react"
 import { type Locale } from "@/lib/useCurrentLocale"
 import { useResumeStore } from "@/store/useResumeStore"
 
@@ -13,8 +14,14 @@ type Props = {
 export function DownloadPdfButton({ locale }: Props) {
   const [loading, setLoading] = useState(false)
   const resume = useResumeStore((s) => s.resume)
+  const { data: session } = useSession()
 
   const handleClick = async () => {
+    if (!session?.user?.email) {
+      console.warn("No user email in session, user is not authenticated")
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -22,7 +29,12 @@ export function DownloadPdfButton({ locale }: Props) {
       const saveRes = await fetch("/api/resumes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: resume }),
+        body: JSON.stringify({
+          data: resume,
+          locale,
+          title: resume.position || resume.fullName || "Untitled resume",
+          userEmail: session.user.email, // 👈 ОБЯЗАТЕЛЬНО
+        }),
       })
 
       if (!saveRes.ok) {
@@ -79,6 +91,7 @@ export function DownloadPdfButton({ locale }: Props) {
         size="small"
         icon={<DownloadOutlined />}
         loading={loading}
+        disabled={!session?.user?.email}
         onClick={handleClick}
       >
         {labelByLocale[locale]}

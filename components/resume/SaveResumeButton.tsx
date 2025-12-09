@@ -1,16 +1,30 @@
 "use client"
 
 import { useState } from "react"
-import { Button, message } from "antd"
+import { Button } from "antd"
+import { useSession } from "next-auth/react"
+import { useSearchParams, useRouter, useParams } from "next/navigation"
 import { useResumeStore } from "@/store/useResumeStore"
-import { useCurrentLocale } from "@/lib/useCurrentLocale"
+import type { Locale } from "@/lib/useCurrentLocale"
 
 export function SaveResumeButton() {
-  const [loading, setLoading] = useState(false)
+  const { data: session } = useSession()
   const { resume } = useResumeStore()
-  const locale = useCurrentLocale()
+  const [loading, setLoading] = useState(false)
 
-  const handleSave = async () => {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const params = useParams() as { locale: Locale }
+  const locale: Locale = params?.locale === "en" ? "en" : "ru"
+
+  const existingId = searchParams.get("resumeId")
+
+  const handleClick = async () => {
+    if (!session?.user?.email) {
+      console.warn("No user email in session, user is not authenticated")
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -18,44 +32,52 @@ export function SaveResumeButton() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          locale,
           data: resume,
+          locale,
+          title: resume.position || resume.fullName || "Untitled resume",
+          userEmail: session.user.email, // 👈 ВАЖНО: отправляем email
         }),
       })
 
-      const text = await res.text()
-      let json: any = null
-
-      try {
-        json = text ? JSON.parse(text) : null
-      } catch {
-        // HTML – значит упали до next/_error
-      }
-
       if (!res.ok) {
-        console.error("Save error:", text)
-        const details = json?.message || json?.code || json?.error
-        message.error(
-          details
-            ? `Не удалось сохранить: ${details}`
-            : "Не удалось сохранить резюме (500)"
-        )
+        console.error("Failed to save resume", await res.text())
         return
       }
 
-      message.success("Резюме сохранено")
-      console.log("Saved resume:", json)
+      const json = await res.json()
+      const newId: string = json.id
+
+      // обновляем URL с resumeId, чтобы потом загружать это резюме
+      if (newId && newId !== existingId) {
+        const usp = new URLSearchParams(searchParams.toString())
+        usp.set("resumeId", newId)
+        router.replace(`/${locale}/editor?${usp.toString()}`)
+      }
     } catch (e) {
       console.error(e)
-      message.error("Ошибка при сохранении")
     } finally {
       setLoading(false)
     }
   }
 
+  const label =
+    locale === "ru"
+      ? existingId
+        ? "Сохранить как новое"
+        : "Сохранить резюме"
+      : existingId
+        ? "Save as new"
+        : "Save resume"
+
   return (
-    <Button size="small" onClick={handleSave} loading={loading}>
-      Сохранить
+    <Button
+      type="primary"
+      size="small"
+      loading={loading}
+      disabled={!session?.user?.email}
+      onClick={handleClick}
+    >
+      {label}
     </Button>
   )
 }

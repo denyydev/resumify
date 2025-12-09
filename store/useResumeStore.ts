@@ -94,7 +94,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
   loadResume: (resume) =>
     set(() => ({
       resume: {
-        ...emptyResume, // на всякий случай, чтобы все поля были
+        ...emptyResume,
         ...resume,
       },
     })),

@@ -1,25 +1,27 @@
 // app/api/resumes/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/auth";
 
 export const runtime = "nodejs";
 
-// СОХРАНЕНИЕ РЕЗЮМЕ
+// POST /api/resumes — сохранить резюме
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
-    const { data, locale, title } = body;
+    console.log("POST /api/resumes body:", body); // для отладки
+
+    const { data, locale, title, userEmail } = body;
+
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: "Unauthorized: no userEmail in body" },
+        { status: 401 }
+      );
+    }
 
     const resume = await prisma.resume.create({
       data: {
-        userEmail: session.user.email,
+        userEmail,
         locale: locale ?? "ru",
         title: title ?? data?.position ?? "",
         data,
@@ -36,29 +38,24 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET:
-// - /api/resumes?id=xxx            -> одно резюме
-// - /api/resumes?userEmail=xxx     -> список резюме пользователя
+// GET /api/resumes?userEmail=... — список резюме пользователя
+// GET /api/resumes?id=...        — одно резюме по id
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
     const userEmail = url.searchParams.get("userEmail");
 
-    // 1) Один резюме по id
+    // одно резюме
     if (id) {
-      const resume = await prisma.resume.findUnique({
-        where: { id },
-      });
-
+      const resume = await prisma.resume.findUnique({ where: { id } });
       if (!resume) {
         return NextResponse.json({ error: "Not found" }, { status: 404 });
       }
-
       return NextResponse.json({ resume });
     }
 
-    // 2) Список резюме по email
+    // список
     if (!userEmail) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -78,7 +75,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// DELETE /api/resumes?id=XXX&userEmail=YYY
+// DELETE /api/resumes?id=XXX&userEmail=YYY — удалить резюме
 export async function DELETE(req: NextRequest) {
   try {
     const url = new URL(req.url);
@@ -89,10 +86,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const resume = await prisma.resume.findUnique({
-      where: { id },
-    });
-
+    const resume = await prisma.resume.findUnique({ where: { id } });
     if (!resume) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -101,9 +95,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    await prisma.resume.delete({
-      where: { id },
-    });
+    await prisma.resume.delete({ where: { id } });
 
     return NextResponse.json({ ok: true });
   } catch (e) {
