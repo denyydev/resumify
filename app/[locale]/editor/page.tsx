@@ -36,7 +36,6 @@ export default function EditorPage() {
 
   const loadResume = useResumeStore((s) => s.loadResume)
 
-
   useEffect(() => {
     if (!resumeId) return
 
@@ -65,32 +64,41 @@ export default function EditorPage() {
     fetchResume()
   }, [resumeId, loadResume])
 
-
-
   return (
     <Layout className="min-h-screen bg-slate-100">
-
       <Layout.Content className="py-6">
-        <div className="flex items-center gap-5">
+        <div className="mx-auto max-w-6xl px-6 space-y-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <Title level={4} className="!mb-0">
+                {dict.editorTitle}
+              </Title>
+              <Text type="secondary" className="text-xs">
+                {dict.editorSubtitle}
+              </Text>
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <SaveResumeButton />
-            <LanguageSwitcher currentLocale={locale} />
-</div>
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 lg:flex-row">
-          
-          <div className="w-full lg:w-[52%]">
-            <EditorShell />
+              <DownloadPdfButton locale={locale} />
+              <LanguageSwitcher currentLocale={locale} />
+            </div>
           </div>
 
-          <div className="w-full lg:w-[48%] space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-medium text-slate-600">
-                {dict.previewTitle}
-              </span>
-              <DownloadPdfButton locale={locale} />
+          <div className="flex flex-col gap-6 lg:flex-row">
+            <div className="w-full lg:w-[52%]">
+              <EditorShell />
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:p-6">
-              <ResumePreview />
+            <div className="w-full lg:w-[48%] space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-medium text-slate-600">
+                  {dict.previewTitle}
+                </span>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:p-6">
+                <ResumePreview />
+              </div>
             </div>
           </div>
         </div>

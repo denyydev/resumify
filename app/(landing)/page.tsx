@@ -34,9 +34,13 @@ export default function LandingPage() {
 
   return (
     <>
+          <div className="flex">
+        asdsa
+        <AuthButton/>
+      </div>
       {/* Только фон для лендинга - темный */}
       <div className="fixed inset-0 -z-30 bg-neutral-950" />
-      
+
       {/* Анимированные градиенты */}
       <div className="fixed inset-0 -z-20 overflow-hidden">
         <motion.div 

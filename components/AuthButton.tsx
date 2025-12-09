@@ -32,6 +32,8 @@ export function AuthButton() {
     )
   }
 
+  console.log(session)
+
   const items: MenuProps["items"] = [
     {
       key: "user",
