@@ -9,35 +9,46 @@ import {
   EducationItem,
   LanguageItem,
   TemplateKey,
-  SkillsBlock,
 } from "@/types/resume";
 
 type ResumeState = {
   resume: Resume;
-  techSkills: SkillsBlock;
-  softSkills: SkillsBlock;
+
   setPhoto: (photo?: string) => void;
   loadResume: (resume: Resume) => void;
+  reset: () => void;
+
   setFullName: (fullName: string) => void;
   setPosition: (position: string) => void;
   setContacts: (contacts: Partial<ResumeContacts>) => void;
   setSummary: (summary: string) => void;
-  setSkills: (skills: string) => void;
-  setSoftSkills: (softSkills: string) => void;
+  setTemplateKey: (templateKey: TemplateKey) => void;
+
+  addTechSkillTag: (tag: string) => void;
+  removeTechSkillTag: (tag: string) => void;
+  setTechSkillsTags: (tags: string[]) => void;
+  setTechSkillsNote: (note: string) => void;
+
+  addSoftSkillTag: (tag: string) => void;
+  removeSoftSkillTag: (tag: string) => void;
+  setSoftSkillsTags: (tags: string[]) => void;
+  setSoftSkillsNote: (note: string) => void;
+
   addExperience: () => void;
   updateExperience: (id: string, patch: Partial<ExperienceItem>) => void;
   removeExperience: (id: string) => void;
+
   addProject: () => void;
   updateProject: (id: string, patch: Partial<ProjectItem>) => void;
   removeProject: (id: string) => void;
+
   addEducation: () => void;
   updateEducation: (id: string, patch: Partial<EducationItem>) => void;
   removeEducation: (id: string) => void;
+
   addLanguage: () => void;
   updateLanguage: (id: string, patch: Partial<LanguageItem>) => void;
   removeLanguage: (id: string) => void;
-  reset: () => void;
-  setTemplateKey: (templateKey: TemplateKey) => void;
 };
 
 const generateId = () => Math.random().toString(36).slice(2, 9);
@@ -65,51 +76,27 @@ const emptyResume: Resume = {
   photo: undefined,
 };
 
+function uniq(list: string[]) {
+  return [...new Set(list.map((x) => x.trim()).filter(Boolean))];
+}
+
 export const useResumeStore = create<ResumeState>((set) => ({
   resume: emptyResume,
+
   setPhoto: (photo) =>
     set((state) => ({
-      resume: {
-        ...state.resume,
-        photo,
-      },
-    })),
-  setTechSkillsTags: (tags: string[]) =>
-    set((state) => ({
-      resume: {
-        ...state.resume,
-        techSkills: { ...state.resume.techSkills, tags: [...new Set(tags)] },
-      },
+      resume: { ...state.resume, photo },
     })),
 
-  setTechSkillsNote: (note: string) =>
-    set((state) => ({
-      resume: {
-        ...state.resume,
-        techSkills: { ...state.resume.techSkills, note },
-      },
-    })),
-
-  setSoftSkillsTags: (tags: string[]) =>
-    set((state) => ({
-      resume: {
-        ...state.resume,
-        softSkills: { ...state.resume.softSkills, tags: [...new Set(tags)] },
-      },
-    })),
-
-  setSoftSkillsNote: (note: string) =>
-    set((state) => ({
-      resume: {
-        ...state.resume,
-        softSkills: { ...state.resume.softSkills, note },
-      },
-    })),
   setFullName: (fullName) =>
-    set((state) => ({ resume: { ...state.resume, fullName } })),
+    set((state) => ({
+      resume: { ...state.resume, fullName },
+    })),
 
   setPosition: (position) =>
-    set((state) => ({ resume: { ...state.resume, position } })),
+    set((state) => ({
+      resume: { ...state.resume, position },
+    })),
 
   setContacts: (contacts) =>
     set((state) => ({
@@ -118,28 +105,131 @@ export const useResumeStore = create<ResumeState>((set) => ({
         contacts: { ...state.resume.contacts, ...contacts },
       },
     })),
+
+  setSummary: (summary) =>
+    set((state) => ({
+      resume: { ...state.resume, summary },
+    })),
+
   setTemplateKey: (templateKey) =>
+    set((state) => ({
+      resume: { ...state.resume, templateKey },
+    })),
+
+  loadResume: (resume) =>
+    set(() => {
+      const r = resume as any;
+      return {
+        resume: {
+          ...emptyResume,
+          ...resume,
+          techSkills:
+            resume.techSkills ??
+            ({
+              tags: [],
+              note: typeof r.skills === "string" ? r.skills : "",
+            } as Resume["techSkills"]),
+          softSkills:
+            resume.softSkills ??
+            ({
+              tags: [],
+              note: typeof r.softSkills === "string" ? r.softSkills : "",
+            } as Resume["softSkills"]),
+        },
+      };
+    }),
+
+  reset: () => ({
+    resume: emptyResume,
+  }),
+
+  addTechSkillTag: (tag) =>
+    set((state) => {
+      const value = tag.trim();
+      if (!value) return state;
+      const prev = state.resume.techSkills.tags;
+      if (prev.includes(value)) return state;
+      return {
+        resume: {
+          ...state.resume,
+          techSkills: {
+            ...state.resume.techSkills,
+            tags: [...prev, value],
+          },
+        },
+      };
+    }),
+
+  removeTechSkillTag: (tag) =>
     set((state) => ({
       resume: {
         ...state.resume,
-        templateKey,
+        techSkills: {
+          ...state.resume.techSkills,
+          tags: state.resume.techSkills.tags.filter((t) => t !== tag),
+        },
       },
     })),
-  loadResume: (resume) =>
-    set(() => ({
+
+  setTechSkillsTags: (tags) =>
+    set((state) => ({
       resume: {
-        ...emptyResume,
-        ...resume,
+        ...state.resume,
+        techSkills: { ...state.resume.techSkills, tags: uniq(tags) },
       },
     })),
-  setSummary: (summary) =>
-    set((state) => ({ resume: { ...state.resume, summary } })),
 
-  setSkills: (skills) =>
-    set((state) => ({ resume: { ...state.resume, skills } })),
+  setTechSkillsNote: (note) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        techSkills: { ...state.resume.techSkills, note },
+      },
+    })),
 
-  setSoftSkills: (softSkills) =>
-    set((state) => ({ resume: { ...state.resume, softSkills } })),
+  addSoftSkillTag: (tag) =>
+    set((state) => {
+      const value = tag.trim();
+      if (!value) return state;
+      const prev = state.resume.softSkills.tags;
+      if (prev.includes(value)) return state;
+      return {
+        resume: {
+          ...state.resume,
+          softSkills: {
+            ...state.resume.softSkills,
+            tags: [...prev, value],
+          },
+        },
+      };
+    }),
+
+  removeSoftSkillTag: (tag) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        softSkills: {
+          ...state.resume.softSkills,
+          tags: state.resume.softSkills.tags.filter((t) => t !== tag),
+        },
+      },
+    })),
+
+  setSoftSkillsTags: (tags) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        softSkills: { ...state.resume.softSkills, tags: uniq(tags) },
+      },
+    })),
+
+  setSoftSkillsNote: (note) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        softSkills: { ...state.resume.softSkills, note },
+      },
+    })),
 
   addExperience: () =>
     set((state) => ({
@@ -178,6 +268,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
         experience: state.resume.experience.filter((item) => item.id !== id),
       },
     })),
+
   addProject: () =>
     set((state) => ({
       resume: {
@@ -282,8 +373,4 @@ export const useResumeStore = create<ResumeState>((set) => ({
         languages: state.resume.languages.filter((item) => item.id !== id),
       },
     })),
-
-  reset: () => ({
-    resume: emptyResume,
-  }),
 }));
