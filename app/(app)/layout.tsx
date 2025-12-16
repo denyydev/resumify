@@ -7,6 +7,7 @@ import { AuthButton } from "@/components/AuthButton"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ThemeSwitcher } from "@/components/ThemeSwitcher"
 import { FileText, Edit, FolderOpen } from "lucide-react"
+import { Divider } from "antd"
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname()
@@ -74,10 +75,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                             </Link>
                         </nav>
 
-                        <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block" />
-
+                        <Divider type="vertical"/>
                         <ThemeSwitcher />
+                        <Divider type="vertical"/>
                         <LanguageSwitcher currentLocale={currentLocale} />
+                        <Divider type="vertical"/>
                         <AuthButton />
                     </div>
                 </div>

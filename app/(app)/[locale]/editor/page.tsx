@@ -1,28 +1,30 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useCallback } from "react"
+import Link from "next/link"
 import { useParams, useSearchParams, usePathname, useRouter } from "next/navigation"
+import { Card, Typography, Space, Button, Grid, Flex } from "antd"
+import { EyeOutlined, LeftOutlined } from "@ant-design/icons"
+
+import type { Locale } from "@/lib/useCurrentLocale"
+import { useResumeStore } from "@/store/useResumeStore"
 import { EditorShell } from "@/components/resume/sections/EditorShell"
 import { DownloadPdfButton } from "@/components/resume/DownloadPdfButton"
-import type { Locale } from "@/lib/useCurrentLocale"
 import { SaveResumeButton } from "@/components/resume/SaveResumeButton"
-import { useResumeStore } from "@/store/useResumeStore"
-import { Eye, ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+
+const { Title, Paragraph, Text } = Typography
+const { useBreakpoint } = Grid
 
 const messages = {
   ru: {
     editorTitle: "Конструктор резюме",
-    editorSubtitle: "Заполните секции, чтобы создать профессиональное резюме",
-    previewTitle: "Превью резюме",
+    editorSubtitle: "Заполните секции, чтобы собрать аккуратное и профессиональное резюме.",
     openPreview: "Предпросмотр",
     back: "Назад",
   },
   en: {
     editorTitle: "Resume Builder",
-    editorSubtitle: "Fill in the sections to build a professional resume",
-    previewTitle: "Resume preview",
+    editorSubtitle: "Fill in the sections to build a clean, professional resume.",
     openPreview: "Preview",
     back: "Back",
   },
@@ -32,6 +34,9 @@ export default function EditorPage() {
   const params = useParams<{ locale: Locale }>()
   const locale: Locale = params?.locale === "en" ? "en" : "ru"
   const dict = messages[locale]
+
+  const screens = useBreakpoint()
+  const isMobile = !screens.sm
 
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -47,11 +52,9 @@ export default function EditorPage() {
       try {
         const res = await fetch(`/api/resumes?id=${resumeId}`)
         if (!res.ok) return
-
         const json = await res.json()
         const data = json.resume?.data
         if (!data) return
-
         loadResume(data)
       } catch {
         return
@@ -61,53 +64,46 @@ export default function EditorPage() {
     fetchResume()
   }, [resumeId, loadResume])
 
-  const handleOpenPreview = () => {
-    const basePath = pathname.endsWith("/preview")
-      ? pathname.replace(/\/preview$/, "")
-      : pathname
-
+  const handleOpenPreview = useCallback(() => {
+    const basePath = pathname.endsWith("/preview") ? pathname.replace(/\/preview$/, "") : pathname
     const queryString = searchParams.toString()
     const suffix = queryString ? `?${queryString}` : ""
-
     router.push(`${basePath}/preview${suffix}`)
-  }
+  }, [pathname, router, searchParams])
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-24">
       <div className="p-5">
+        <Card
+          styles={{ body: { padding: isMobile ? 16 : 20 } }}
+          style={{ borderRadius: 16 }}
+        >
+          <Flex justify="space-between" align={isMobile ? "flex-start" : "center"} gap={12} wrap>
+            <Link href={`/${locale}/resumes`} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <LeftOutlined />
+              <Text type="secondary">{dict.back}</Text>
+            </Link>
 
-        {/* Header Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <Link href={`/${locale}/resumes`} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-900 transition-colors">
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            {dict.back}
-          </Link>
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleOpenPreview}
-              className="rounded-full"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              {dict.openPreview}
-            </Button>
-            <DownloadPdfButton locale={locale} />
-            <SaveResumeButton />
+            <Space size={8} wrap>
+              <Button onClick={handleOpenPreview} icon={<EyeOutlined />}>
+                {dict.openPreview}
+              </Button>
+              <DownloadPdfButton locale={locale} />
+              <SaveResumeButton />
+            </Space>
+          </Flex>
+
+          <div style={{ marginTop: 14 }}>
+            <Title level={2} style={{ margin: 0 }}>
+              {dict.editorTitle}
+            </Title>
+            <Paragraph type="secondary" style={{ marginTop: 6, marginBottom: 0, maxWidth: 720 }}>
+              {dict.editorSubtitle}
+            </Paragraph>
           </div>
-        </div>
+        </Card>
 
-        {/* Title Section */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-            {dict.editorTitle}
-          </h1>
-          <p className="text-slate-500 text-lg max-w-2xl">
-            {dict.editorSubtitle}
-          </p>
-        </div>
-
-        <div className="w-full">
+        <div style={{ marginTop: 14 }}>
           <EditorShell />
         </div>
       </div>
