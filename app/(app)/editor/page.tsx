@@ -4,6 +4,7 @@ import { Layout, Typography } from "antd"
 import { EditorShell } from "@/components/resume/sections/EditorShell"
 import { ResumePreview } from "@/components/resume/ResumePreview"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
+import { ResumeDashboard } from "@/components/resume/sections/ResumeDashboard"
 
 const { Title, Text } = Typography
 
@@ -47,6 +48,7 @@ export default function EditorPage({
       <Layout.Content className="py-6">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 lg:flex-row">
           <div className="w-full lg:w-[52%]">
+            <ResumeDashboard/>
             <EditorShell />
           </div>
           <div className="w-full lg:w-[48%]">

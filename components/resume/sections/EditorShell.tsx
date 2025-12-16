@@ -5,6 +5,7 @@ import { ExperienceSection } from "./ExperienceSection"
 import { SkillsSection } from "./SkillsSection"
 import { ProjectsSection } from "./ProjectsSection"
 import { EducationSection } from "./EducationSection"
+import { ResumeDashboard } from "./ResumeDashboard"
 
 
 export function EditorShell() {
@@ -24,12 +25,16 @@ export function EditorShell() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-5">
+<div className="flex flex-col gap-5">
+          <ResumeDashboard/>
+      <div className="grid grid-cols-2 gap-5">
+
         <BasicSection />
         <ExperienceSection />
         <SkillsSection />
         <ProjectsSection />
         <EducationSection />
     </div>
+</div>
   )
 }
