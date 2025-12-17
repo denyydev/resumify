@@ -90,9 +90,7 @@ export default function PreviewPage() {
             </Card>
           </aside>
           <main className="flex-1 min-w-0">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-lg p-6 overflow-auto">
               <ResumePreview />
-            </div>
           </main>
         </div>
       </div>

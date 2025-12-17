@@ -5,6 +5,7 @@ import { useCurrentLocale } from "@/lib/useCurrentLocale"
 import { ResumePrint } from "@/components/resume/ResumePrint"
 import { FileText } from "lucide-react"
 import type { Resume } from "@/types/resume"
+import { Card } from "antd"
 
 const messages = {
   ru: {
@@ -31,29 +32,8 @@ export function ResumePreview() {
     resume.education.length === 0
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="w-full max-w-[794px]">
-        {/* Paper-like container with shadow */}
-        <div className="relative bg-white shadow-2xl rounded-sm overflow-hidden">
-          {/* Paper texture effect */}
-          <div className="absolute inset-0 opacity-[0.02] pointer-events-none" 
-            style={{
-              backgroundImage: `repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                #000 2px,
-                #000 4px
-              )`,
-            }}
-          />
-          
-          {/* Content */}
-          <div className="relative">
-            <ResumePrint data={resume as Resume} locale={locale} />
-          </div>
-        </div>
-
+<div className="flex justify-center"><div>
+  <ResumePrint data={resume as Resume} locale={locale} />
         {isEmpty && (
           <div className="mt-6 border border-slate-200 rounded-xl bg-gradient-to-br from-slate-50 to-white p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
@@ -66,8 +46,6 @@ export function ResumePreview() {
               {t.emptyDescription}
             </p>
           </div>
-        )}
-      </div>
-    </div>
+        )}</div></div>
   )
 }
