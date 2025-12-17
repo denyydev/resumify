@@ -8,7 +8,8 @@ import { ResumePreview } from "@/components/resume/ResumePreview"
 import { TemplateSelector } from "@/components/resume/sections/TemplateSelector"
 import { DownloadPdfButton } from "@/components/resume/DownloadPdfButton"
 import { ArrowLeft } from "lucide-react"
-import { Button } from "antd"
+import { Button, Card, Divider, Typography } from "antd"
+import AccentColorPicker from "@/components/resume/AccentColorPicker"
 
 const messages = {
   ru: {
@@ -82,11 +83,12 @@ export default function PreviewPage() {
       <div className="py-5">
         <div className="flex flex-col lg:flex-row gap-5">
           <aside className="lg:w-80 flex-shrink-0">
-            <div className="sticky top-24 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <Card>
               <TemplateSelector />
-            </div>
+              <Divider/>
+    <AccentColorPicker/>
+            </Card>
           </aside>
-
           <main className="flex-1 min-w-0">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-lg p-6 overflow-auto">
               <ResumePreview />

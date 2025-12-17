@@ -2,10 +2,19 @@
 
 import { formatPeriod, type ResumeTemplateProps } from "./common"
 
-function InitialAvatar({ fullName }: { fullName?: string }) {
+function InitialAvatar({
+  fullName,
+  accentColor,
+}: {
+  fullName?: string
+  accentColor: string
+}) {
   const letter = (fullName || "N").trim().charAt(0).toUpperCase()
   return (
-    <div className="w-20 h-20 rounded-2xl bg-slate-800 flex items-center justify-center text-xl font-semibold border border-white/10">
+    <div
+      className="w-20 h-20 rounded-2xl bg-slate-950 flex items-center justify-center text-xl font-semibold border"
+      style={{ borderColor: `${accentColor}55` }} // полупрозрачный акцент
+    >
       {letter}
     </div>
   )
@@ -26,6 +35,28 @@ function TagPill({ label, tone = "dark" }: { label: string; tone?: "dark" | "lig
   )
 }
 
+function SectionTitle({
+  children,
+  accentColor,
+  tone = "light",
+}: {
+  children: React.ReactNode
+  accentColor: string
+  tone?: "light" | "dark"
+}) {
+  const base =
+    tone === "dark"
+      ? "text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-200"
+      : "text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-700"
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: accentColor }} />
+      <h2 className={base}>{children}</h2>
+    </div>
+  )
+}
+
 export function SidebarTemplate({ data }: ResumeTemplateProps) {
   const {
     fullName,
@@ -39,7 +70,10 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
     education,
     languages,
     photo,
+    accentColor, // ✅ NEW: берём из data (из zustand оно должно попасть в props экспорта/превью)
   } = data
+
+  const accent = accentColor || "#1677ff"
 
   const techTags = techSkills?.tags ?? []
   const techNote = techSkills?.note?.trim() ?? ""
@@ -54,16 +88,23 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
 
   return (
     <div className="w-[794px] min-h-[1123px] bg-white text-slate-900 flex">
-      <aside className="w-[270px] bg-slate-950 text-slate-50 px-6 py-8 flex flex-col gap-6">
+      <aside
+        className="w-[270px] bg-slate-950 text-slate-50 px-6 py-8 flex flex-col gap-6"
+        style={{
+          // лёгкий акцентный бордер слева, чтобы цвет был “в тему”, но не кричал
+          boxShadow: `inset 4px 0 0 0 ${accent}`,
+        }}
+      >
         <div className="flex flex-col items-start gap-4">
           {photo ? (
             <img
               src={photo}
               alt={fullName}
-              className="w-20 h-20 rounded-2xl object-cover border border-white/15"
+              className="w-20 h-20 rounded-2xl object-cover border"
+              style={{ borderColor: `${accent}55` }}
             />
           ) : (
-            <InitialAvatar fullName={fullName} />
+            <InitialAvatar fullName={fullName} accentColor={accent} />
           )}
 
           <div className="space-y-1">
@@ -101,9 +142,9 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
           <section className="space-y-4">
             {hasTech && (
               <div className="space-y-2">
-                <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-200">
+                <SectionTitle accentColor={accent} tone="dark">
                   Skills
-                </h2>
+                </SectionTitle>
 
                 {techTags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
@@ -123,9 +164,9 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
 
             {hasSoft && (
               <div className="space-y-2">
-                <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-200">
+                <SectionTitle accentColor={accent} tone="dark">
                   Soft Skills
-                </h2>
+                </SectionTitle>
 
                 {softTags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
@@ -147,9 +188,9 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
 
         {languages?.length > 0 && (
           <section className="space-y-2">
-            <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-200">
+            <SectionTitle accentColor={accent} tone="dark">
               Languages
-            </h2>
+            </SectionTitle>
             <ul className="space-y-1 text-[11px] text-slate-100">
               {languages.map((l) => (
                 <li key={l.id} className="leading-snug">
@@ -165,18 +206,14 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
       <main className="flex-1 px-9 py-8 space-y-5 text-[11px] leading-snug">
         {summary && (
           <section className="space-y-2 border-b border-slate-200 pb-4">
-            <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-700">
-              Profile
-            </h2>
+            <SectionTitle accentColor={accent}>Profile</SectionTitle>
             <p className="text-slate-800 whitespace-pre-line leading-snug">{summary}</p>
           </section>
         )}
 
         {experience?.length > 0 && (
           <section className="space-y-3">
-            <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-700">
-              Experience
-            </h2>
+            <SectionTitle accentColor={accent}>Experience</SectionTitle>
 
             {experience.map((item) => (
               <div key={item.id} className="space-y-1">
@@ -204,9 +241,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
 
         {projects?.length > 0 && (
           <section className="space-y-3">
-            <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-700">
-              Projects
-            </h2>
+            <SectionTitle accentColor={accent}>Projects</SectionTitle>
 
             {projects.map((p) => (
               <div key={p.id} className="space-y-1">
@@ -216,7 +251,10 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
                     {p.role && <span className="text-slate-600"> · {p.role}</span>}
                   </p>
                   {p.link && (
-                    <p className="text-[10px] text-sky-600 truncate max-w-[220px] text-right">
+                    <p
+                      className="text-[10px] truncate max-w-[220px] text-right"
+                      style={{ color: accent }} // ✅ акцент на ссылке
+                    >
                       {p.link}
                     </p>
                   )}
@@ -236,9 +274,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
 
         {education?.length > 0 && (
           <section className="space-y-3">
-            <h2 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-700">
-              Education
-            </h2>
+            <SectionTitle accentColor={accent}>Education</SectionTitle>
 
             {education.map((e) => (
               <div key={e.id} className="space-y-1">

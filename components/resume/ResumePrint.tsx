@@ -8,7 +8,7 @@ import { mockResume } from "@/lib/mockResume"
 
 export function ResumePrint({ data, locale }: { data: Resume; locale: Locale }) {
   // const key = (data.templateKey as keyof typeof templateMap) ?? "default"
-  const key = "grid"
+  const key = "sidebar"
   const Template = templateMap[key] ?? NeoTemplate
 
   return <Template data={mockResume} locale={locale} />

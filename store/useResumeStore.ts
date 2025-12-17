@@ -24,6 +24,9 @@ type ResumeState = {
   setSummary: (summary: string) => void;
   setTemplateKey: (templateKey: TemplateKey) => void;
 
+  // ✅ NEW
+  setAccentColor: (accentColor: string) => void;
+
   addTechSkillTag: (tag: string) => void;
   removeTechSkillTag: (tag: string) => void;
   setTechSkillsTags: (tags: string[]) => void;
@@ -53,6 +56,9 @@ type ResumeState = {
 
 const generateId = () => Math.random().toString(36).slice(2, 9);
 
+// ✅ NEW: дефолтный акцент (под твои 6 цветов можно взять любой)
+const DEFAULT_ACCENT_COLOR = "#1677ff";
+
 const emptyResume: Resume = {
   fullName: "",
   position: "",
@@ -73,6 +79,8 @@ const emptyResume: Resume = {
   education: [],
   languages: [],
   templateKey: "default",
+  // ✅ NEW
+  accentColor: DEFAULT_ACCENT_COLOR,
   photo: undefined,
 };
 
@@ -116,6 +124,12 @@ export const useResumeStore = create<ResumeState>((set) => ({
       resume: { ...state.resume, templateKey },
     })),
 
+  // ✅ NEW
+  setAccentColor: (accentColor) =>
+    set((state) => ({
+      resume: { ...state.resume, accentColor },
+    })),
+
   loadResume: (resume) =>
     set(() => {
       const r = resume as any;
@@ -123,6 +137,10 @@ export const useResumeStore = create<ResumeState>((set) => ({
         resume: {
           ...emptyResume,
           ...resume,
+
+          // ✅ NEW: если в сохранённом резюме нет accentColor — берем дефолт
+          accentColor: resume.accentColor ?? DEFAULT_ACCENT_COLOR,
+
           techSkills:
             resume.techSkills ??
             ({
