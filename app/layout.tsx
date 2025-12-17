@@ -5,7 +5,7 @@ import { SessionProvider } from "@/components/SessionProvider"
 import { ThemeProvider } from "@/components/ThemeProvider"
 
 export const metadata = {
-  title: "Next resume builder",
+  title: "ResumeCraft",
   description: "Конструктор резюме с PDF-экспортом",
 }
 

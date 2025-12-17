@@ -10,11 +10,19 @@ export function NeoTemplate({ data }: ResumeTemplateProps) {
     summary,
     experience,
     projects,
-    skills,
+    techSkills,
     softSkills,
     education,
     languages,
   } = data
+
+  const techTags = techSkills?.tags ?? []
+  const techNote = techSkills?.note?.trim() ?? ""
+  const softTags = softSkills?.tags ?? []
+  const softNote = softSkills?.note?.trim() ?? ""
+
+  const hasTech = techTags.length > 0 || techNote.length > 0
+  const hasSoft = softTags.length > 0 || softNote.length > 0
 
   return (
     <div className="w-[794px] min-h-[1123px] bg-white text-slate-900 px-10 py-9 flex flex-col gap-6">
@@ -27,6 +35,7 @@ export function NeoTemplate({ data }: ResumeTemplateProps) {
             {position || "Job Title / Position"}
           </p>
         </div>
+
         <div className="text-[11px] text-slate-500 text-right space-y-0.5">
           <div className="flex flex-col gap-0.5">
             {contacts.email && <span>{contacts.email}</span>}
@@ -58,28 +67,26 @@ export function NeoTemplate({ data }: ResumeTemplateProps) {
               <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
                 Experience
               </h2>
+
               {experience.map((item) => (
                 <div key={item.id} className="space-y-0.5">
                   <div className="flex justify-between gap-4">
                     <p className="font-medium text-slate-900">
                       {item.position || "Position"}
-                      {item.company && (
-                        <span className="text-slate-600"> · {item.company}</span>
-                      )}
+                      {item.company && <span className="text-slate-600"> · {item.company}</span>}
                     </p>
                     <p className="text-[10px] text-slate-500 whitespace-nowrap">
                       {formatPeriod(item.startDate, item.endDate, item.isCurrent)}
                     </p>
                   </div>
+
                   {(item.location || item.description) && (
                     <div className="space-y-0.5">
                       {item.location && (
                         <p className="text-[10px] text-slate-500">{item.location}</p>
                       )}
                       {item.description && (
-                        <p className="text-slate-800 whitespace-pre-line">
-                          {item.description}
-                        </p>
+                        <p className="text-slate-800 whitespace-pre-line">{item.description}</p>
                       )}
                     </div>
                   )}
@@ -93,6 +100,7 @@ export function NeoTemplate({ data }: ResumeTemplateProps) {
               <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
                 Projects
               </h2>
+
               {projects.map((p) => (
                 <div key={p.id} className="space-y-0.5">
                   <div className="flex justify-between gap-4">
@@ -106,13 +114,10 @@ export function NeoTemplate({ data }: ResumeTemplateProps) {
                       </p>
                     )}
                   </div>
-                  {p.stack && (
-                    <p className="text-[10px] text-slate-500">{p.stack}</p>
-                  )}
+
+                  {p.stack && <p className="text-[10px] text-slate-500">{p.stack}</p>}
                   {p.description && (
-                    <p className="text-slate-800 whitespace-pre-line">
-                      {p.description}
-                    </p>
+                    <p className="text-slate-800 whitespace-pre-line">{p.description}</p>
                   )}
                 </div>
               ))}
@@ -121,22 +126,51 @@ export function NeoTemplate({ data }: ResumeTemplateProps) {
         </div>
 
         <aside className="space-y-4">
-          {(skills || softSkills) && (
+          {(hasTech || hasSoft) && (
             <section className="space-y-2">
-              {skills && (
+              {hasTech && (
                 <div className="space-y-1.5">
                   <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
                     Skills
                   </h2>
-                  <p className="text-slate-800 whitespace-pre-line">{skills}</p>
+
+                  {techTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {techTags.map((t) => (
+                        <span
+                          key={`tech-${t}`}
+                          className="rounded-full border border-slate-200 px-2 py-0.5 text-[10px] text-slate-700"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {techNote && <p className="text-slate-800 whitespace-pre-line">{techNote}</p>}
                 </div>
               )}
-              {softSkills && (
+
+              {hasSoft && (
                 <div className="space-y-1.5">
                   <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
                     Soft Skills
                   </h2>
-                  <p className="text-slate-800 whitespace-pre-line">{softSkills}</p>
+
+                  {softTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {softTags.map((t) => (
+                        <span
+                          key={`soft-${t}`}
+                          className="rounded-full border border-slate-200 px-2 py-0.5 text-[10px] text-slate-700"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {softNote && <p className="text-slate-800 whitespace-pre-line">{softNote}</p>}
                 </div>
               )}
             </section>
@@ -147,14 +181,11 @@ export function NeoTemplate({ data }: ResumeTemplateProps) {
               <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
                 Education
               </h2>
+
               {education.map((e) => (
                 <div key={e.id} className="space-y-0.5">
-                  <p className="font-medium text-slate-900">
-                    {e.degree || e.field || "Education"}
-                  </p>
-                  {e.institution && (
-                    <p className="text-[10px] text-slate-600">{e.institution}</p>
-                  )}
+                  <p className="font-medium text-slate-900">{e.degree || e.field || "Education"}</p>
+                  {e.institution && <p className="text-[10px] text-slate-600">{e.institution}</p>}
                   {(e.startDate || e.endDate) && (
                     <p className="text-[10px] text-slate-500">
                       {formatPeriod(e.startDate, e.endDate)}

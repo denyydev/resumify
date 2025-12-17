@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "antd"
+import { SaveOutlined, LoadingOutlined } from "@ant-design/icons"
 import { useSession } from "next-auth/react"
 import { useSearchParams, useRouter, useParams } from "next/navigation"
 import { useResumeStore } from "@/store/useResumeStore"
@@ -70,15 +71,12 @@ export function SaveResumeButton() {
 
   return (
     <Button
-      variant="default"
-      size="sm"
-      disabled={!session?.user?.email || loading}
+      type="primary"
       onClick={handleClick}
-      className="rounded-full bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-slate-900/20"
+      disabled={!session?.user?.email}
+      loading={loading}
+      icon={loading ? <LoadingOutlined /> : <SaveOutlined />}
     >
-      {loading ? (
-        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-      ) : null}
       {label}
     </Button>
   )
