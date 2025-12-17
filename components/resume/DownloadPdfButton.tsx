@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "antd"
 import { Download, FileDown } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { type Locale } from "@/lib/useCurrentLocale"
 import { useResumeStore } from "@/store/useResumeStore"
+
 
 type Props = {
   locale: Locale
@@ -73,23 +74,19 @@ export function DownloadPdfButton({ locale }: Props) {
   }
 
   const labelByLocale: Record<Locale, string> = {
-    ru: "PDF",
-    en: "PDF",
+    ru: "Скачать PDF",
+    en: "Download PDF",
   }
 
   return (
     <Button
-      variant="outline"
-      size="sm"
+      type="primary"
       className="rounded-full gap-2 border-slate-200"
       disabled={!session?.user?.email || loading}
       onClick={handleClick}
+      icon={<FileDown className="w-4 h-4" />}
+      loading={loading}
     >
-      {loading ? (
-        <div className="w-3.5 h-3.5 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
-      ) : (
-        <FileDown className="w-4 h-4" />
-      )}
       {labelByLocale[locale]}
     </Button>
   )

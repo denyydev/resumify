@@ -7,8 +7,6 @@ import { useResumeStore } from "@/store/useResumeStore"
 import { ResumePreview } from "@/components/resume/ResumePreview"
 import { TemplateSelector } from "@/components/resume/sections/TemplateSelector"
 import { DownloadPdfButton } from "@/components/resume/DownloadPdfButton"
-import { SaveResumeButton } from "@/components/resume/SaveResumeButton"
-import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "antd"
 
@@ -60,23 +58,19 @@ export default function PreviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen ">
+      <header className="">
+        <div className="px-5">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Button
                 type="primary"
                 onClick={handleBack}
                 className="gap-2"
+                icon={<ArrowLeft className="w-4 h-4" />}
               >
-                <ArrowLeft className="w-4 h-4" />
                 {t.backToEditor}
               </Button>
-              <div className="h-6 w-px bg-slate-200" />
-              <h1 className="text-lg font-semibold text-slate-900">
-                {t.previewTitle}
-              </h1>
             </div>
             <div className="flex items-center gap-2">
               <DownloadPdfButton locale={locale} />
@@ -85,8 +79,8 @@ export default function PreviewPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="py-5">
+        <div className="flex flex-col lg:flex-row gap-5">
           <aside className="lg:w-80 flex-shrink-0">
             <div className="sticky top-24 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <TemplateSelector />
