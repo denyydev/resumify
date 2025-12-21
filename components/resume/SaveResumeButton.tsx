@@ -71,7 +71,7 @@ export function SaveResumeButton() {
 
   return (
     <Button
-      type="primary"
+      type="text"
       onClick={handleClick}
       disabled={!session?.user?.email}
       loading={loading}

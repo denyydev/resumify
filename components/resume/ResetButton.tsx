@@ -59,7 +59,7 @@ export function ResetResumeButton({ className }: ResetResumeButtonProps) {
   return (
     <Button
       danger
-      type="default"
+      type="text"
       icon={<RotateCcw size={16} />}
       className={className}
       onClick={handleClick}

@@ -10,6 +10,9 @@ import {
   EducationItem,
   LanguageItem,
   TemplateKey,
+  EmploymentPreferences,
+  CertificationItem,
+  ActivityItem,
 } from "@/types/resume";
 
 type ResumeState = {
@@ -27,6 +30,18 @@ type ResumeState = {
 
   setAccentColor: (accentColor: string) => void;
   setIncludePhoto: (includePhoto: boolean) => void;
+
+  setEmploymentPreferences: (patch: Partial<EmploymentPreferences>) => void;
+
+  // NEW: Certifications
+  addCertification: () => void;
+  updateCertification: (id: string, patch: Partial<CertificationItem>) => void;
+  removeCertification: (id: string) => void;
+
+  // NEW: Open Source / Volunteering (Activities)
+  addActivity: (type?: ActivityItem["type"]) => void;
+  updateActivity: (id: string, patch: Partial<ActivityItem>) => void;
+  removeActivity: (id: string) => void;
 
   addTechSkillTag: (tag: string) => void;
   removeTechSkillTag: (tag: string) => void;
@@ -58,7 +73,6 @@ type ResumeState = {
 const DEFAULT_ACCENT_COLOR = "#1677ff";
 const DEFAULT_INCLUDE_PHOTO = true;
 
-// ✅ фабрика дефолтного резюме
 const createEmptyResume = (): Resume => ({
   fullName: "",
   position: "",
@@ -78,6 +92,22 @@ const createEmptyResume = (): Resume => ({
   softSkills: { tags: [], note: "" },
   education: [],
   languages: [],
+
+  // NEW: Employment / Work Preferences
+  employmentPreferences: {
+    employmentType: [],
+    workFormat: [],
+    relocation: undefined,
+    timezone: "",
+    workAuthorization: "",
+  },
+
+  // NEW: Certifications
+  certifications: [],
+
+  // NEW: Open Source / Volunteering
+  activities: [],
+
   templateKey: "default",
   accentColor: DEFAULT_ACCENT_COLOR,
   includePhoto: DEFAULT_INCLUDE_PHOTO,
@@ -134,6 +164,18 @@ export const useResumeStore = create<ResumeState>((set) => ({
       resume: { ...state.resume, includePhoto },
     })),
 
+  // NEW: Employment / Work Preferences
+  setEmploymentPreferences: (patch) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        employmentPreferences: {
+          ...state.resume.employmentPreferences,
+          ...patch,
+        },
+      },
+    })),
+
   loadResume: (resume) =>
     set(() => {
       const r = resume as any;
@@ -144,6 +186,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
           ...resume,
           accentColor: resume.accentColor ?? DEFAULT_ACCENT_COLOR,
           includePhoto: (resume as any).includePhoto ?? DEFAULT_INCLUDE_PHOTO,
+
           techSkills:
             resume.techSkills ??
             ({
@@ -156,6 +199,18 @@ export const useResumeStore = create<ResumeState>((set) => ({
               tags: [],
               note: typeof r.softSkills === "string" ? r.softSkills : "",
             } as Resume["softSkills"]),
+
+          // NEW: safe defaults / backward compatibility
+          employmentPreferences:
+            (resume as any).employmentPreferences ??
+            createEmptyResume().employmentPreferences,
+
+          certifications:
+            (resume as any).certifications ??
+            createEmptyResume().certifications,
+
+          activities:
+            (resume as any).activities ?? createEmptyResume().activities,
         },
       };
     }),
@@ -393,6 +448,83 @@ export const useResumeStore = create<ResumeState>((set) => ({
       resume: {
         ...state.resume,
         languages: state.resume.languages.filter((item) => item.id !== id),
+      },
+    })),
+
+  // NEW: Certifications
+  addCertification: () =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        certifications: [
+          ...(state.resume.certifications ?? []),
+          {
+            id: nanoid(),
+            name: "",
+            issuer: "",
+            year: "",
+            link: "",
+          },
+        ],
+      },
+    })),
+
+  updateCertification: (id, patch) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        certifications: (state.resume.certifications ?? []).map((item) =>
+          item.id === id ? { ...item, ...patch } : item
+        ),
+      },
+    })),
+
+  removeCertification: (id) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        certifications: (state.resume.certifications ?? []).filter(
+          (item) => item.id !== id
+        ),
+      },
+    })),
+
+  // NEW: Open Source / Volunteering (Activities)
+  addActivity: (type = "open-source") =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        activities: [
+          ...(state.resume.activities ?? []),
+          {
+            id: nanoid(),
+            type,
+            name: "",
+            role: "",
+            description: "",
+            link: "",
+          },
+        ],
+      },
+    })),
+
+  updateActivity: (id, patch) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        activities: (state.resume.activities ?? []).map((item) =>
+          item.id === id ? { ...item, ...patch } : item
+        ),
+      },
+    })),
+
+  removeActivity: (id) =>
+    set((state) => ({
+      resume: {
+        ...state.resume,
+        activities: (state.resume.activities ?? []).filter(
+          (item) => item.id !== id
+        ),
       },
     })),
 }));

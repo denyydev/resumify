@@ -127,16 +127,6 @@ export function BasicContactsSection({ t }: { t: LocaleMessages }) {
           onChange={(e) => setSummary(e.target.value.slice(0, 300))}
         />
       </Form.Item>
-
-      <div className="mt-2 grid grid-cols-1 gap-3">
-        <Button type="default" icon={<RotateCcw size={16} />} onClick={() => reset()} className="w-full">
-          {t.reset}
-        </Button>
-
-        <Button type="primary" icon={<ArrowRight size={16} />} iconPlacement="end" className="w-full">
-          {t.next}
-        </Button>
-      </div>
     </Form>
     </Card>
   )
