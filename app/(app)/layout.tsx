@@ -75,11 +75,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                             </Link>
                         </nav>
 
-                        <Divider type="vertical"/>
+                        <Divider orientation="vertical"/>
                         <ThemeSwitcher />
-                        <Divider type="vertical"/>
+                        <Divider orientation="vertical"/>
                         <LanguageSwitcher currentLocale={currentLocale} />
-                        <Divider type="vertical"/>
+                        <Divider orientation="vertical"/>
                         <AuthButton />
                     </div>
                 </div>

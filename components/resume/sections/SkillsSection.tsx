@@ -121,7 +121,7 @@ const available = useMemo(() => {
 
       <Divider style={{ margin: "12px 0" }} />
 
-      <Space direction="vertical" size={12} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={12} style={{ width: "100%" }}>
         {tags.length > 0 && (
           <Flex wrap gap={8}>
             <AnimatePresence initial={false}>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { ArrowRight, Sparkles, Zap, CheckCircle2, Palette, Globe } from "lucide-react"
 import { fadeInUp, staggerContainer } from "./landing.motion"
 import { heroBadges, heroHighlights } from "./landing.constants"
+import { signIn } from "next-auth/react"
 
 function Badge({ tone, children }: { tone: "cyan" | "emerald" | "purple" | "blue"; children: React.ReactNode }) {
   const map = {
@@ -49,22 +50,15 @@ export default function HeroSection() {
 
           <motion.div className="flex flex-wrap items-center gap-4" variants={fadeInUp} transition={{ delay: 0.1 }}>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/api/auth/signin"
-                className="group relative flex items-center gap-3 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25 lg:text-lg"
-              >
-                <span className="relative">Начать бесплатно</span>
-                <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </motion.div>
+<button
+  type="button"
+  onClick={() => signIn("google", { callbackUrl: "/ru/editor" })}
+  className="group relative flex items-center gap-3 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25 lg:text-lg cursor-pointer"
+>
+  <span className="relative">Начать бесплатно</span>
+  <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" />
+</button>
 
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/editor"
-                className="rounded-full border border-white/20 bg-white/5 px-6 py-4 text-base font-medium text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10 lg:text-lg"
-              >
-                Открыть редактор
-              </Link>
             </motion.div>
           </motion.div>
 

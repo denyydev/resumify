@@ -115,7 +115,7 @@ export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
               )}
             </div>
 
-            <Space direction="vertical" size={2} align="center">
+            <Space orientation="vertical" size={2} align="center">
               <Text>{t.dragDrop}</Text>
               <Text type="secondary">{t.photoSubtitle}</Text>
             </Space>
