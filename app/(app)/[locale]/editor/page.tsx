@@ -11,6 +11,8 @@ import { useResumeStore } from "@/store/useResumeStore"
 import { EditorShell } from "@/components/resume/sections/EditorShell"
 import { DownloadPdfButton } from "@/components/resume/DownloadPdfButton"
 import { SaveResumeButton } from "@/components/resume/SaveResumeButton"
+import { ResumeDashboard } from "@/components/resume/sections/ResumeDashboard"
+import { ResetResumeButton } from "@/components/resume/ResetButton"
 
 const { Title, Paragraph, Text } = Typography
 const { useBreakpoint } = Grid
@@ -73,26 +75,13 @@ export default function EditorPage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-24">
-      <div className="p-5">
+      <div className="p-5 flex flex-col gap-5">
         <Card
           styles={{ body: { padding: isMobile ? 16 : 20 } }}
           style={{ borderRadius: 16 }}
         >
           <Flex justify="space-between" align={isMobile ? "flex-start" : "center"} gap={12} wrap>
-            <Link href={`/${locale}/resumes`} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-              <LeftOutlined />
-              <Text type="secondary">{dict.back}</Text>
-            </Link>
-
-            <Space size={8} wrap>
-              <Button onClick={handleOpenPreview} icon={<EyeOutlined />}>
-                {dict.openPreview}
-              </Button>
-              <SaveResumeButton />
-            </Space>
-          </Flex>
-
-          <div style={{ marginTop: 14 }}>
+          <div >
             <Title level={2} style={{ margin: 0 }}>
               {dict.editorTitle}
             </Title>
@@ -100,11 +89,17 @@ export default function EditorPage() {
               {dict.editorSubtitle}
             </Paragraph>
           </div>
+            <Space size={8} wrap>
+              <Button onClick={handleOpenPreview} icon={<EyeOutlined />}>
+                {dict.openPreview}
+              </Button>
+              <SaveResumeButton />
+              <ResetResumeButton/>
+            </Space>
+          </Flex>
         </Card>
-
-        <div style={{ marginTop: 14 }}>
-          <EditorShell />
-        </div>
+        <ResumeDashboard/>
+        <EditorShell />
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { nanoid } from "nanoid";
 import {
   Resume,
   ResumeContacts,
@@ -25,8 +26,6 @@ type ResumeState = {
   setTemplateKey: (templateKey: TemplateKey) => void;
 
   setAccentColor: (accentColor: string) => void;
-
-  // ✅ NEW
   setIncludePhoto: (includePhoto: boolean) => void;
 
   addTechSkillTag: (tag: string) => void;
@@ -56,13 +55,11 @@ type ResumeState = {
   removeLanguage: (id: string) => void;
 };
 
-const generateId = () => Math.random().toString(36).slice(2, 9);
-
 const DEFAULT_ACCENT_COLOR = "#1677ff";
-// ✅ NEW
 const DEFAULT_INCLUDE_PHOTO = true;
 
-const emptyResume: Resume = {
+// ✅ фабрика дефолтного резюме
+const createEmptyResume = (): Resume => ({
   fullName: "",
   position: "",
   contacts: {
@@ -83,19 +80,16 @@ const emptyResume: Resume = {
   languages: [],
   templateKey: "default",
   accentColor: DEFAULT_ACCENT_COLOR,
-
-  // ✅ NEW
   includePhoto: DEFAULT_INCLUDE_PHOTO,
-
   photo: undefined,
-};
+});
 
 function uniq(list: string[]) {
   return [...new Set(list.map((x) => x.trim()).filter(Boolean))];
 }
 
 export const useResumeStore = create<ResumeState>((set) => ({
-  resume: emptyResume,
+  resume: createEmptyResume(),
 
   setPhoto: (photo) =>
     set((state) => ({
@@ -135,7 +129,6 @@ export const useResumeStore = create<ResumeState>((set) => ({
       resume: { ...state.resume, accentColor },
     })),
 
-  // ✅ NEW
   setIncludePhoto: (includePhoto) =>
     set((state) => ({
       resume: { ...state.resume, includePhoto },
@@ -144,16 +137,13 @@ export const useResumeStore = create<ResumeState>((set) => ({
   loadResume: (resume) =>
     set(() => {
       const r = resume as any;
+
       return {
         resume: {
-          ...emptyResume,
+          ...createEmptyResume(),
           ...resume,
-
           accentColor: resume.accentColor ?? DEFAULT_ACCENT_COLOR,
-
-          // ✅ NEW: миграция (если поля нет в сохранёнке)
           includePhoto: (resume as any).includePhoto ?? DEFAULT_INCLUDE_PHOTO,
-
           techSkills:
             resume.techSkills ??
             ({
@@ -170,11 +160,11 @@ export const useResumeStore = create<ResumeState>((set) => ({
       };
     }),
 
-  reset: () => ({
-    resume: emptyResume,
-  }),
+  reset: () =>
+    set(() => ({
+      resume: createEmptyResume(),
+    })),
 
-  // ... остальной код без изменений
   addTechSkillTag: (tag) =>
     set((state) => {
       const value = tag.trim();
@@ -270,7 +260,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
         experience: [
           ...state.resume.experience,
           {
-            id: generateId(),
+            id: nanoid(),
             company: "",
             position: "",
             location: "",
@@ -308,7 +298,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
         projects: [
           ...state.resume.projects,
           {
-            id: generateId(),
+            id: nanoid(),
             name: "",
             role: "",
             stack: "",
@@ -344,7 +334,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
         education: [
           ...state.resume.education,
           {
-            id: generateId(),
+            id: nanoid(),
             institution: "",
             degree: "",
             field: "",
@@ -380,7 +370,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
         languages: [
           ...state.resume.languages,
           {
-            id: generateId(),
+            id: nanoid(),
             name: "",
             level: "",
           },

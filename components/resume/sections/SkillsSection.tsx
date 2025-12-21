@@ -210,7 +210,7 @@ export function SkillsSection() {
   )
 
   return (
-<>        <Space direction="vertical" size={14} style={{ width: "100%" }}>
+<>        <Space orientation="vertical" size={14} style={{ width: "100%" }}>
           <SkillsBlock
             kind="tech"
             title="HARD SKILLS"

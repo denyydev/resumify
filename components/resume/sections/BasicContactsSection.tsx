@@ -133,7 +133,7 @@ export function BasicContactsSection({ t }: { t: LocaleMessages }) {
           {t.reset}
         </Button>
 
-        <Button type="primary" icon={<ArrowRight size={16} />} iconPosition="end" className="w-full">
+        <Button type="primary" icon={<ArrowRight size={16} />} iconPlacement="end" className="w-full">
           {t.next}
         </Button>
       </div>

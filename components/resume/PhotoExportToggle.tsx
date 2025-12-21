@@ -45,8 +45,6 @@ export function PhotoExportToggle({ className }: { className?: string }) {
         <Switch
           checked={checked}
           onChange={(v) => setIncludePhoto(v)}
-          checkedChildren={<ImageIcon className="w-3.5 h-3.5" />}
-          unCheckedChildren={<ImageOff className="w-3.5 h-3.5" />}
         />
       </Tooltip>
     </div>

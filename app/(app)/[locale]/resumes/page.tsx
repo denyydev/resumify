@@ -196,8 +196,11 @@ export default function MyResumesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
-      <div className="mx-auto py-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div className="flex flex-col gap-5 py-5">
+
+        <Card>
+
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <Typography.Title level={2} style={{ marginBottom: 6 }}>
               {t.title}
@@ -213,8 +216,9 @@ export default function MyResumesPage() {
             </Button>
           </Link>
         </div>
-
-        <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      </Card>
+      <div>
+                <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="w-full md:max-w-md">
             <Input
               size="large"
@@ -238,6 +242,8 @@ export default function MyResumesPage() {
             />
           )}
         </div>
+
+
 
         <AnimatePresence mode="popLayout">
           {filteredResumes.length === 0 ? (
@@ -342,6 +348,7 @@ export default function MyResumesPage() {
           )}
         </AnimatePresence>
       </div>
+    </div>
     </div>
   )
 }

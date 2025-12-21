@@ -26,9 +26,7 @@ export function EditorShell() {
 
   return (
 <div className="flex flex-col gap-5">
-          <ResumeDashboard/>
       <div className="grid grid-cols-2 gap-5">
-
         <BasicSection />
         <ExperienceSection />
         <SkillsSection />
