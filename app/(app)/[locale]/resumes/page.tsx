@@ -8,7 +8,21 @@ import { Search, FileText, Trash2, Plus, Clock, File } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import type { ResumeData } from "@/types/resume"
 import { ResumePreviewThumb } from "@/components/resume/ResumePreviewThumb"
-import { Button, Card, Empty, Input, Modal, Result, Spin, Typography, Tooltip, Row, Col, Space } from "antd"
+import {
+  Button,
+  Card,
+  Empty,
+  Input,
+  Modal,
+  Result,
+  Spin,
+  Typography,
+  Tooltip,
+  Row,
+  Col,
+  Space,
+  Pagination,
+} from "antd"
 
 type ResumeListItem = {
   id: string
@@ -69,6 +83,9 @@ export default function MyResumesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [search, setSearch] = useState("")
 
+  const pageSize = 4
+  const [page, setPage] = useState(1)
+
   useEffect(() => {
     if (status === "loading") return
 
@@ -79,9 +96,7 @@ export default function MyResumesPage() {
 
     const load = async () => {
       try {
-        const res = await fetch(
-          `/api/resumes?userEmail=${encodeURIComponent(session.user!.email as string)}`,
-        )
+        const res = await fetch(`/api/resumes?userEmail=${encodeURIComponent(session.user!.email as string)}`)
         if (!res.ok) {
           console.error("Failed to load resumes", await res.text())
           return
@@ -114,9 +129,7 @@ export default function MyResumesPage() {
         try {
           setDeletingId(id)
           const res = await fetch(
-            `/api/resumes?id=${encodeURIComponent(id)}&userEmail=${encodeURIComponent(
-              session.user!.email as string,
-            )}`,
+            `/api/resumes?id=${encodeURIComponent(id)}&userEmail=${encodeURIComponent(session.user!.email as string)}`,
             { method: "DELETE" },
           )
           if (!res.ok) {
@@ -142,6 +155,20 @@ export default function MyResumesPage() {
       return fullName.includes(q) || position.includes(q)
     })
   }, [resumes, search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [search])
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredResumes.length / pageSize))
+    if (page > maxPage) setPage(maxPage)
+  }, [filteredResumes.length, page])
+
+  const paginatedResumes = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return filteredResumes.slice(start, start + pageSize)
+  }, [filteredResumes, page])
 
   if (status === "loading" || loading) {
     return (
@@ -187,25 +214,34 @@ export default function MyResumesPage() {
           </Link>
         </div>
 
-        <div className="mb-7 max-w-md">
-          <Input
-            size="large"
-            allowClear
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t.searchPlaceholder}
-            prefix={<Search className="w-4 h-4 text-slate-400" />}
-            className="rounded-2xl"
-          />
+        <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="w-full md:max-w-md">
+            <Input
+              size="large"
+              allowClear
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t.searchPlaceholder}
+              prefix={<Search className="w-4 h-4 text-slate-400" />}
+              className="rounded-2xl"
+            />
+          </div>
+
+          {filteredResumes.length > pageSize && (
+            <Pagination
+              current={page}
+              pageSize={pageSize}
+              total={filteredResumes.length}
+              showSizeChanger={false}
+              onChange={(p) => setPage(p)}
+
+            />
+          )}
         </div>
 
         <AnimatePresence mode="popLayout">
           {filteredResumes.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}>
               <Card className="rounded-3xl" styles={{ body: { padding: 28 } }}>
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -227,15 +263,16 @@ export default function MyResumesPage() {
           ) : (
             <motion.div layout>
               <Row gutter={[16, 16]}>
-                {filteredResumes.map((resume, index) => {
+                {paginatedResumes.map((resume, index) => {
                   const data = (resume.data || {}) as any
                   const title = data.fullName || t.newResume
                   const subtitle = data.position || t.noPosition
 
-                  const date = new Date(resume.updatedAt).toLocaleDateString(
-                    locale === "ru" ? "ru-RU" : "en-US",
-                    { month: "short", day: "numeric", year: "numeric" },
-                  )
+                  const date = new Date(resume.updatedAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
 
                   const isDeleting = deletingId === resume.id
 
@@ -248,55 +285,54 @@ export default function MyResumesPage() {
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="h-full"
                       >
-                       <Card
-  hoverable
-  className="group relative h-full rounded-2xl border border-slate-200/70"
-  styles={{ body: { padding: 14 } }}
->
-  <Link href={`/${locale}/editor?resumeId=${resume.id}`} className="block">
-    <div className="relative">
-      <ResumePreviewThumb data={data} locale={locale} className="mb-3" />
-    </div>
+                        <Card
+                          hoverable
+                          className="group relative h-full rounded-2xl border border-slate-200/70"
+                          styles={{ body: { padding: 14 } }}
+                        >
+                          <Link href={`/${locale}/editor?resumeId=${resume.id}`} className="block">
+                            <div className="relative">
+                              <ResumePreviewThumb data={data} locale={locale} className="mb-3" />
+                            </div>
 
-    <div className="px-1">
-      <Typography.Text strong className="block" style={{ fontSize: 16 }}>
-        <span className="line-clamp-1">{title}</span>
-      </Typography.Text>
-      <Typography.Text type="secondary" className="block" style={{ fontSize: 13 }}>
-        <span className="line-clamp-2">{subtitle}</span>
-      </Typography.Text>
-    </div>
-  </Link>
+                            <div className="px-1">
+                              <Typography.Text strong className="block" style={{ fontSize: 16 }}>
+                                <span className="line-clamp-1">{title}</span>
+                              </Typography.Text>
+                              <Typography.Text type="secondary" className="block" style={{ fontSize: 13 }}>
+                                <span className="line-clamp-2">{subtitle}</span>
+                              </Typography.Text>
+                            </div>
+                          </Link>
 
-  <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between px-1">
-    <Space size={6} className="text-slate-400">
-      <Clock className="w-3.5 h-3.5" />
-      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-        {date}
-      </Typography.Text>
-    </Space>
+                          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between px-1">
+                            <Space size={6} className="text-slate-400">
+                              <Clock className="w-3.5 h-3.5" />
+                              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                                {date}
+                              </Typography.Text>
+                            </Space>
 
-    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-      <Tooltip title={t.openPdf}>
-        <Link href={`/${locale}/print/${resume.id}`} target="_blank">
-          <Button type="text" shape="circle" icon={<File className="w-4 h-4" />} />
-        </Link>
-      </Tooltip>
+                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <Tooltip title={t.openPdf}>
+                                <Link href={`/${locale}/print/${resume.id}`} target="_blank">
+                                  <Button type="text" shape="circle" icon={<File className="w-4 h-4" />} />
+                                </Link>
+                              </Tooltip>
 
-      <Tooltip title={t.delete}>
-        <Button
-          type="text"
-          danger
-          shape="circle"
-          loading={isDeleting}
-          onClick={(e) => handleDelete(resume.id, e)}
-          icon={!isDeleting ? <Trash2 className="w-4 h-4" /> : undefined}
-        />
-      </Tooltip>
-    </div>
-  </div>
-</Card>
-
+                              <Tooltip title={t.delete}>
+                                <Button
+                                  type="text"
+                                  danger
+                                  shape="circle"
+                                  loading={isDeleting}
+                                  onClick={(e) => handleDelete(resume.id, e)}
+                                  icon={!isDeleting ? <Trash2 className="w-4 h-4" /> : undefined}
+                                />
+                              </Tooltip>
+                            </div>
+                          </div>
+                        </Card>
                       </motion.div>
                     </Col>
                   )
