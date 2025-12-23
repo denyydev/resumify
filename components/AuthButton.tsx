@@ -75,7 +75,7 @@ export function AuthButton() {
 <Dropdown
   trigger={["click"]}
   placement="bottomRight"
-  dropdownRender={(menu) => (
+  popupRender={(menu) => (
     <div className="!bg-white/95 dark:!bg-slate-800/95 !backdrop-blur-xl !border !border-slate-200/60 dark:!border-slate-700/60 !rounded-xl !p-1.5 !shadow-xl !shadow-slate-200/20 dark:!shadow-slate-900/50">
       <div className="flex items-center gap-3 px-3 py-2 min-w-[200px] select-none cursor-default">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden shrink-0">
