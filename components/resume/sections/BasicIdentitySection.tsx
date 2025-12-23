@@ -1,77 +1,89 @@
-"use client"
+"use client";
 
-import { useMemo, useRef, useState } from "react"
-import { User, Camera, Trash2 } from "lucide-react"
-import { Upload, Button, Typography, message, Space, Input, Form, Card } from "antd"
-import type { UploadProps } from "antd"
-import { useResumeStore } from "@/store/useResumeStore"
+import { useResumeStore } from "@/store/useResumeStore";
+import type { UploadProps } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  message,
+  Space,
+  Typography,
+  Upload,
+} from "antd";
+import { Camera, Trash2, User } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 
-const { Text } = Typography
+const { Text } = Typography;
 
 type LocaleMessages = {
-  lastName: string
-  firstName: string
-  patronymic: string
-  lastNamePlaceholder: string
-  firstNamePlaceholder: string
-  patronymicPlaceholder: string
-  photo: string
-  photoSubtitle: string
-  removePhoto: string
-  dragDrop: string
-  errorSize: string
-  errorType: string
-}
+  lastName: string;
+  firstName: string;
+  patronymic: string;
+  lastNamePlaceholder: string;
+  firstNamePlaceholder: string;
+  patronymicPlaceholder: string;
+  photo: string;
+  photoSubtitle: string;
+  removePhoto: string;
+  dragDrop: string;
+  errorSize: string;
+  errorType: string;
+};
 
 function splitFullName(fullName: string) {
-  const parts = fullName.trim().split(/\s+/).filter(Boolean)
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
   return {
     lastName: parts[0] ?? "",
     firstName: parts[1] ?? "",
-    patronymic: parts.slice(2).join(" ") ?? ""
-  }
+    patronymic: parts.slice(2).join(" ") ?? "",
+  };
 }
 
 function joinFullName(lastName: string, firstName: string, patronymic: string) {
-  return [lastName, firstName, patronymic].map((s) => s.trim()).filter(Boolean).join(" ")
+  return [lastName, firstName, patronymic]
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(" ");
 }
 
 export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
-  const [msgApi, contextHolder] = message.useMessage()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [isHoverPhoto, setIsHoverPhoto] = useState(false)
+  const [msgApi, contextHolder] = message.useMessage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isHoverPhoto, setIsHoverPhoto] = useState(false);
 
-  const { resume, setFullName, setPhoto } = useResumeStore()
+  const { resume, setFullName, setPhoto } = useResumeStore();
 
-  const name = useMemo(() => splitFullName(resume.fullName), [resume.fullName])
+  const name = useMemo(() => splitFullName(resume.fullName), [resume.fullName]);
 
   const beforeUpload: UploadProps["beforeUpload"] = (file) => {
-    const isImage = file.type.startsWith("image/")
+    const isImage = file.type.startsWith("image/");
     if (!isImage) {
-      msgApi.error(t.errorType)
-      return Upload.LIST_IGNORE
+      msgApi.error(t.errorType);
+      return Upload.LIST_IGNORE;
     }
 
-    const isLt5M = file.size < 5 * 1024 * 1024
+    const isLt5M = file.size < 5 * 1024 * 1024;
     if (!isLt5M) {
-      msgApi.error(t.errorSize)
-      return Upload.LIST_IGNORE
+      msgApi.error(t.errorSize);
+      return Upload.LIST_IGNORE;
     }
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (e) => {
-      const result = e.target?.result
-      if (typeof result === "string") setPhoto(result)
-    }
-    reader.readAsDataURL(file)
+      const result = e.target?.result;
+      if (typeof result === "string") setPhoto(result);
+    };
+    reader.readAsDataURL(file);
 
-    return Upload.LIST_IGNORE
-  }
+    return Upload.LIST_IGNORE;
+  };
 
   const setPart = (patch: Partial<typeof name>) => {
-    const next = { ...name, ...patch }
-    setFullName(joinFullName(next.lastName, next.firstName, next.patronymic))
-  }
+    const next = { ...name, ...patch };
+    setFullName(joinFullName(next.lastName, next.firstName, next.patronymic));
+  };
 
   return (
     <Card>
@@ -107,7 +119,7 @@ export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
                 <div
                   className={[
                     "pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl",
-                    isHoverPhoto ? "bg-black/40 opacity-100" : "opacity-0"
+                    isHoverPhoto ? "bg-black/40 opacity-100" : "opacity-0",
                   ].join(" ")}
                 >
                   <Camera className="text-white" />
@@ -138,7 +150,6 @@ export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
       <Form layout="vertical" colon={false} className="grid grid-cols-1 gap-4">
         <Form.Item label={t.lastName} style={{ marginBottom: 0 }}>
           <Input
-            size="large"
             prefix={<User size={16} />}
             placeholder={t.lastNamePlaceholder}
             value={name.lastName}
@@ -148,7 +159,6 @@ export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
 
         <Form.Item label={t.firstName} style={{ marginBottom: 0 }}>
           <Input
-            size="large"
             prefix={<User size={16} />}
             placeholder={t.firstNamePlaceholder}
             value={name.firstName}
@@ -158,7 +168,6 @@ export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
 
         <Form.Item label={t.patronymic} style={{ marginBottom: 0 }}>
           <Input
-            size="large"
             prefix={<User size={16} />}
             placeholder={t.patronymicPlaceholder}
             value={name.patronymic}
@@ -167,5 +176,5 @@ export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
         </Form.Item>
       </Form>
     </Card>
-  )
+  );
 }

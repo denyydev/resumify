@@ -2,16 +2,9 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 
-
 export function ResumeForm() {
-  const {
-    resume,
-    setFullName,
-    setPosition,
-    setContacts,
-    setSummary,
-    reset,
-  } = useResumeStore();
+  const { resume, setFullName, setPosition, setContacts, setSummary, reset } =
+    useResumeStore();
 
   return (
     <div className="space-y-6">
@@ -25,7 +18,6 @@ export function ResumeForm() {
       </div>
 
       <div className="space-y-4">
-
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-slate-700">
             Полное имя
@@ -38,7 +30,6 @@ export function ResumeForm() {
           />
         </div>
 
- 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-slate-700">
             Желаемая позиция
@@ -51,12 +42,9 @@ export function ResumeForm() {
           />
         </div>
 
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">
-              Email
-            </label>
+            <label className="text-sm font-medium text-slate-700">Email</label>
             <input
               className="w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-slate-900/10"
               placeholder="you@example.com"
@@ -84,9 +72,7 @@ export function ResumeForm() {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">
-              Город
-            </label>
+            <label className="text-sm font-medium text-slate-700">Город</label>
             <input
               className="w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-slate-900/10"
               placeholder="Москва / Санкт-Петербург / Remote"
@@ -115,7 +101,6 @@ export function ResumeForm() {
           </div>
         </div>
 
- 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-slate-700">
             Краткое резюме (summary)
@@ -137,8 +122,6 @@ export function ResumeForm() {
         >
           Сбросить
         </button>
-
-
       </div>
     </div>
   );

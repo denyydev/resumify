@@ -1,26 +1,27 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
-import { useParams, useSearchParams, usePathname, useRouter } from "next/navigation";
-import { Grid, Button, Flex, Divider } from "antd";
-import { EyeOutlined } from "@ant-design/icons";
+import { Grid } from "antd";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import { useCallback, useEffect, useMemo } from "react";
 
+import { EditorBottomBar } from "@/components/editor/EditorBottomBar";
+import { ResetResumeButton } from "@/components/resume/ResetButton";
+import { SaveResumeButton } from "@/components/resume/SaveResumeButton";
+import { EditorShell } from "@/components/resume/sections/EditorShell";
+import { ResumeDashboard } from "@/components/resume/sections/ResumeDashboard";
 import type { Locale } from "@/lib/useCurrentLocale";
 import { useResumeStore } from "@/store/useResumeStore";
-import { EditorShell } from "@/components/resume/sections/EditorShell";
-import { SaveResumeButton } from "@/components/resume/SaveResumeButton";
-import { ResumeDashboard } from "@/components/resume/sections/ResumeDashboard";
-import { ResetResumeButton } from "@/components/resume/ResetButton";
 
 const { useBreakpoint } = Grid;
 
 const messages = {
-  ru: {
-    openPreview: "Предпросмотр",
-  },
-  en: {
-    openPreview: "Preview",
-  },
+  ru: { openPreview: "Предпросмотр" },
+  en: { openPreview: "Preview" },
 } as const;
 
 export default function EditorPage() {
@@ -29,7 +30,7 @@ export default function EditorPage() {
   const dict = messages[locale];
 
   const screens = useBreakpoint();
-  const isMobile = !screens.sm;
+  const isMobile = useMemo(() => !screens.sm, [screens.sm]);
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -68,27 +69,22 @@ export default function EditorPage() {
   }, [pathname, router, searchParams]);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-28">
-      <div className="p-5 flex flex-col gap-5">
+    <div className="min-h-screen bg-bg pb-24">
+      <div className="flex flex-col gap-5 p-5">
         <ResumeDashboard />
         <EditorShell />
       </div>
 
-      <div
-        className="fixed left-0 right-0 bottom-0 z-50 shadow-lg bg-white/90 backdrop-blur"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-      >
-<div className="flex py-2 justify-between max-w-[1440px] mx-auto">
-                <Button type="text" onClick={handleOpenPreview} icon={<EyeOutlined />}>
-                {dict.openPreview}
-              </Button>
-<div>
-                <SaveResumeButton />
-              <Divider orientation="vertical"/>
-              <ResetResumeButton  />
-</div>
-</div>
-      </div>
+      <EditorBottomBar
+        previewLabel={dict.openPreview}
+        onOpenPreview={handleOpenPreview}
+        actions={
+          <>
+            <SaveResumeButton />
+            <ResetResumeButton />
+          </>
+        }
+      />
     </div>
   );
 }
