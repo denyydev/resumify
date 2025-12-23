@@ -73,6 +73,7 @@ export function CertificationsSection() {
       }
       extra={
         <Button
+          size="small"
           type="primary"
           icon={<PlusOutlined />}
           onClick={addCertification}

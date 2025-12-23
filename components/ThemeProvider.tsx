@@ -11,7 +11,6 @@ const commonTokens = {
   borderRadiusLG: 20,
   borderRadiusSM: 10,
   controlHeight: 40,
-  colorPrimary: "#0A84FF",
   colorInfo: "#0A84FF",
 };
 
@@ -19,11 +18,15 @@ const lightTokens = {
   ...commonTokens,
   colorBgLayout: "#f1f5f9",
   colorBgBase: "#ffffff",
-  colorBgContainer: "#f9fafb",
+  colorBgContainer: "#ffffff",
   colorBorder: "#e5e7eb",
   colorBorderSecondary: "#e5e7eb",
   colorTextBase: "#0f172a",
   colorTextSecondary: "#64748b",
+  colorPrimary: "#020617",
+  colorPrimaryHover: "#020617",
+  colorPrimaryActive: "#000000",
+  colorTextLightSolid: "#ffffff",
 };
 
 const darkTokens = {
@@ -35,6 +38,10 @@ const darkTokens = {
   colorBorderSecondary: "#1f2937",
   colorTextBase: "#e5e7eb",
   colorTextSecondary: "#94a3b8",
+  colorPrimary: "#0A84FF",
+  colorPrimaryHover: "#0060df",
+  colorPrimaryActive: "#0047b3",
+  colorTextLightSolid: "#ffffff",
 };
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -57,9 +64,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           },
           Menu: {
             itemColor: isDark ? "#e5e7eb" : "#0f172a",
-            itemHoverColor: "#0A84FF",
-            itemSelectedColor: "#0A84FF",
-            itemSelectedBg: "rgba(10,132,255,0.10)",
+            itemHoverColor: isDark ? "#0A84FF" : "#020617",
+            itemSelectedColor: isDark ? "#0A84FF" : "#020617",
+            itemSelectedBg: isDark
+              ? "rgba(10,132,255,0.10)"
+              : "rgba(2,6,23,0.06)",
             horizontalItemHoverBg: "transparent",
             horizontalItemSelectedBg: "transparent",
             borderRadius: 999,
@@ -80,11 +89,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           Button: {
             borderRadius: 999,
             controlHeight: 40,
-            colorPrimary: "#0A84FF",
-            colorPrimaryHover: "#0060df",
-            colorPrimaryActive: "#0047b3",
+            colorPrimary: isDark ? "#0A84FF" : "#020617",
+            colorPrimaryHover: isDark ? "#0060df" : "#020617",
+            colorPrimaryActive: isDark ? "#0047b3" : "#000000",
+            colorTextLightSolid: "#ffffff",
             colorText: isDark ? "#e5e7eb" : "#0f172a",
-            colorTextLightSolid: "#0b1120",
           },
           Input: {
             borderRadius: 999,
@@ -123,8 +132,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
               ? "0 18px 45px rgba(15,23,42,0.9)"
               : "0 18px 45px rgba(15,23,42,0.12)",
           },
-          Tag: { borderRadiusSM: 999 },
-          Pagination: { borderRadius: 999 },
+          Tag: {
+            borderRadiusSM: 999,
+          },
+          Pagination: {
+            borderRadius: 999,
+          },
         },
       }}
     >

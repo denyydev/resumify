@@ -22,7 +22,7 @@ export function EditorBottomBar({
     >
       <div
         style={{
-          background: token.colorBgElevated,
+          background: token.colorBgContainer,
           borderTop: `1px solid ${token.colorBorderSecondary}`,
           boxShadow: token.boxShadowSecondary,
         }}

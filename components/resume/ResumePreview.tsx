@@ -4,7 +4,6 @@ import { ResumePrint } from "@/components/resume/ResumePrint";
 import { useCurrentLocale } from "@/lib/useCurrentLocale";
 import { useResumeStore } from "@/store/useResumeStore";
 import type { Resume } from "@/types/resume";
-import { FileText } from "lucide-react";
 
 const messages = {
   ru: {
@@ -34,20 +33,7 @@ export function ResumePreview() {
 
   return (
     <div className="flex justify-center">
-      <div>
-        <ResumePrint data={resume as Resume} locale={locale} />
-        {isEmpty && (
-          <div className="mt-6 border border-slate-200 rounded-xl bg-linear-to-br from-slate-50 to-white p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-              <FileText className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-700 mb-1">
-              {t.emptyTitle}
-            </p>
-            <p className="text-xs text-slate-500">{t.emptyDescription}</p>
-          </div>
-        )}
-      </div>
+      <ResumePrint data={resume as Resume} locale={locale} />
     </div>
   );
 }

@@ -94,6 +94,7 @@ export function ActivitiesSection() {
       }
       extra={
         <Button
+          size="small"
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => addActivity("open-source")}

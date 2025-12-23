@@ -1,18 +1,19 @@
-"use client"
+"use client";
 
-import { useResumeStore } from "@/store/useResumeStore"
-import type { TemplateKey } from "@/types/resume"
-import { Check } from "lucide-react"
-import { useCurrentLocale } from "@/lib/useCurrentLocale"
+import { useCurrentLocale } from "@/lib/useCurrentLocale";
+import { useResumeStore } from "@/store/useResumeStore";
+import type { TemplateKey } from "@/types/resume";
+import { theme } from "antd";
+import { Check } from "lucide-react";
 
-type LocaleKey = "ru" | "en"
+type LocaleKey = "ru" | "en";
 
 const templateLabels: Record<
   TemplateKey,
   {
-    icon: string
-    title: Record<LocaleKey, string>
-    subtitle: Record<LocaleKey, string>
+    icon: string;
+    title: Record<LocaleKey, string>;
+    subtitle: Record<LocaleKey, string>;
   }
 > = {
   classic: {
@@ -63,7 +64,7 @@ const templateLabels: Record<
       en: "Card-based structured layout",
     },
   },
-}
+};
 
 const messages = {
   ru: {
@@ -74,70 +75,129 @@ const messages = {
     title: "Select template",
     subtitle: "This template will be used for PDF export",
   },
-} as const
+} as const;
 
 export function TemplateSelector() {
-  const localeRaw = useCurrentLocale()
-  const locale: LocaleKey = localeRaw === "en" ? "en" : "ru"
-  const t = messages[locale]
+  const { token } = theme.useToken();
 
-  const templateKey = useResumeStore((s) => s.resume.templateKey)
-  const setTemplateKey = useResumeStore((s) => s.setTemplateKey)
+  const localeRaw = useCurrentLocale();
+  const locale: LocaleKey = localeRaw === "en" ? "en" : "ru";
+  const t = messages[locale];
 
-  const options: TemplateKey[] = ["classic", "minimal", "modern", "simple", "timeline", "grid"]
+  const templateKey = useResumeStore((s) => s.resume.templateKey);
+  const setTemplateKey = useResumeStore((s) => s.setTemplateKey);
+
+  const options: TemplateKey[] = [
+    "classic",
+    "minimal",
+    "modern",
+    "simple",
+    "timeline",
+    "grid",
+  ];
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
-        <p className="text-xs text-slate-500 mt-0.5">{t.subtitle}</p>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: token.colorText,
+          }}
+        >
+          {t.title}
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: token.colorTextSecondary,
+          }}
+        >
+          {t.subtitle}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {options.map((key) => {
-          const active = templateKey === key
-          const template = templateLabels[key]
+          const active = templateKey === key;
+          const template = templateLabels[key];
 
           return (
             <button
               key={key}
               type="button"
               onClick={() => setTemplateKey(key)}
-              className={`group cursor-pointer relative w-full flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all duration-200 ${
-                active
-                  ? "border-slate-900 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-lg"
-                  : "border-slate-200 bg-white hover:border-slate-400 hover:shadow-md"
-              }`}
+              style={{
+                position: "relative",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: 12,
+                textAlign: "left",
+                borderRadius: 12,
+                border: `2px solid ${
+                  active ? token.colorPrimary : token.colorBorderSecondary
+                }`,
+                background: active
+                  ? token.colorPrimaryBg
+                  : token.colorBgContainer,
+                color: token.colorText,
+                cursor: "pointer",
+                transition:
+                  "border-color 160ms ease, background 160ms ease, box-shadow 160ms ease",
+                boxShadow: active ? token.boxShadowSecondary : "none",
+              }}
             >
               {active && (
-                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-                  <Check className="w-3 h-3 text-slate-900" />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    width: 20,
+                    height: 20,
+                    borderRadius: "50%",
+                    background: token.colorBgContainer,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Check size={12} style={{ color: token.colorPrimary }} />
                 </div>
               )}
 
-              <span className="text-xl">{template.icon}</span>
+              <span style={{ fontSize: 20 }}>{template.icon}</span>
 
-              <div className="flex-1 min-w-0">
-                <span
-                  className={`text-sm font-semibold block ${
-                    active ? "text-white" : "text-slate-900"
-                  }`}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: active ? token.colorPrimaryText : token.colorText,
+                  }}
                 >
                   {template.title[locale]}
-                </span>
+                </div>
 
-                <span
-                  className={`text-xs leading-relaxed ${
-                    active ? "text-slate-200" : "text-slate-600"
-                  }`}
+                <div
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 1.4,
+                    color: active
+                      ? token.colorTextSecondary
+                      : token.colorTextSecondary,
+                  }}
                 >
                   {template.subtitle[locale]}
-                </span>
+                </div>
               </div>
             </button>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

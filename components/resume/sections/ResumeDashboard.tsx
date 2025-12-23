@@ -160,7 +160,7 @@ export function ResumeDashboard({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-surface2 px-4 py-3">
+        <div className="rounded-2xl bg-surface2 px-4 py-3">
           <Progress
             percent={data.percent}
             showInfo={false}
@@ -184,7 +184,7 @@ export function ResumeDashboard({
           ))}
         </div>
 
-        <div className="rounded-2xl border border-border bg-surface px-4 py-4">
+        <div className="rounded-2xl bg-surface px-4 py-4">
           {data.nextHint ? (
             <div className="flex items-start justify-between gap-4">
               <div className="flex min-w-0 items-start gap-3">
