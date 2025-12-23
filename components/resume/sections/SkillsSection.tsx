@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import React, { useMemo, useState, useCallback } from "react"
-import { Card, Typography, Input, Button, Space, Divider, Flex } from "antd"
-import { CodeOutlined, MessageOutlined, PlusOutlined, BulbOutlined } from "@ant-design/icons"
-import { useResumeStore } from "@/store/useResumeStore"
-import { AnimatePresence } from "framer-motion"
-import { SkillTag } from "./SkillTag"
+import { useResumeStore } from "@/store/useResumeStore";
+import { CodeOutlined, MessageOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Card, Divider, Flex, Input, Space, Typography } from "antd";
+import { AnimatePresence } from "framer-motion";
+import React, { useCallback, useMemo, useState } from "react";
+import { SkillTag } from "./SkillTag";
 
-const { Title, Text, Paragraph } = Typography
-const { TextArea } = Input
+const { Title, Text, Paragraph } = Typography;
+const { TextArea } = Input;
 
 const TECH_SKILLS_TAGS = [
   "React",
@@ -43,7 +43,7 @@ const TECH_SKILLS_TAGS = [
   "Tailwind CSS",
   "SCSS",
   "Figma",
-]
+];
 
 const SOFT_SKILLS_TAGS = [
   "Коммуникация",
@@ -61,20 +61,20 @@ const SOFT_SKILLS_TAGS = [
   "Критическое мышление",
   "Эмпатия",
   "Переговоры",
-]
+];
 
 type SkillsBlockProps = {
-  kind: "tech" | "soft"
-  title: string
-  subtitle: string
-  icon: React.ReactNode
-  tags: string[]
-  note: string
-  suggestions: string[]
-  onAddTag: (tag: string) => void
-  onRemoveTag: (tag: string) => void
-  onChangeNote: (note: string) => void
-}
+  kind: "tech" | "soft";
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  tags: string[];
+  note: string;
+  suggestions: string[];
+  onAddTag: (tag: string) => void;
+  onRemoveTag: (tag: string) => void;
+  onChangeNote: (note: string) => void;
+};
 
 function SkillsBlock({
   kind,
@@ -86,30 +86,26 @@ function SkillsBlock({
   onAddTag,
   onRemoveTag,
   onChangeNote,
-  subtitle
+  subtitle,
 }: SkillsBlockProps) {
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState("");
 
-const norm = (s: string) =>
-  s
-    .trim()
-    .replace(/\s+/g, " ")
-    .toLowerCase()
+  const norm = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
 
-const selectedSet = useMemo(() => {
-  return new Set(tags.map(norm))
-}, [tags])
+  const selectedSet = useMemo(() => {
+    return new Set(tags.map(norm));
+  }, [tags]);
 
-const available = useMemo(() => {
-  return suggestions.filter((t) => !selectedSet.has(norm(t)))
-}, [suggestions, selectedSet])
+  const available = useMemo(() => {
+    return suggestions.filter((t) => !selectedSet.has(norm(t)));
+  }, [suggestions, selectedSet]);
 
   const handleAddCustom = useCallback(() => {
-    const value = input.trim()
-    if (!value) return setInput("")
-    onAddTag(value)
-    setInput("")
-  }, [input, onAddTag])
+    const value = input.trim();
+    if (!value) return setInput("");
+    onAddTag(value);
+    setInput("");
+  }, [input, onAddTag]);
 
   return (
     <Card size="small" styles={{ body: { padding: 16 } }}>
@@ -143,32 +139,36 @@ const available = useMemo(() => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                e.preventDefault()
-                handleAddCustom()
+                e.preventDefault();
+                handleAddCustom();
               }
             }}
             placeholder="Добавить навык..."
             allowClear
           />
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCustom}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleAddCustom}
+          >
             Добавить
           </Button>
         </Flex>
 
-{available.length > 0 && (
-  <Flex wrap gap={8}>
-    {available.slice(0, 14).map((tag) => (
-      <SkillTag
-        key={`available-${tag}`}
-        kind={kind}
-        variant="pick"
-        label={tag}
-        closable={false}
-        onClick={() => onAddTag(tag)}
-      />
-    ))}
-  </Flex>
-)}
+        {available.length > 0 && (
+          <Flex wrap gap={8}>
+            {available.slice(0, 14).map((tag) => (
+              <SkillTag
+                key={`available-${tag}`}
+                kind={kind}
+                variant="pick"
+                label={tag}
+                closable={false}
+                onClick={() => onAddTag(tag)}
+              />
+            ))}
+          </Flex>
+        )}
 
         <TextArea
           value={note}
@@ -178,64 +178,73 @@ const available = useMemo(() => {
         />
       </Space>
     </Card>
-  )
+  );
 }
 
 export function SkillsSection() {
-  const resume = useResumeStore((s) => s.resume)
+  const resume = useResumeStore((s) => s.resume);
 
-  const addTechSkillTag = useResumeStore((s) => s.addTechSkillTag)
-  const removeTechSkillTag = useResumeStore((s) => s.removeTechSkillTag)
-  const setTechSkillsNote = useResumeStore((s) => s.setTechSkillsNote)
+  const addTechSkillTag = useResumeStore((s) => s.addTechSkillTag);
+  const removeTechSkillTag = useResumeStore((s) => s.removeTechSkillTag);
+  const setTechSkillsNote = useResumeStore((s) => s.setTechSkillsNote);
 
-  const addSoftSkillTag = useResumeStore((s) => s.addSoftSkillTag)
-  const removeSoftSkillTag = useResumeStore((s) => s.removeSoftSkillTag)
-  const setSoftSkillsNote = useResumeStore((s) => s.setSoftSkillsNote)
+  const addSoftSkillTag = useResumeStore((s) => s.addSoftSkillTag);
+  const removeSoftSkillTag = useResumeStore((s) => s.removeSoftSkillTag);
+  const setSoftSkillsNote = useResumeStore((s) => s.setSoftSkillsNote);
 
-  const techTags = resume.techSkills.tags
-  const techNote = resume.techSkills.note
-  const softTags = resume.softSkills.tags
-  const softNote = resume.softSkills.note
+  const techTags = resume.techSkills.tags;
+  const techNote = resume.techSkills.note;
+  const softTags = resume.softSkills.tags;
+  const softNote = resume.softSkills.note;
 
-  const addTechTag = useCallback((tag: string) => addTechSkillTag(tag), [addTechSkillTag])
+  const addTechTag = useCallback(
+    (tag: string) => addTechSkillTag(tag),
+    [addTechSkillTag]
+  );
   const removeTechTag = useCallback(
     (tag: string) => removeTechSkillTag(tag),
     [removeTechSkillTag]
-  )
+  );
 
-  const addSoftTag = useCallback((tag: string) => addSoftSkillTag(tag), [addSoftSkillTag])
+  const addSoftTag = useCallback(
+    (tag: string) => addSoftSkillTag(tag),
+    [addSoftSkillTag]
+  );
   const removeSoftTag = useCallback(
     (tag: string) => removeSoftSkillTag(tag),
     [removeSoftSkillTag]
-  )
+  );
 
   return (
-<>        <Space orientation="vertical" size={14} style={{ width: "100%" }}>
-          <SkillsBlock
-            kind="tech"
-            title="HARD SKILLS"
-            subtitle="Технологии, инструменты и фреймворки, с которыми ты работаешь на практике"
-            icon={<CodeOutlined />}
-            tags={techTags}
-            note={techNote}
-            suggestions={TECH_SKILLS_TAGS}
-            onAddTag={addTechTag}
-            onRemoveTag={removeTechTag}
-            onChangeNote={setTechSkillsNote}
-          />
+    <>
+      {" "}
+      <Space orientation="vertical" size={14} style={{ width: "100%" }}>
+        <SkillsBlock
+          kind="tech"
+          title="HARD SKILLS"
+          subtitle="Технологии, инструменты и фреймворки, с которыми ты работаешь на практике"
+          icon={<CodeOutlined />}
+          tags={techTags}
+          note={techNote}
+          suggestions={TECH_SKILLS_TAGS}
+          onAddTag={addTechTag}
+          onRemoveTag={removeTechTag}
+          onChangeNote={setTechSkillsNote}
+        />
 
-          <SkillsBlock
-            kind="soft"
-            title="SOFT SKILLS"
-            subtitle="Навыки взаимодействия и личные качества, влияющие на эффективность работы"
-            icon={<MessageOutlined />}
-            tags={softTags}
-            note={softNote}
-            suggestions={SOFT_SKILLS_TAGS}
-            onAddTag={addSoftTag}
-            onRemoveTag={removeSoftTag}
-            onChangeNote={setSoftSkillsNote}
-          />
-        </Space></>
-  )
+        <SkillsBlock
+          kind="soft"
+          title="SOFT SKILLS"
+          subtitle="Навыки взаимодействия и личные качества, влияющие на эффективность работы"
+          icon={<MessageOutlined />}
+          tags={softTags}
+          note={softNote}
+          suggestions={SOFT_SKILLS_TAGS}
+          onAddTag={addSoftTag}
+          onRemoveTag={removeSoftTag}
+          onChangeNote={setSoftSkillsNote}
+        />
+      </Space>
+    </>
+  );
 }

@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { useParams, useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
-import { Search, FileText, Trash2, Plus, Clock, File } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import type { ResumeData } from "@/types/resume"
-import { ResumePreviewThumb } from "@/components/resume/ResumePreviewThumb"
+import { ResumePreviewThumb } from "@/components/resume/ResumePreviewThumb";
+import type { ResumeData } from "@/types/resume";
 import {
   Button,
   Card,
+  Col,
   Empty,
   Input,
   Modal,
-  Result,
-  Spin,
-  Typography,
-  Tooltip,
-  Row,
-  Col,
-  Space,
   Pagination,
-} from "antd"
+  Result,
+  Row,
+  Space,
+  Spin,
+  Tooltip,
+  Typography,
+} from "antd";
+import { AnimatePresence, motion } from "framer-motion";
+import { Clock, File, FileText, Plus, Search, Trash2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type ResumeListItem = {
-  id: string
-  data: ResumeData
-  createdAt: string
-  updatedAt: string
-}
+  id: string;
+  data: ResumeData;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const messages = {
   ru: {
@@ -68,56 +68,60 @@ const messages = {
     openPdf: "PDF",
     delete: "Delete",
   },
-} as const
+} as const;
 
 export default function MyResumesPage() {
-  const params = useParams() as { locale: "ru" | "en" }
-  const locale = params.locale ?? "en"
-  const t = messages[locale] ?? messages.en
-  const router = useRouter()
+  const params = useParams() as { locale: "ru" | "en" };
+  const locale = params.locale ?? "en";
+  const t = messages[locale] ?? messages.en;
+  const router = useRouter();
 
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession();
 
-  const [resumes, setResumes] = useState<ResumeListItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [search, setSearch] = useState("")
+  const [resumes, setResumes] = useState<ResumeListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
-  const pageSize = 4
-  const [page, setPage] = useState(1)
+  const pageSize = 4;
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    if (status === "loading") return
+    if (status === "loading") return;
 
     if (status === "unauthenticated" || !session?.user?.email) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
 
     const load = async () => {
       try {
-        const res = await fetch(`/api/resumes?userEmail=${encodeURIComponent(session.user!.email as string)}`)
+        const res = await fetch(
+          `/api/resumes?userEmail=${encodeURIComponent(
+            session.user!.email as string
+          )}`
+        );
         if (!res.ok) {
-          console.error("Failed to load resumes", await res.text())
-          return
+          console.error("Failed to load resumes", await res.text());
+          return;
         }
-        const json = await res.json()
-        setResumes(json.resumes || [])
+        const json = await res.json();
+        setResumes(json.resumes || []);
       } catch (e) {
-        console.error(e)
+        console.error(e);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    load()
-  }, [status, session?.user])
+    load();
+  }, [status, session?.user]);
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
-    if (!session?.user?.email) return
+    if (!session?.user?.email) return;
 
     Modal.confirm({
       title: t.confirmDeleteTitle,
@@ -127,55 +131,57 @@ export default function MyResumesPage() {
       okButtonProps: { danger: true, loading: deletingId === id },
       onOk: async () => {
         try {
-          setDeletingId(id)
+          setDeletingId(id);
           const res = await fetch(
-            `/api/resumes?id=${encodeURIComponent(id)}&userEmail=${encodeURIComponent(session.user!.email as string)}`,
-            { method: "DELETE" },
-          )
+            `/api/resumes?id=${encodeURIComponent(
+              id
+            )}&userEmail=${encodeURIComponent(session.user!.email as string)}`,
+            { method: "DELETE" }
+          );
           if (!res.ok) {
-            console.error("Failed to delete resume", await res.text())
-            return
+            console.error("Failed to delete resume", await res.text());
+            return;
           }
-          setResumes((prev) => prev.filter((r) => r.id !== id))
+          setResumes((prev) => prev.filter((r) => r.id !== id));
         } catch (err) {
-          console.error(err)
+          console.error(err);
         } finally {
-          setDeletingId(null)
+          setDeletingId(null);
         }
       },
-    })
-  }
+    });
+  };
 
   const filteredResumes = useMemo(() => {
-    if (!search.trim()) return resumes
-    const q = search.toLowerCase()
+    if (!search.trim()) return resumes;
+    const q = search.toLowerCase();
     return resumes.filter((r) => {
-      const fullName = (r.data?.fullName || "").toLowerCase()
-      const position = (r.data?.position || "").toLowerCase()
-      return fullName.includes(q) || position.includes(q)
-    })
-  }, [resumes, search])
+      const fullName = (r.data?.fullName || "").toLowerCase();
+      const position = (r.data?.position || "").toLowerCase();
+      return fullName.includes(q) || position.includes(q);
+    });
+  }, [resumes, search]);
 
   useEffect(() => {
-    setPage(1)
-  }, [search])
+    setPage(1);
+  }, [search]);
 
   useEffect(() => {
-    const maxPage = Math.max(1, Math.ceil(filteredResumes.length / pageSize))
-    if (page > maxPage) setPage(maxPage)
-  }, [filteredResumes.length, page])
+    const maxPage = Math.max(1, Math.ceil(filteredResumes.length / pageSize));
+    if (page > maxPage) setPage(maxPage);
+  }, [filteredResumes.length, page]);
 
   const paginatedResumes = useMemo(() => {
-    const start = (page - 1) * pageSize
-    return filteredResumes.slice(start, start + pageSize)
-  }, [filteredResumes, page])
+    const start = (page - 1) * pageSize;
+    return filteredResumes.slice(start, start + pageSize);
+  }, [filteredResumes, page]);
 
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
         <Spin size="large" />
       </div>
-    )
+    );
   }
 
   if (status === "unauthenticated" || !session?.user?.email) {
@@ -191,164 +197,214 @@ export default function MyResumesPage() {
           }
         />
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
-    <div className="flex flex-col gap-5 py-5">
-
+      <div className="flex flex-col gap-5 py-5">
         <Card>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <Typography.Title level={2} style={{ marginBottom: 6 }}>
+                {t.title}
+              </Typography.Title>
+              <Typography.Paragraph
+                type="secondary"
+                style={{ marginBottom: 0, fontSize: 16 }}
+              >
+                {t.subtitle}
+              </Typography.Paragraph>
+            </div>
 
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <Typography.Title level={2} style={{ marginBottom: 6 }}>
-              {t.title}
-            </Typography.Title>
-            <Typography.Paragraph type="secondary" style={{ marginBottom: 0, fontSize: 16 }}>
-              {t.subtitle}
-            </Typography.Paragraph>
+            <Link href={`/${locale}/editor`}>
+              <Button
+                type="primary"
+                icon={<Plus className="w-4 h-4" />}
+                className="rounded-full px-6"
+              >
+                {t.createResume}
+              </Button>
+            </Link>
+          </div>
+        </Card>
+        <div>
+          <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="w-full md:max-w-md">
+              <Input
+                allowClear
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t.searchPlaceholder}
+                prefix={<Search className="w-4 h-4 text-slate-400" />}
+                className="rounded-2xl"
+              />
+            </div>
+
+            {filteredResumes.length > pageSize && (
+              <Pagination
+                current={page}
+                pageSize={pageSize}
+                total={filteredResumes.length}
+                showSizeChanger={false}
+                onChange={(p) => setPage(p)}
+              />
+            )}
           </div>
 
-          <Link href={`/${locale}/editor`}>
-            <Button type="primary" size="large" icon={<Plus className="w-4 h-4" />} className="rounded-full px-6">
-              {t.createResume}
-            </Button>
-          </Link>
-        </div>
-      </Card>
-      <div>
-                <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="w-full md:max-w-md">
-            <Input
-              size="large"
-              allowClear
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t.searchPlaceholder}
-              prefix={<Search className="w-4 h-4 text-slate-400" />}
-              className="rounded-2xl"
-            />
-          </div>
-
-          {filteredResumes.length > pageSize && (
-            <Pagination
-              current={page}
-              pageSize={pageSize}
-              total={filteredResumes.length}
-              showSizeChanger={false}
-              onChange={(p) => setPage(p)}
-
-            />
-          )}
-        </div>
-
-
-
-        <AnimatePresence mode="popLayout">
-          {filteredResumes.length === 0 ? (
-            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}>
-              <Card className="rounded-3xl" styles={{ body: { padding: 28 } }}>
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={
-                    <div className="space-y-1">
-                      <div className="text-base font-semibold text-slate-900">{t.empty}</div>
-                      <div className="text-sm text-slate-500">{t.emptySubtext}</div>
-                    </div>
-                  }
+          <AnimatePresence mode="popLayout">
+            {filteredResumes.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+              >
+                <Card
+                  className="rounded-3xl"
+                  styles={{ body: { padding: 28 } }}
                 >
-                  <Link href={`/${locale}/editor`}>
-                    <Button size="large" type="default" className="rounded-full px-6">
-                      {t.createResume}
-                    </Button>
-                  </Link>
-                </Empty>
-              </Card>
-            </motion.div>
-          ) : (
-            <motion.div layout>
-              <Row gutter={[16, 16]}>
-                {paginatedResumes.map((resume, index) => {
-                  const data = (resume.data || {}) as any
-                  const title = data.fullName || t.newResume
-                  const subtitle = data.position || t.noPosition
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={
+                      <div className="space-y-1">
+                        <div className="text-base font-semibold text-slate-900">
+                          {t.empty}
+                        </div>
+                        <div className="text-sm text-slate-500">
+                          {t.emptySubtext}
+                        </div>
+                      </div>
+                    }
+                  >
+                    <Link href={`/${locale}/editor`}>
+                      <Button type="default" className="rounded-full px-6">
+                        {t.createResume}
+                      </Button>
+                    </Link>
+                  </Empty>
+                </Card>
+              </motion.div>
+            ) : (
+              <motion.div layout>
+                <Row gutter={[16, 16]}>
+                  {paginatedResumes.map((resume, index) => {
+                    const data = (resume.data || {}) as any;
+                    const title = data.fullName || t.newResume;
+                    const subtitle = data.position || t.noPosition;
 
-                  const date = new Date(resume.updatedAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })
+                    const date = new Date(resume.updatedAt).toLocaleDateString(
+                      locale === "ru" ? "ru-RU" : "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    );
 
-                  const isDeleting = deletingId === resume.id
+                    const isDeleting = deletingId === resume.id;
 
-                  return (
-                    <Col key={resume.id} xs={24} sm={12} lg={8} xl={6}>
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, y: 18 }}
-                        animate={{ opacity: 1, y: 0, transition: { delay: index * 0.04 } }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="h-full"
-                      >
-                        <Card
-                          hoverable
-                          className="group relative h-full rounded-2xl border border-slate-200/70"
-                          styles={{ body: { padding: 14 } }}
+                    return (
+                      <Col key={resume.id} xs={24} sm={12} lg={8} xl={6}>
+                        <motion.div
+                          layout
+                          initial={{ opacity: 0, y: 18 }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                            transition: { delay: index * 0.04 },
+                          }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          className="h-full"
                         >
-                          <Link href={`/${locale}/editor?resumeId=${resume.id}`} className="block">
-                            <div className="relative">
-                              <ResumePreviewThumb data={data} locale={locale} className="mb-3" />
-                            </div>
-
-                            <div className="px-1">
-                              <Typography.Text strong className="block" style={{ fontSize: 16 }}>
-                                <span className="line-clamp-1">{title}</span>
-                              </Typography.Text>
-                              <Typography.Text type="secondary" className="block" style={{ fontSize: 13 }}>
-                                <span className="line-clamp-2">{subtitle}</span>
-                              </Typography.Text>
-                            </div>
-                          </Link>
-
-                          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between px-1">
-                            <Space size={6} className="text-slate-400">
-                              <Clock className="w-3.5 h-3.5" />
-                              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                                {date}
-                              </Typography.Text>
-                            </Space>
-
-                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              <Tooltip title={t.openPdf}>
-                                <Link href={`/${locale}/print/${resume.id}`} target="_blank">
-                                  <Button type="text" shape="circle" icon={<File className="w-4 h-4" />} />
-                                </Link>
-                              </Tooltip>
-
-                              <Tooltip title={t.delete}>
-                                <Button
-                                  type="text"
-                                  danger
-                                  shape="circle"
-                                  loading={isDeleting}
-                                  onClick={(e) => handleDelete(resume.id, e)}
-                                  icon={!isDeleting ? <Trash2 className="w-4 h-4" /> : undefined}
+                          <Card
+                            hoverable
+                            className="group relative h-full rounded-2xl border border-slate-200/70"
+                            styles={{ body: { padding: 14 } }}
+                          >
+                            <Link
+                              href={`/${locale}/editor?resumeId=${resume.id}`}
+                              className="block"
+                            >
+                              <div className="relative">
+                                <ResumePreviewThumb
+                                  data={data}
+                                  locale={locale}
+                                  className="mb-3"
                                 />
-                              </Tooltip>
+                              </div>
+
+                              <div className="px-1">
+                                <Typography.Text
+                                  strong
+                                  className="block"
+                                  style={{ fontSize: 16 }}
+                                >
+                                  <span className="line-clamp-1">{title}</span>
+                                </Typography.Text>
+                                <Typography.Text
+                                  type="secondary"
+                                  className="block"
+                                  style={{ fontSize: 13 }}
+                                >
+                                  <span className="line-clamp-2">
+                                    {subtitle}
+                                  </span>
+                                </Typography.Text>
+                              </div>
+                            </Link>
+
+                            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between px-1">
+                              <Space size={6} className="text-slate-400">
+                                <Clock className="w-3.5 h-3.5" />
+                                <Typography.Text
+                                  type="secondary"
+                                  style={{ fontSize: 12 }}
+                                >
+                                  {date}
+                                </Typography.Text>
+                              </Space>
+
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <Tooltip title={t.openPdf}>
+                                  <Link
+                                    href={`/${locale}/print/${resume.id}`}
+                                    target="_blank"
+                                  >
+                                    <Button
+                                      type="text"
+                                      shape="circle"
+                                      icon={<File className="w-4 h-4" />}
+                                    />
+                                  </Link>
+                                </Tooltip>
+
+                                <Tooltip title={t.delete}>
+                                  <Button
+                                    type="text"
+                                    danger
+                                    shape="circle"
+                                    loading={isDeleting}
+                                    onClick={(e) => handleDelete(resume.id, e)}
+                                    icon={
+                                      !isDeleting ? (
+                                        <Trash2 className="w-4 h-4" />
+                                      ) : undefined
+                                    }
+                                  />
+                                </Tooltip>
+                              </div>
                             </div>
-                          </div>
-                        </Card>
-                      </motion.div>
-                    </Col>
-                  )
-                })}
-              </Row>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                          </Card>
+                        </motion.div>
+                      </Col>
+                    );
+                  })}
+                </Row>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
-    </div>
-  )
+  );
 }

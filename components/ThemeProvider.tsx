@@ -2,7 +2,7 @@
 
 import { useThemeStore } from "@/store/useThemeStore";
 import { ConfigProvider, theme as antdTheme } from "antd";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 const commonTokens = {
   fontFamily:
@@ -50,18 +50,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         token: isDark ? darkTokens : lightTokens,
         components: {
           Layout: {
-            headerBg: isDark ? "rgba(15,23,42,0.92)" : "rgba(255,255,255,0.94)",
+            headerBg: isDark ? "rgba(15,23,42,0.96)" : "#ffffff",
             footerBg: "transparent",
-            siderBg: isDark ? "#020617" : "#ffffff",
+            siderBg: isDark ? "rgba(15,23,42,0.96)" : "#ffffff",
             bodyBg: isDark ? "#020617" : "#f1f5f9",
           },
           Menu: {
             itemColor: isDark ? "#e5e7eb" : "#0f172a",
             itemHoverColor: "#0A84FF",
             itemSelectedColor: "#0A84FF",
-            itemSelectedBg: isDark
-              ? "rgba(10,132,255,0.08)"
-              : "rgba(10,132,255,0.08)",
+            itemSelectedBg: "rgba(10,132,255,0.10)",
             horizontalItemHoverBg: "transparent",
             horizontalItemSelectedBg: "transparent",
             borderRadius: 999,
@@ -69,7 +67,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           },
           Card: {
             colorBgContainer: isDark ? "rgba(15,23,42,0.96)" : "#ffffff",
-            colorBorderSecondary: "rgba(148,163,184,0.25)",
+            colorBorderSecondary: isDark
+              ? "rgba(148,163,184,0.20)"
+              : "rgba(148,163,184,0.25)",
             borderRadius: 18,
             boxShadow: isDark
               ? "0 18px 45px rgba(15,23,42,0.85)"
@@ -88,12 +88,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           },
           Input: {
             borderRadius: 999,
+            borderRadiusLG: 999,
+            borderRadiusSM: 12,
             controlHeight: 40,
             colorBgContainer: isDark ? "#020617" : "#ffffff",
             colorBorder: isDark ? "#1e293b" : "#d1d5db",
             colorText: isDark ? "#e5e7eb" : "#0f172a",
             activeBorderColor: "#0A84FF",
             hoverBorderColor: "#0A84FF",
+          },
+          InputNumber: {
+            borderRadius: 999,
+            controlHeight: 40,
+          },
+          TextArea: {
+            borderRadius: 14,
+            borderRadiusLG: 16,
           },
           Modal: {
             borderRadiusLG: 22,
@@ -102,23 +112,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             paddingContentVerticalLG: 20,
           },
           Table: {
-            headerBg: isDark ? "#020617" : "#f9fafb",
+            headerBg: isDark ? "rgba(15,23,42,0.96)" : "#f9fafb",
             headerColor: isDark ? "#e5e7eb" : "#0f172a",
             rowHoverBg: isDark ? "rgba(15,23,42,0.9)" : "#f1f5f9",
           },
           Dropdown: {
             borderRadiusLG: 16,
-            colorBgElevated: isDark ? "#020617" : "#ffffff",
+            colorBgElevated: isDark ? "rgba(15,23,42,0.98)" : "#ffffff",
             boxShadowSecondary: isDark
               ? "0 18px 45px rgba(15,23,42,0.9)"
               : "0 18px 45px rgba(15,23,42,0.12)",
           },
-          Tag: {
-            borderRadiusSM: 999,
-          },
-          Pagination: {
-            borderRadius: 999,
-          },
+          Tag: { borderRadiusSM: 999 },
+          Pagination: { borderRadius: 999 },
         },
       }}
     >
