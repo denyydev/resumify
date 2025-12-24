@@ -5,19 +5,13 @@ import type { ResumeData } from "@/types/resume";
 import {
   Button,
   Card,
-  Col,
   Empty,
-  Grid,
   Input,
   Modal,
   Pagination,
   Result,
-  Row,
-  Space,
   Spin,
-  theme,
   Tooltip,
-  Typography,
 } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clock, File, FileText, Plus, Search, Trash2 } from "lucide-react";
@@ -75,9 +69,6 @@ const messages = {
 } as const;
 
 export default function MyResumesPage() {
-  const { token } = theme.useToken();
-  const screens = Grid.useBreakpoint();
-
   const params = useParams() as { locale?: "ru" | "en" };
   const locale = params?.locale ?? "en";
   const t = messages[locale] ?? messages.en;
@@ -89,9 +80,9 @@ export default function MyResumesPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const pageSize = 8;
-  const [page, setPage] = useState(1);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -181,17 +172,9 @@ export default function MyResumesPage() {
     return filteredResumes.slice(start, start + pageSize);
   }, [filteredResumes, page]);
 
-  const pageWrapStyle: React.CSSProperties = {
-    minHeight: "100vh",
-    background: token.colorBgLayout,
-    padding: screens.md ? 24 : 16,
-    paddingBottom: 56,
-    width: "100%",
-  };
-
   if (status === "loading" || loading) {
     return (
-      <div style={{ ...pageWrapStyle, display: "grid", placeItems: "center" }}>
+      <div className="min-h-screen w-full bg-gray-50 p-4 pb-14 md:p-6 md:pb-14 grid place-items-center">
         <Spin size="large" />
       </div>
     );
@@ -199,11 +182,9 @@ export default function MyResumesPage() {
 
   if (status === "unauthenticated" || !session?.user?.email) {
     return (
-      <div style={{ ...pageWrapStyle, display: "grid", placeItems: "center" }}>
+      <div className="min-h-screen w-full bg-gray-50 p-4 pb-14 md:p-6 md:pb-14 grid place-items-center">
         <Result
-          icon={
-            <FileText size={42} style={{ color: token.colorTextSecondary }} />
-          }
+          icon={<FileText size={42} className="text-gray-400" />}
           title={t.unauthorized}
           extra={
             <Button type="primary" onClick={() => router.push(`/${locale}`)}>
@@ -216,32 +197,13 @@ export default function MyResumesPage() {
   }
 
   return (
-    <div style={pageWrapStyle}>
-      <Space
-        direction="vertical"
-        size="large"
-        style={{ width: "100%", maxWidth: 1120, margin: "0 auto" }}
-      >
+    <div className="min-h-screen w-full">
+      <div className="flex flex-col gap-6">
         <Card>
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              alignItems: screens.md ? "flex-end" : "flex-start",
-              justifyContent: "space-between",
-              flexDirection: screens.md ? "row" : "column",
-            }}
-          >
-            <div style={{ maxWidth: 720 }}>
-              <Typography.Title level={2} style={{ margin: 0 }}>
-                {t.title}
-              </Typography.Title>
-              <Typography.Paragraph
-                type="secondary"
-                style={{ margin: 0, fontSize: 16 }}
-              >
-                {t.subtitle}
-              </Typography.Paragraph>
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-[720px]">
+              <h2 className="m-0 text-2xl font-semibold">{t.title}</h2>
+              <p className="m-0 text-base text-gray-500">{t.subtitle}</p>
             </div>
 
             <Link href={`/${locale}/editor`}>
@@ -253,24 +215,14 @@ export default function MyResumesPage() {
         </Card>
 
         <Card>
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexDirection: screens.md ? "row" : "column",
-            }}
-          >
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <Input
               allowClear
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t.searchPlaceholder}
-              prefix={
-                <Search size={16} style={{ color: token.colorTextTertiary }} />
-              }
-              style={{ maxWidth: screens.md ? 420 : "100%" }}
+              prefix={<Search size={16} className="text-gray-400" />}
+              className="w-full md:max-w-[420px]"
             />
 
             {filteredResumes.length > pageSize && (
@@ -296,12 +248,10 @@ export default function MyResumesPage() {
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                   description={
-                    <Space direction="vertical" size={4}>
-                      <Typography.Text strong>{t.empty}</Typography.Text>
-                      <Typography.Text type="secondary">
-                        {t.emptySubtext}
-                      </Typography.Text>
-                    </Space>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-semibold">{t.empty}</span>
+                      <span className="text-gray-500">{t.emptySubtext}</span>
+                    </div>
                   }
                 >
                   <Link href={`/${locale}/editor`}>
@@ -314,7 +264,7 @@ export default function MyResumesPage() {
             </motion.div>
           ) : (
             <motion.div layout>
-              <Row gutter={[16, 16]}>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {paginatedResumes.map((resume, index) => {
                   const data = (resume.data || {}) as any;
                   const title = data.fullName || t.newResume;
@@ -327,29 +277,24 @@ export default function MyResumesPage() {
 
                   const isDeleting = deletingId === resume.id;
 
-                  const showActionsAlways = !screens.lg; // mobile/tablet: actions always visible
-
                   return (
-                    <Col key={resume.id} xs={24} sm={12} lg={8} xl={6}>
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, y: 14 }}
-                        animate={{
-                          opacity: 1,
-                          y: 0,
-                          transition: { delay: index * 0.03 },
-                        }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        style={{ height: "100%" }}
-                      >
-                        <Card
-                          hoverable
-                          style={{ height: "100%" }}
-                          styles={{ body: { padding: 14 } }}
-                        >
+                    <motion.div
+                      key={resume.id}
+                      layout
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        transition: { delay: index * 0.03 },
+                      }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      className="h-full"
+                    >
+                      <div className="group h-full">
+                        <Card hoverable className="h-full">
                           <Link
                             href={`/${locale}/editor?resumeId=${resume.id}`}
-                            style={{ display: "block" }}
+                            className="block"
                           >
                             <ResumePreviewThumb
                               data={data}
@@ -357,73 +302,25 @@ export default function MyResumesPage() {
                               className="mb-3"
                             />
 
-                            <div style={{ paddingInline: 4 }}>
-                              <Typography.Text
-                                strong
-                                style={{ fontSize: 16, display: "block" }}
-                              >
-                                <span
-                                  style={{
-                                    display: "block",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                  }}
-                                >
-                                  {title}
-                                </span>
-                              </Typography.Text>
-                              <Typography.Text
-                                type="secondary"
-                                style={{ fontSize: 13, display: "block" }}
-                              >
-                                <span
-                                  style={{
-                                    display: "-webkit-box",
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: "vertical",
-                                    overflow: "hidden",
-                                  }}
-                                >
-                                  {subtitle}
-                                </span>
-                              </Typography.Text>
+                            <div className="px-1">
+                              <div className="text-base font-semibold truncate">
+                                {title}
+                              </div>
+                              <div className="mt-0.5 text-[13px] text-gray-500 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
+                                {subtitle}
+                              </div>
                             </div>
                           </Link>
 
-                          <div
-                            style={{
-                              marginTop: 12,
-                              paddingTop: 12,
-                              borderTop: `1px solid ${token.colorBorderSecondary}`,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              paddingInline: 4,
-                            }}
-                          >
-                            <Space size={6}>
-                              <Clock
-                                size={14}
-                                style={{ color: token.colorTextTertiary }}
-                              />
-                              <Typography.Text
-                                type="secondary"
-                                style={{ fontSize: 12 }}
-                              >
+                          <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-3 px-1">
+                            <div className="flex items-center gap-1.5 text-gray-500">
+                              <Clock size={14} className="text-gray-400" />
+                              <span className="text-xs">
                                 {t.updated} • {date}
-                              </Typography.Text>
-                            </Space>
+                              </span>
+                            </div>
 
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: 6,
-                                opacity: showActionsAlways ? 1 : 0,
-                                transition: "opacity 160ms ease",
-                              }}
-                              className="resume-actions"
-                            >
+                            <div className="flex gap-1.5 ">
                               <Tooltip title={t.openPdf}>
                                 <Link
                                   href={`/${locale}/print/${resume.id}`}
@@ -453,24 +350,16 @@ export default function MyResumesPage() {
                               </Tooltip>
                             </div>
                           </div>
-
-                          {!showActionsAlways && (
-                            <style jsx>{`
-                              :global(.ant-card:hover .resume-actions) {
-                                opacity: 1 !important;
-                              }
-                            `}</style>
-                          )}
                         </Card>
-                      </motion.div>
-                    </Col>
+                      </div>
+                    </motion.div>
                   );
                 })}
-              </Row>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </Space>
+      </div>
     </div>
   );
 }
