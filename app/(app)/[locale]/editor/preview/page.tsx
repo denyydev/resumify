@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useParams, useSearchParams, useRouter } from "next/navigation"
-import type { Locale } from "@/lib/useCurrentLocale"
-import { useResumeStore } from "@/store/useResumeStore"
-import { ResumePreview } from "@/components/resume/ResumePreview"
-import { TemplateSelector } from "@/components/resume/sections/TemplateSelector"
-import { DownloadPdfButton } from "@/components/resume/DownloadPdfButton"
-import { ArrowLeft } from "lucide-react"
-import { Button, Card, Divider, Typography } from "antd"
-import AccentColorPicker from "@/components/resume/AccentColorPicker"
-import { PhotoExportToggle } from "@/components/resume/PhotoExportToggle"
+import AccentColorPicker from "@/components/resume/AccentColorPicker";
+import { DownloadPdfButton } from "@/components/resume/DownloadPdfButton";
+import { PhotoExportToggle } from "@/components/resume/PhotoExportToggle";
+import { ResumePreview } from "@/components/resume/ResumePreview";
+import { TemplateSelector } from "@/components/resume/sections/TemplateSelector";
+import type { Locale } from "@/lib/useCurrentLocale";
+import { useResumeStore } from "@/store/useResumeStore";
+import { Button, Card, Divider } from "antd";
+import { ArrowLeft } from "lucide-react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 const messages = {
   ru: {
@@ -21,43 +21,43 @@ const messages = {
     previewTitle: "Resume Preview",
     backToEditor: "Back to editor",
   },
-} as const
+} as const;
 
 export default function PreviewPage() {
-  const params = useParams<{ locale: Locale }>()
-  const locale: Locale = params?.locale === "en" ? "en" : "ru"
-  const t = messages[locale]
+  const params = useParams<{ locale: Locale }>();
+  const locale: Locale = params?.locale === "en" ? "en" : "ru";
+  const t = messages[locale];
 
-  const searchParams = useSearchParams()
-  const resumeId = searchParams.get("resumeId")
-  const router = useRouter()
-  const loadResume = useResumeStore((s) => s.loadResume)
+  const searchParams = useSearchParams();
+  const resumeId = searchParams.get("resumeId");
+  const router = useRouter();
+  const loadResume = useResumeStore((s) => s.loadResume);
 
   useEffect(() => {
-    if (!resumeId) return
+    if (!resumeId) return;
 
     const fetchResume = async () => {
       try {
-        const res = await fetch(`/api/resumes?id=${resumeId}`)
-        if (!res.ok) return
+        const res = await fetch(`/api/resumes?id=${resumeId}`);
+        if (!res.ok) return;
 
-        const json = await res.json()
-        const data = json.resume?.data
-        if (!data) return
+        const json = await res.json();
+        const data = json.resume?.data;
+        if (!data) return;
 
-        loadResume(data)
+        loadResume(data);
       } catch {
-        return
+        return;
       }
-    }
+    };
 
-    fetchResume()
-  }, [resumeId, loadResume])
+    fetchResume();
+  }, [resumeId, loadResume]);
 
   const handleBack = () => {
-    const query = resumeId ? `?resumeId=${resumeId}` : ""
-    router.push(`/${locale}/editor${query}`)
-  }
+    const query = resumeId ? `?resumeId=${resumeId}` : "";
+    router.push(`/${locale}/editor${query}`);
+  };
 
   return (
     <div className="min-h-screen ">
@@ -86,17 +86,17 @@ export default function PreviewPage() {
           <aside className="lg:w-80 flex-shrink-0">
             <Card>
               <TemplateSelector />
-              <Divider/>
-          <AccentColorPicker/>
-                 <Divider/>
-                 <PhotoExportToggle/>
+              <Divider />
+              <AccentColorPicker />
+              <Divider />
+              <PhotoExportToggle />
             </Card>
           </aside>
           <main className="flex-1 min-w-0">
-              <ResumePreview />
+            <ResumePreview />
           </main>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -86,9 +86,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </Header>
 
       <Content>
-        <div className="mx-auto w-full max-w-[1440px] px-4 py-6">
-          {children}
-        </div>
+        <div className="mx-auto w-full max-w-[1440px]">{children}</div>
       </Content>
     </Layout>
   );

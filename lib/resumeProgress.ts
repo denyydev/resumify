@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/useCurrentLocale";
 import type { Resume } from "@/types/resume";
 
 export type DashboardMetric = {
@@ -26,7 +27,159 @@ export type DashboardHint = {
 const clean = (s?: string) => (s ?? "").trim();
 const has = (s?: string) => clean(s).length > 0;
 
-export function computeResumeScore(resume: Resume) {
+const messages = {
+  ru: {
+    hints: {
+      fullName: {
+        title: "Добавь имя — так резюме выглядит завершённым",
+        description: "Укажи ФИО, чтобы шапка резюме не выглядела пустой.",
+      },
+      position: {
+        title: "Уточни желаемую позицию",
+        description: "Например: Frontend Developer (React/Next.js).",
+      },
+      email: {
+        title: "Добавь email для связи",
+        description: "Это один из ключевых контактов для рекрутера.",
+      },
+      summary: {
+        title: "Сделай краткое резюме сильнее",
+        description:
+          "2–4 предложения: опыт, стек, ценность. Идеально от 120 символов.",
+      },
+      expAny: {
+        title: "Добавь хотя бы 1 опыт",
+        description: "Без опыта резюме сильно теряет вес.",
+      },
+      expDesc: {
+        title: "Усиль описание опыта",
+        description: "Добавь 2–4 строки задач/результатов (от 60 символов).",
+      },
+      tech: {
+        title: "Добавь 5+ технологий в стек",
+        description: "Так резюме легче матчится по ключевым словам.",
+      },
+      soft: {
+        title: "Добавь 5+ soft skills",
+        description: "Покажи, как ты работаешь в команде и решаешь задачи.",
+      },
+      prefsAny: {
+        title: "Заполни предпочтения по работе",
+        description:
+          "Укажи тип занятости и формат (remote/hybrid/onsite) — это помогает рекрутерам.",
+      },
+      prefsDetails: {
+        title: "Добавь тип занятости и формат работы",
+        description:
+          "Хотя бы один вариант: full-time/contract и remote/hybrid/onsite.",
+      },
+      certs: {
+        title: "Добавь сертификаты (если есть)",
+        description: "Сертификации повышают доверие и улучшают релевантность.",
+      },
+      activities: {
+        title: "Добавь open-source или волонтёрство",
+        description:
+          "Даже 1 запись про вклад/комьюнити заметно усиливает профиль.",
+      },
+    },
+
+    metrics: {
+      score: "Готовность",
+      experience: "Опыт",
+      skills: "Стек",
+      contacts: "Контакты",
+      preferences: "Предпочтения",
+      certifications: "Сертификаты",
+      activities: "Активности",
+    },
+
+    values: {
+      none: "нет",
+      yes: "есть",
+      expPosShort: "поз.",
+      pcsShort: "шт.",
+    },
+  },
+
+  en: {
+    hints: {
+      fullName: {
+        title: "Add your name — it makes the resume feel complete",
+        description: "Fill in your full name so the header doesn’t look empty.",
+      },
+      position: {
+        title: "Specify your target position",
+        description: "For example: Frontend Developer (React/Next.js).",
+      },
+      email: {
+        title: "Add an email address",
+        description: "This is one of the key contacts for recruiters.",
+      },
+      summary: {
+        title: "Make your summary stronger",
+        description:
+          "2–4 sentences: experience, stack, impact. Ideally 120+ characters.",
+      },
+      expAny: {
+        title: "Add at least 1 experience entry",
+        description:
+          "With no experience listed, your resume loses a lot of weight.",
+      },
+      expDesc: {
+        title: "Improve experience descriptions",
+        description: "Add 2–4 lines of tasks/results (60+ characters).",
+      },
+      tech: {
+        title: "Add 5+ technologies to your stack",
+        description: "It helps matching by keywords.",
+      },
+      soft: {
+        title: "Add 5+ soft skills",
+        description: "Show how you work in a team and solve problems.",
+      },
+      prefsAny: {
+        title: "Fill in work preferences",
+        description:
+          "Add employment type and work format (remote/hybrid/onsite) — recruiters care.",
+      },
+      prefsDetails: {
+        title: "Add employment type and work format",
+        description:
+          "At least one: full-time/contract and remote/hybrid/onsite.",
+      },
+      certs: {
+        title: "Add certifications (if you have any)",
+        description: "Certifications increase trust and relevance.",
+      },
+      activities: {
+        title: "Add open-source or volunteering",
+        description: "Even one entry can noticeably strengthen your profile.",
+      },
+    },
+
+    metrics: {
+      score: "Readiness",
+      experience: "Experience",
+      skills: "Stack",
+      contacts: "Contacts",
+      preferences: "Preferences",
+      certifications: "Certifications",
+      activities: "Activities",
+    },
+
+    values: {
+      none: "none",
+      yes: "yes",
+      expPosShort: "pos.",
+      pcsShort: "pcs.",
+    },
+  },
+} as const;
+
+export function computeResumeScore(resume: Resume, locale: Locale = "ru") {
+  const dict = messages[locale === "en" ? "en" : "ru"];
+
   const prefs = resume.employmentPreferences;
   const certs = resume.certifications ?? [];
   const acts = resume.activities ?? [];
@@ -108,79 +261,75 @@ export function computeResumeScore(resume: Resume) {
   const hints: DashboardHint[] = [
     missing("fullName") && {
       key: "h_fullName",
-      title: "Добавь имя — так резюме выглядит завершённым",
-      description: "Укажи ФИО, чтобы шапка резюме не выглядела пустой.",
+      title: dict.hints.fullName.title,
+      description: dict.hints.fullName.description,
       section: "basic",
     },
     missing("position") && {
       key: "h_position",
-      title: "Уточни желаемую позицию",
-      description: "Например: Frontend Developer (React/Next.js).",
+      title: dict.hints.position.title,
+      description: dict.hints.position.description,
       section: "basic",
     },
     missing("email") && {
       key: "h_email",
-      title: "Добавь email для связи",
-      description: "Это один из ключевых контактов для рекрутера.",
+      title: dict.hints.email.title,
+      description: dict.hints.email.description,
       section: "basic",
     },
     missing("summary") && {
       key: "h_summary",
-      title: "Сделай краткое резюме сильнее",
-      description:
-        "2–4 предложения: опыт, стек, ценность. Идеально от 120 символов.",
+      title: dict.hints.summary.title,
+      description: dict.hints.summary.description,
       section: "summary",
     },
     missing("experienceAny") && {
       key: "h_exp",
-      title: "Добавь хотя бы 1 опыт",
-      description: "Без опыта резюме сильно теряет вес.",
+      title: dict.hints.expAny.title,
+      description: dict.hints.expAny.description,
       section: "experience",
     },
     missing("experienceDesc") && {
       key: "h_exp_desc",
-      title: "Усиль описание опыта",
-      description: "Добавь 2–4 строки задач/результатов (от 60 символов).",
+      title: dict.hints.expDesc.title,
+      description: dict.hints.expDesc.description,
       section: "experience",
     },
     missing("techTags") && {
       key: "h_tech",
-      title: "Добавь 5+ технологий в стек",
-      description: "Так резюме легче матчится по ключевым словам.",
+      title: dict.hints.tech.title,
+      description: dict.hints.tech.description,
       section: "skills",
     },
     missing("softTags") && {
       key: "h_soft",
-      title: "Добавь 5+ soft skills",
-      description: "Покажи, как ты работаешь в команде и решаешь задачи.",
+      title: dict.hints.soft.title,
+      description: dict.hints.soft.description,
       section: "skills",
     },
     missing("preferencesAny") && {
       key: "h_prefs_any",
-      title: "Заполни предпочтения по работе",
-      description:
-        "Укажи тип занятости и формат (remote/hybrid/onsite) — это помогает рекрутерам.",
+      title: dict.hints.prefsAny.title,
+      description: dict.hints.prefsAny.description,
       section: "preferences",
     },
     !missing("preferencesAny") &&
       (missing("preferencesType") || missing("preferencesFormat")) && {
         key: "h_prefs_details",
-        title: "Добавь тип занятости и формат работы",
-        description:
-          "Хотя бы один вариант: full-time/contract и remote/hybrid/onsite.",
+        title: dict.hints.prefsDetails.title,
+        description: dict.hints.prefsDetails.description,
         section: "preferences",
       },
     missing("certificationsAny") && {
       key: "h_certs",
-      title: "Добавь сертификаты (если есть)",
-      description: "Сертификации повышают доверие и улучшают релевантность.",
+      title: dict.hints.certs.title,
+      description: dict.hints.certs.description,
       section: "certifications",
     },
     missing("activitiesAny") && {
       key: "h_activities",
-      title: "Добавь open-source или волонтёрство",
-      description:
-        "Даже 1 запись про вклад/комьюнити заметно усиливает профиль.",
+      title: dict.hints.activities.title,
+      description: dict.hints.activities.description,
       section: "activities",
     },
   ].filter(Boolean) as DashboardHint[];
@@ -190,21 +339,21 @@ export function computeResumeScore(resume: Resume) {
   const metrics: DashboardMetric[] = [
     {
       key: "score",
-      label: "Готовность",
+      label: dict.metrics.score,
       value: `${percent}%`,
       status: percent >= 80 ? "good" : percent >= 50 ? "warn" : "bad",
     },
     {
       key: "experience",
-      label: "Опыт",
+      label: dict.metrics.experience,
       value: resume.experience.length
-        ? `${resume.experience.length} поз.`
-        : "нет",
+        ? `${resume.experience.length} ${dict.values.expPosShort}`
+        : dict.values.none,
       status: resume.experience.length ? "good" : "bad",
     },
     {
       key: "skills",
-      label: "Стек",
+      label: dict.metrics.skills,
       value: `${resume.techSkills.tags.length} tech / ${resume.softSkills.tags.length} soft`,
       status:
         resume.techSkills.tags.length >= 5 && resume.softSkills.tags.length >= 5
@@ -213,27 +362,31 @@ export function computeResumeScore(resume: Resume) {
     },
     {
       key: "contacts",
-      label: "Контакты",
+      label: dict.metrics.contacts,
       value: `${contactsCount}/3`,
       status:
         contactsCount >= 2 ? "good" : contactsCount === 1 ? "warn" : "bad",
     },
     {
       key: "preferences",
-      label: "Предпочтения",
-      value: prefAnyOk ? "есть" : "нет",
+      label: dict.metrics.preferences,
+      value: prefAnyOk ? dict.values.yes : dict.values.none,
       status: prefAnyOk ? "good" : "warn",
     },
     {
       key: "certifications",
-      label: "Сертификаты",
-      value: certs.length ? `${certs.length} шт.` : "нет",
+      label: dict.metrics.certifications,
+      value: certs.length
+        ? `${certs.length} ${dict.values.pcsShort}`
+        : dict.values.none,
       status: certs.length ? (certStrongOk ? "good" : "warn") : "warn",
     },
     {
       key: "activities",
-      label: "Активности",
-      value: acts.length ? `${acts.length} шт.` : "нет",
+      label: dict.metrics.activities,
+      value: acts.length
+        ? `${acts.length} ${dict.values.pcsShort}`
+        : dict.values.none,
       status: acts.length ? (actsStrongOk ? "good" : "warn") : "warn",
     },
   ];

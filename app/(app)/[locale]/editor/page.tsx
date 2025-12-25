@@ -14,7 +14,7 @@ import { ResetResumeButton } from "@/components/resume/ResetButton";
 import { SaveResumeButton } from "@/components/resume/SaveResumeButton";
 import { EditorShell } from "@/components/resume/sections/EditorShell";
 import { ResumeDashboard } from "@/components/resume/sections/ResumeDashboard";
-import { SectionsVisibilityPanel } from "@/components/resume/sections/SectionsVisibilityPanel";
+import { SectionsSidebar } from "@/components/resume/sections/SectionsSidebar";
 import type { Locale } from "@/lib/useCurrentLocale";
 import { useResumeStore } from "@/store/useResumeStore";
 
@@ -70,13 +70,35 @@ export default function EditorPage() {
   }, [pathname, router, searchParams]);
 
   return (
-    <div className="min-h-screen bg-bg pb-24">
-      <div className="grid grid-cols-2 gap-5 p-5">
-        <EditorShell />
-        <div className="grid grid-cols-1 gap-5">
-          <SectionsVisibilityPanel />
-          <ResumeDashboard />
-        </div>
+    <div className="min-h-screen bg-bg pb-12">
+      <div className="flex gap-5 p-5">
+        {!isMobile && (
+          <aside className="w-[240px] shrink-0">
+            <div className="sticky top-[88px]">
+              <SectionsSidebar />
+            </div>
+          </aside>
+        )}
+
+        <main className="min-w-0 flex-1">
+          <EditorShell />
+        </main>
+
+        {!isMobile && (
+          <aside className="w-[360px] shrink-0">
+            <div className="sticky top-[88px]">
+              <ResumeDashboard />
+            </div>
+          </aside>
+        )}
+
+        {isMobile && (
+          <div className="grid w-full grid-cols-1 gap-5">
+            <SectionsSidebar />
+            <EditorShell />
+            <ResumeDashboard />
+          </div>
+        )}
       </div>
 
       <EditorBottomBar
