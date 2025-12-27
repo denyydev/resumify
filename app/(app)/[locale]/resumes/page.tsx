@@ -13,7 +13,6 @@ import {
   Spin,
   Tooltip,
 } from "antd";
-import { AnimatePresence, motion } from "framer-motion";
 import { Clock, File, FileText, Plus, Search, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -46,6 +45,7 @@ const messages = {
     openPdf: "PDF",
     delete: "Удалить",
     updated: "Обновлено",
+    total: "Всего",
   },
   en: {
     title: "My Resumes",
@@ -65,6 +65,7 @@ const messages = {
     openPdf: "PDF",
     delete: "Delete",
     updated: "Updated",
+    total: "Total",
   },
 } as const;
 
@@ -115,6 +116,28 @@ export default function MyResumesPage() {
     load();
   }, [status, session?.user]);
 
+  const filteredResumes = useMemo(() => {
+    if (!search.trim()) return resumes;
+    const q = search.toLowerCase();
+    return resumes.filter((r) => {
+      const fullName = (r.data?.fullName || "").toLowerCase();
+      const position = (r.data?.position || "").toLowerCase();
+      return fullName.includes(q) || position.includes(q);
+    });
+  }, [resumes, search]);
+
+  useEffect(() => setPage(1), [search]);
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredResumes.length / pageSize));
+    if (page > maxPage) setPage(maxPage);
+  }, [filteredResumes.length, page]);
+
+  const paginatedResumes = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredResumes.slice(start, start + pageSize);
+  }, [filteredResumes, page]);
+
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -150,28 +173,6 @@ export default function MyResumesPage() {
     });
   };
 
-  const filteredResumes = useMemo(() => {
-    if (!search.trim()) return resumes;
-    const q = search.toLowerCase();
-    return resumes.filter((r) => {
-      const fullName = (r.data?.fullName || "").toLowerCase();
-      const position = (r.data?.position || "").toLowerCase();
-      return fullName.includes(q) || position.includes(q);
-    });
-  }, [resumes, search]);
-
-  useEffect(() => setPage(1), [search]);
-
-  useEffect(() => {
-    const maxPage = Math.max(1, Math.ceil(filteredResumes.length / pageSize));
-    if (page > maxPage) setPage(maxPage);
-  }, [filteredResumes.length, page]);
-
-  const paginatedResumes = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredResumes.slice(start, start + pageSize);
-  }, [filteredResumes, page]);
-
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen w-full bg-gray-50 p-4 pb-14 md:p-6 md:pb-14 grid place-items-center">
@@ -196,55 +197,73 @@ export default function MyResumesPage() {
     );
   }
 
+  const total = filteredResumes.length;
+  const showPagination = total > pageSize;
+
   return (
     <div className="min-h-screen w-full">
-      <div className="flex flex-col gap-6">
-        <Card>
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-[720px]">
-              <h2 className="m-0 text-2xl font-semibold">{t.title}</h2>
-              <p className="m-0 text-base text-gray-500">{t.subtitle}</p>
-            </div>
+      <div className="mx-auto w-full py-5">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
+          <aside className="lg:sticky lg:top-6 lg:self-start">
+            <Card className="rounded-2xl">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <h1 className="m-0 text-2xl font-semibold">{t.title}</h1>
+                  <p className="m-0 text-sm text-gray-500">{t.subtitle}</p>
+                </div>
 
-            <Link href={`/${locale}/editor`}>
-              <Button type="primary" icon={<Plus size={16} />}>
-                {t.createResume}
-              </Button>
-            </Link>
-          </div>
-        </Card>
+                <Link href={`/${locale}/editor`} className="w-full">
+                  <Button
+                    type="primary"
+                    icon={<Plus size={16} />}
+                    className="w-full !h-10"
+                  >
+                    {t.createResume}
+                  </Button>
+                </Link>
 
-        <Card>
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <Input
-              allowClear
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t.searchPlaceholder}
-              prefix={<Search size={16} className="text-gray-400" />}
-              className="w-full md:max-w-[420px]"
-            />
+                <div className="h-px w-full bg-gray-200" />
 
-            {filteredResumes.length > pageSize && (
-              <Pagination
-                current={page}
-                pageSize={pageSize}
-                total={filteredResumes.length}
-                showSizeChanger={false}
-                onChange={(p) => setPage(p)}
-              />
-            )}
-          </div>
-        </Card>
+                <div className="flex flex-col gap-3">
+                  <Input
+                    allowClear
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder={t.searchPlaceholder}
+                    prefix={<Search size={16} className="text-gray-400" />}
+                    className="!h-10"
+                  />
 
-        <AnimatePresence mode="popLayout">
-          {filteredResumes.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-            >
-              <Card>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>
+                      {t.total}:{" "}
+                      <span className="font-medium text-gray-700">{total}</span>
+                    </span>
+                    {showPagination ? (
+                      <span>
+                        {page}/{Math.max(1, Math.ceil(total / pageSize))}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {showPagination ? (
+                    <Pagination
+                      current={page}
+                      pageSize={pageSize}
+                      total={total}
+                      showSizeChanger={false}
+                      onChange={(p) => setPage(p)}
+                      className="!m-0"
+                    />
+                  ) : null}
+                </div>
+              </div>
+            </Card>
+          </aside>
+
+          <main>
+            {total === 0 ? (
+              <Card className="rounded-2xl">
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                   description={
@@ -261,11 +280,9 @@ export default function MyResumesPage() {
                   </Link>
                 </Empty>
               </Card>
-            </motion.div>
-          ) : (
-            <motion.div layout>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {paginatedResumes.map((resume, index) => {
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+                {paginatedResumes.map((resume) => {
                   const data = (resume.data || {}) as any;
                   const title = data.fullName || t.newResume;
                   const subtitle = data.position || t.noPosition;
@@ -278,87 +295,74 @@ export default function MyResumesPage() {
                   const isDeleting = deletingId === resume.id;
 
                   return (
-                    <motion.div
+                    <Card
                       key={resume.id}
-                      layout
-                      initial={{ opacity: 0, y: 14 }}
-                      animate={{
-                        opacity: 1,
-                        y: 0,
-                        transition: { delay: index * 0.03 },
-                      }}
-                      exit={{ opacity: 0, scale: 0.98 }}
-                      className="h-full"
+                      hoverable
+                      className="h-full rounded-2xl"
                     >
-                      <div className="group h-full">
-                        <Card hoverable className="h-full">
-                          <Link
-                            href={`/${locale}/editor?resumeId=${resume.id}`}
-                            className="block"
-                          >
-                            <ResumePreviewThumb
-                              data={data}
-                              locale={locale}
-                              className="mb-3"
-                            />
+                      <Link
+                        href={`/${locale}/editor?resumeId=${resume.id}`}
+                        className="block"
+                      >
+                        <ResumePreviewThumb
+                          data={data}
+                          locale={locale}
+                          className="mb-3"
+                        />
 
-                            <div className="px-1">
-                              <div className="text-base font-semibold truncate">
-                                {title}
-                              </div>
-                              <div className="mt-0.5 text-[13px] text-gray-500 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
-                                {subtitle}
-                              </div>
-                            </div>
-                          </Link>
-
-                          <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-3 px-1">
-                            <div className="flex items-center gap-1.5 text-gray-500">
-                              <Clock size={14} className="text-gray-400" />
-                              <span className="text-xs">
-                                {t.updated} • {date}
-                              </span>
-                            </div>
-
-                            <div className="flex gap-1.5 ">
-                              <Tooltip title={t.openPdf}>
-                                <Link
-                                  href={`/${locale}/print/${resume.id}`}
-                                  target="_blank"
-                                >
-                                  <Button
-                                    type="text"
-                                    shape="circle"
-                                    icon={<File size={16} />}
-                                  />
-                                </Link>
-                              </Tooltip>
-
-                              <Tooltip title={t.delete}>
-                                <Button
-                                  type="text"
-                                  danger
-                                  shape="circle"
-                                  loading={isDeleting}
-                                  onClick={(e) => handleDelete(resume.id, e)}
-                                  icon={
-                                    !isDeleting ? (
-                                      <Trash2 size={16} />
-                                    ) : undefined
-                                  }
-                                />
-                              </Tooltip>
-                            </div>
+                        <div className="px-1">
+                          <div className="text-base font-semibold truncate">
+                            {title}
                           </div>
-                        </Card>
+                          <div className="mt-0.5 text-[13px] text-gray-500 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
+                            {subtitle}
+                          </div>
+                        </div>
+                      </Link>
+
+                      <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-3 px-1">
+                        <div className="flex items-center gap-1.5 text-gray-500">
+                          <Clock size={14} className="text-gray-400" />
+                          <span className="text-xs">
+                            {t.updated} • {date}
+                          </span>
+                        </div>
+
+                        <div className="flex gap-1.5">
+                          <Tooltip title={t.openPdf}>
+                            <Link
+                              href={`/${locale}/print/${resume.id}`}
+                              target="_blank"
+                            >
+                              <Button
+                                type="text"
+                                shape="circle"
+                                icon={<File size={16} />}
+                              />
+                            </Link>
+                          </Tooltip>
+
+                          <Tooltip title={t.delete}>
+                            <Button
+                              type="text"
+                              danger
+                              shape="circle"
+                              loading={isDeleting}
+                              onClick={(e) => handleDelete(resume.id, e)}
+                              icon={
+                                !isDeleting ? <Trash2 size={16} /> : undefined
+                              }
+                            />
+                          </Tooltip>
+                        </div>
                       </div>
-                    </motion.div>
+                    </Card>
                   );
                 })}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );
