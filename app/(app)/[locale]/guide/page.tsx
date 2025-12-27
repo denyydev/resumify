@@ -153,7 +153,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.ats.title,
         tags: ["ATS"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               <Text strong>{isRu ? "ATS" : "ATS"}</Text>{" "}
               {isRu
@@ -178,7 +178,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.length.title,
         tags: [isRu ? "1 страница" : "1 page"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "1 страница — идеальный стандарт. 2 страницы допустимы, если опыта реально много и каждая строка несёт пользу."
@@ -209,7 +209,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.format.title,
         tags: ["PDF", "ATS"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "Для ATS важны простая структура, один столбец и отсутствие декоративных элементов. Фото и графика часто мешают парсингу."
@@ -234,7 +234,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.links.title,
         tags: [isRu ? "ссылки" : "links"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "LinkedIn / GitHub / портфолио должны быть кликабельными и корректными. Лучшее правило: всегда добавляй https://"
@@ -262,7 +262,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.structure.title,
         tags: [isRu ? "структура" : "structure"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "Читаемость важнее креатива. Стандартные заголовки секций помогают и ATS, и рекрутеру."
@@ -294,7 +294,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.summary.title,
         tags: ["Summary"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "Summary — один из самых важных блоков. 3–5 строк: кто ты, в чём сильный, какой стек/домены, какую задачу ищешь."
@@ -322,7 +322,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.xyz.title,
         tags: ["XYZ"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "Вместо «что делал» — «что изменил». Формула XYZ: достижение → что делал → результат (цифры/эффект)."
@@ -356,7 +356,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.keywords.title,
         tags: [isRu ? "ключевые слова" : "keywords"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "Ключевые слова должны быть в резюме текстом: технологии, инструменты, домены. Лучше всего — и в Skills, и в Experience."
@@ -410,7 +410,7 @@ export default function RecommendationsFaqPage() {
         title: t.items.export.title,
         tags: [isRu ? "экспорт" : "export"],
         content: (
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Paragraph>
               {isRu
                 ? "Если у тебя есть несколько шаблонов — добавь отдельный «ATS-friendly». Для откликов через сайты это будет дефолт."
@@ -460,7 +460,7 @@ export default function RecommendationsFaqPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6">
-      <Space direction="vertical" size={14} className="w-full">
+      <Space orientation="vertical" size={14} className="w-full">
         <Title level={2} style={{ margin: 0 }}>
           {t.pageTitle}
         </Title>

@@ -115,7 +115,7 @@ export function EmploymentPreferencesSection() {
 
         <Form.Item
           label={
-            <Space direction="vertical" size={0}>
+            <Space orientation="vertical" size={0}>
               <Space>
                 <Globe2 size={16} />
                 <span>{t.relocation}</span>
