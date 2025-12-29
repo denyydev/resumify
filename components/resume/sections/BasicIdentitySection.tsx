@@ -38,16 +38,23 @@ function joinFullName(lastName: string, firstName: string, patronymic: string) {
     .join(" ");
 }
 
-export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
+function useVisible(
+  sectionKey: keyof ReturnType<
+    typeof useResumeStore
+  >["resume"]["sectionsVisibility"]
+) {
+  const sectionsVisibility = useResumeStore((s) => s.resume.sectionsVisibility);
+  return sectionsVisibility?.[sectionKey] !== false;
+}
+
+function PhotoBlock({ t }: { t: LocaleMessages }) {
   const [msgApi, contextHolder] = message.useMessage();
   const [hover, setHover] = useState(false);
 
-  const { resume, setFullName, setPhoto } = useResumeStore();
+  const photo = useResumeStore((s) => s.resume.photo);
+  const setPhoto = useResumeStore((s) => s.setPhoto);
 
-  const name = useMemo(
-    () => splitFullName(resume.fullName ?? ""),
-    [resume.fullName]
-  );
+  const visible = useVisible("photo");
 
   const beforeUpload: UploadProps["beforeUpload"] = (file) => {
     const isImage = file.type?.startsWith("image/");
@@ -72,124 +79,148 @@ export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
     return Upload.LIST_IGNORE;
   };
 
+  if (!visible) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      {contextHolder}
+
+      <div className="text-sm font-semibold">{t.photo}</div>
+
+      <Upload.Dragger
+        accept="image/*"
+        multiple={false}
+        showUploadList={false}
+        beforeUpload={beforeUpload}
+        className="!rounded-2xl"
+      >
+        <div
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--ant-colorBorderSecondary)] bg-[var(--ant-colorFillSecondary)]"
+        >
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={photo}
+              alt="Avatar"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <User size={32} className="opacity-60" />
+            </div>
+          )}
+
+          <div
+            className={[
+              "pointer-events-none absolute inset-0 flex items-center justify-center transition-colors duration-150",
+              photo && hover ? "bg-black/35" : "bg-transparent",
+            ].join(" ")}
+          >
+            {photo ? (
+              <Camera
+                size={18}
+                className={hover ? "opacity-100" : "opacity-0"}
+                color="#fff"
+              />
+            ) : null}
+          </div>
+        </div>
+      </Upload.Dragger>
+
+      <div className="text-xs text-[var(--ant-colorTextSecondary)]">
+        {t.photoSubtitle}
+      </div>
+
+      {photo ? (
+        <div className="flex flex-col gap-2">
+          {t.replacePhoto ? (
+            <div className="text-xs text-[var(--ant-colorTextSecondary)]">
+              {t.replacePhoto}
+            </div>
+          ) : null}
+
+          <Button
+            danger
+            type="default"
+            icon={<Trash2 size={16} />}
+            onClick={(e) => {
+              e.stopPropagation();
+              setPhoto(undefined);
+            }}
+          >
+            {t.removePhoto}
+          </Button>
+        </div>
+      ) : (
+        <div className="text-xs text-[var(--ant-colorTextSecondary)]">
+          {t.dragDrop}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NameInputsBlock({ t }: { t: LocaleMessages }) {
+  const fullName = useResumeStore((s) => s.resume.fullName);
+  const setFullName = useResumeStore((s) => s.setFullName);
+
+  const name = useMemo(() => splitFullName(fullName ?? ""), [fullName]);
+
   const setPart = (patch: Partial<typeof name>) => {
     const next = { ...name, ...patch };
     setFullName(joinFullName(next.lastName, next.firstName, next.patronymic));
   };
 
   return (
-    <Card className="w-full">
-      {contextHolder}
+    <Form layout="vertical" colon={false} className="space-y-1">
+      <Form.Item label={t.lastName}>
+        <Input
+          prefix={<User size={16} />}
+          placeholder={t.lastNamePlaceholder}
+          value={name.lastName}
+          onChange={(e) => setPart({ lastName: e.target.value })}
+          allowClear
+        />
+      </Form.Item>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-[140px_1fr]">
-        <div className="flex flex-col gap-2">
-          <div className="text-sm font-semibold">{t.photo}</div>
+      <Form.Item label={t.firstName}>
+        <Input
+          prefix={<User size={16} />}
+          placeholder={t.firstNamePlaceholder}
+          value={name.firstName}
+          onChange={(e) => setPart({ firstName: e.target.value })}
+          allowClear
+        />
+      </Form.Item>
 
-          <Upload.Dragger
-            accept="image/*"
-            multiple={false}
-            showUploadList={false}
-            beforeUpload={beforeUpload}
-            className="!rounded-2xl"
-          >
-            <div
-              onMouseEnter={() => setHover(true)}
-              onMouseLeave={() => setHover(false)}
-              className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--ant-colorBorderSecondary)] bg-[var(--ant-colorFillSecondary)]"
-            >
-              {resume.photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={resume.photo}
-                  alt="Avatar"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <User size={32} className="opacity-60" />
-                </div>
-              )}
+      <Form.Item label={t.patronymic} className="mb-0">
+        <Input
+          prefix={<User size={16} />}
+          placeholder={t.patronymicPlaceholder}
+          value={name.patronymic}
+          onChange={(e) => setPart({ patronymic: e.target.value })}
+          allowClear
+        />
+      </Form.Item>
+    </Form>
+  );
+}
 
-              <div
-                className={[
-                  "pointer-events-none absolute inset-0 flex items-center justify-center transition-colors duration-150",
-                  resume.photo && hover ? "bg-black/35" : "bg-transparent",
-                ].join(" ")}
-              >
-                {resume.photo ? (
-                  <Camera
-                    size={18}
-                    className={hover ? "opacity-100" : "opacity-0"}
-                    color="#fff"
-                  />
-                ) : null}
-              </div>
-            </div>
-          </Upload.Dragger>
+export function BasicIdentitySection({ t }: { t: LocaleMessages }) {
+  const photoVisible = useResumeStore(
+    (s) => s.resume.sectionsVisibility?.photo !== false
+  );
 
-          <div className="text-xs text-[var(--ant-colorTextSecondary)]">
-            {t.photoSubtitle}
-          </div>
-
-          {resume.photo ? (
-            <div className="flex flex-col gap-2">
-              {t.replacePhoto ? (
-                <div className="text-xs text-[var(--ant-colorTextSecondary)]">
-                  {t.replacePhoto}
-                </div>
-              ) : null}
-
-              <Button
-                danger
-                type="default"
-                icon={<Trash2 size={16} />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPhoto(undefined);
-                }}
-              >
-                {t.removePhoto}
-              </Button>
-            </div>
-          ) : (
-            <div className="text-xs text-[var(--ant-colorTextSecondary)]">
-              {t.dragDrop}
-            </div>
-          )}
-        </div>
-
-        <Form layout="vertical" colon={false} className="space-y-1">
-          <Form.Item label={t.lastName}>
-            <Input
-              prefix={<User size={16} />}
-              placeholder={t.lastNamePlaceholder}
-              value={name.lastName}
-              onChange={(e) => setPart({ lastName: e.target.value })}
-              allowClear
-            />
-          </Form.Item>
-
-          <Form.Item label={t.firstName}>
-            <Input
-              prefix={<User size={16} />}
-              placeholder={t.firstNamePlaceholder}
-              value={name.firstName}
-              onChange={(e) => setPart({ firstName: e.target.value })}
-              allowClear
-            />
-          </Form.Item>
-
-          <Form.Item label={t.patronymic} className="mb-0">
-            <Input
-              prefix={<User size={16} />}
-              placeholder={t.patronymicPlaceholder}
-              value={name.patronymic}
-              onChange={(e) => setPart({ patronymic: e.target.value })}
-              allowClear
-            />
-          </Form.Item>
-        </Form>
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-[140px_1fr]">
+        <Card>{photoVisible ? <PhotoBlock t={t} /> : <div />}</Card>
+        <Card>
+          <NameInputsBlock t={t} />
+        </Card>
       </div>
-    </Card>
+    </>
   );
 }

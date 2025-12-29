@@ -10,7 +10,7 @@ import {
   Modal,
   Pagination,
   Result,
-  Spin,
+  Skeleton,
   Tooltip,
 } from "antd";
 import { Clock, File, FileText, Plus, Search, Trash2 } from "lucide-react";
@@ -18,6 +18,8 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
+
+type Locale = "ru" | "en";
 
 type ResumeListItem = {
   id: string;
@@ -69,13 +71,122 @@ const messages = {
   },
 } as const;
 
+const PAGE_SIZE = 8;
+
+function getLocale(params: unknown): Locale {
+  const p = params as { locale?: Locale };
+  return p?.locale ?? "en";
+}
+
+function formatDate(dateIso: string, locale: Locale) {
+  return new Date(dateIso).toLocaleDateString(
+    locale === "ru" ? "ru-RU" : "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }
+  );
+}
+
+function filterResumes(resumes: ResumeListItem[], q: string) {
+  const query = q.trim().toLowerCase();
+  if (!query) return resumes;
+  return resumes.filter((r) => {
+    const fullName = (r.data?.fullName || "").toLowerCase();
+    const position = (r.data?.position || "").toLowerCase();
+    return fullName.includes(query) || position.includes(query);
+  });
+}
+
+function PreviewThumbSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={
+        "relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 shadow-sm " +
+        (className ?? "")
+      }
+      style={{ height: 180 }}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/70 via-transparent to-transparent" />
+
+      <div className="absolute left-3 top-3 pointer-events-none">
+        <div
+          className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white"
+          style={{
+            width: "calc(100vw)",
+            maxWidth: 794,
+            height: 1123,
+            transform: "scale(0.18)",
+            transformOrigin: "top left",
+            boxShadow:
+              "0 18px 40px rgba(15, 23, 42, 0.12), 0 1px 0 rgba(255,255,255,0.6) inset",
+          }}
+        >
+          <div className="p-10">
+            <Skeleton
+              active
+              title={false}
+              paragraph={{
+                rows: 10,
+                width: [
+                  "70%",
+                  "90%",
+                  "85%",
+                  "60%",
+                  "92%",
+                  "88%",
+                  "75%",
+                  "90%",
+                  "65%",
+                  "85%",
+                ],
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-900/5 to-transparent" />
+    </div>
+  );
+}
+
+function ResumeCardSkeleton() {
+  return (
+    <Card hoverable className="h-full rounded-2xl">
+      <PreviewThumbSkeleton className="mb-3" />
+
+      <div className="px-1"></div>
+
+      <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-3 px-1">
+        <div className="flex gap-5">
+          <Skeleton.Button active shape="circle" className="!h-8 !w-8" />
+          <Skeleton.Button active shape="circle" className="!h-8 !w-8" />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function ResumesGridSkeleton({ count }: { count: number }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+      {Array.from({ length: count }).map((_, i) => (
+        <ResumeCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
+
 export default function MyResumesPage() {
-  const params = useParams() as { locale?: "ru" | "en" };
-  const locale = params?.locale ?? "en";
+  const params = useParams();
+  const locale = getLocale(params);
   const t = messages[locale] ?? messages.en;
   const router = useRouter();
 
   const { data: session, status } = useSession();
+  const userEmail = session?.user?.email ? String(session.user.email) : "";
 
   const [resumes, setResumes] = useState<ResumeListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,66 +194,70 @@ export default function MyResumesPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const pageSize = 8;
+  const isAuthLoading = status === "loading";
+  const isUnauthed =
+    !isAuthLoading && (status === "unauthenticated" || !userEmail);
+  const isLoading = isAuthLoading || loading;
 
   useEffect(() => {
-    if (status === "loading") return;
+    if (isAuthLoading) return;
 
-    if (status === "unauthenticated" || !session?.user?.email) {
+    if (status === "unauthenticated" || !userEmail) {
       setLoading(false);
       return;
     }
 
-    const load = async () => {
+    let alive = true;
+
+    (async () => {
+      setLoading(true);
       try {
         const res = await fetch(
-          `/api/resumes?userEmail=${encodeURIComponent(
-            session.user!.email as string
-          )}`
+          `/api/resumes?userEmail=${encodeURIComponent(userEmail)}`
         );
-        if (!res.ok) {
-          console.error("Failed to load resumes", await res.text());
-          return;
-        }
+        if (!res.ok) return;
         const json = await res.json();
-        setResumes(json.resumes || []);
-      } catch (e) {
-        console.error(e);
+        if (!alive) return;
+        setResumes(Array.isArray(json?.resumes) ? json.resumes : []);
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
+    })();
+
+    return () => {
+      alive = false;
     };
+  }, [isAuthLoading, status, userEmail]);
 
-    load();
-  }, [status, session?.user]);
-
-  const filteredResumes = useMemo(() => {
-    if (!search.trim()) return resumes;
-    const q = search.toLowerCase();
-    return resumes.filter((r) => {
-      const fullName = (r.data?.fullName || "").toLowerCase();
-      const position = (r.data?.position || "").toLowerCase();
-      return fullName.includes(q) || position.includes(q);
-    });
-  }, [resumes, search]);
-
-  useEffect(() => setPage(1), [search]);
+  const filtered = useMemo(
+    () => filterResumes(resumes, search),
+    [resumes, search]
+  );
 
   useEffect(() => {
-    const maxPage = Math.max(1, Math.ceil(filteredResumes.length / pageSize));
-    if (page > maxPage) setPage(maxPage);
-  }, [filteredResumes.length, page]);
+    setPage(1);
+  }, [search]);
 
-  const paginatedResumes = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredResumes.slice(start, start + pageSize);
-  }, [filteredResumes, page]);
+  useEffect(() => {
+    const max = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (page > max) setPage(max);
+  }, [filtered.length, page]);
 
-  const handleDelete = (id: string, e: React.MouseEvent) => {
+  const total = filtered.length;
+  const maxPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const showPagination = !isLoading && total > PAGE_SIZE;
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filtered.slice(start, start + PAGE_SIZE);
+  }, [filtered, page]);
+
+  const createHref = `/${locale}/editor`;
+
+  const onDelete = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!session?.user?.email) return;
+    if (!userEmail) return;
 
     Modal.confirm({
       title: t.confirmDeleteTitle,
@@ -156,16 +271,11 @@ export default function MyResumesPage() {
           const res = await fetch(
             `/api/resumes?id=${encodeURIComponent(
               id
-            )}&userEmail=${encodeURIComponent(session.user!.email as string)}`,
+            )}&userEmail=${encodeURIComponent(userEmail)}`,
             { method: "DELETE" }
           );
-          if (!res.ok) {
-            console.error("Failed to delete resume", await res.text());
-            return;
-          }
+          if (!res.ok) return;
           setResumes((prev) => prev.filter((r) => r.id !== id));
-        } catch (err) {
-          console.error(err);
         } finally {
           setDeletingId(null);
         }
@@ -173,17 +283,9 @@ export default function MyResumesPage() {
     });
   };
 
-  if (status === "loading" || loading) {
+  if (isUnauthed) {
     return (
-      <div className="min-h-screen w-full bg-gray-50 p-4 pb-14 md:p-6 md:pb-14 grid place-items-center">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  if (status === "unauthenticated" || !session?.user?.email) {
-    return (
-      <div className="min-h-screen w-full bg-gray-50 p-4 pb-14 md:p-6 md:pb-14 grid place-items-center">
+      <div className="min-h-screen w-full p-4 pb-14 md:p-6 md:pb-14 grid place-items-center">
         <Result
           icon={<FileText size={42} className="text-gray-400" />}
           title={t.unauthorized}
@@ -197,14 +299,11 @@ export default function MyResumesPage() {
     );
   }
 
-  const total = filteredResumes.length;
-  const showPagination = total > pageSize;
-
   return (
-    <div className="min-h-screen w-full">
-      <div className="mx-auto w-full py-5">
+    <div className="min-h-screen w-full 0">
+      <div className="mx-auto w-full p-4 pb-14 md:p-6 md:pb-14">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-          <aside className="lg:sticky lg:top-6 lg:self-start">
+          <aside className="sticky top-6 self-start">
             <Card className="rounded-2xl">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
@@ -212,11 +311,16 @@ export default function MyResumesPage() {
                   <p className="m-0 text-sm text-gray-500">{t.subtitle}</p>
                 </div>
 
-                <Link href={`/${locale}/editor`} className="w-full">
+                <Link
+                  href={createHref}
+                  className={`w-full ${isLoading ? "pointer-events-none" : ""}`}
+                  aria-disabled={isLoading}
+                >
                   <Button
                     type="primary"
                     icon={<Plus size={16} />}
                     className="w-full !h-10"
+                    disabled={isLoading}
                   >
                     {t.createResume}
                   </Button>
@@ -232,16 +336,19 @@ export default function MyResumesPage() {
                     placeholder={t.searchPlaceholder}
                     prefix={<Search size={16} className="text-gray-400" />}
                     className="!h-10"
+                    disabled={isLoading}
                   />
 
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>
                       {t.total}:{" "}
-                      <span className="font-medium text-gray-700">{total}</span>
+                      <span className="font-medium text-gray-700">
+                        {isLoading ? "—" : total}
+                      </span>
                     </span>
                     {showPagination ? (
                       <span>
-                        {page}/{Math.max(1, Math.ceil(total / pageSize))}
+                        {page}/{maxPage}
                       </span>
                     ) : null}
                   </div>
@@ -249,7 +356,7 @@ export default function MyResumesPage() {
                   {showPagination ? (
                     <Pagination
                       current={page}
-                      pageSize={pageSize}
+                      pageSize={PAGE_SIZE}
                       total={total}
                       showSizeChanger={false}
                       onChange={(p) => setPage(p)}
@@ -262,7 +369,9 @@ export default function MyResumesPage() {
           </aside>
 
           <main>
-            {total === 0 ? (
+            {isLoading ? (
+              <ResumesGridSkeleton count={6} />
+            ) : total === 0 ? (
               <Card className="rounded-2xl">
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -273,7 +382,7 @@ export default function MyResumesPage() {
                     </div>
                   }
                 >
-                  <Link href={`/${locale}/editor`}>
+                  <Link href={createHref}>
                     <Button type="primary" icon={<Plus size={16} />}>
                       {t.createResume}
                     </Button>
@@ -282,16 +391,11 @@ export default function MyResumesPage() {
               </Card>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                {paginatedResumes.map((resume) => {
+                {paginated.map((resume) => {
                   const data = (resume.data || {}) as any;
                   const title = data.fullName || t.newResume;
                   const subtitle = data.position || t.noPosition;
-
-                  const date = new Date(resume.updatedAt).toLocaleDateString(
-                    locale === "ru" ? "ru-RU" : "en-US",
-                    { month: "short", day: "numeric", year: "numeric" }
-                  );
-
+                  const date = formatDate(resume.updatedAt, locale);
                   const isDeleting = deletingId === resume.id;
 
                   return (
@@ -306,7 +410,7 @@ export default function MyResumesPage() {
                       >
                         <ResumePreviewThumb
                           data={data}
-                          locale={locale}
+                          locale={locale as any}
                           className="mb-3"
                         />
 
@@ -348,7 +452,7 @@ export default function MyResumesPage() {
                               danger
                               shape="circle"
                               loading={isDeleting}
-                              onClick={(e) => handleDelete(resume.id, e)}
+                              onClick={(e) => onDelete(resume.id, e)}
                               icon={
                                 !isDeleting ? <Trash2 size={16} /> : undefined
                               }

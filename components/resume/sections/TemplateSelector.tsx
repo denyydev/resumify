@@ -96,10 +96,10 @@ export function TemplateSelector() {
   const setTemplateKey = useResumeStore((s) => s.setTemplateKey);
 
   const options: TemplateKey[] = [
+    "simple",
     "classic",
     "minimal",
     "modern",
-    "simple",
     "timeline",
     "grid",
   ];

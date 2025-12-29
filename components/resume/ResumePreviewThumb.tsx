@@ -1,48 +1,49 @@
-"use client"
+"use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import type { Resume } from "@/types/resume"
-import type { Locale } from "@/lib/useCurrentLocale"
-import { ResumePrint } from "@/components/resume/ResumePrint"
+import { ResumePrint } from "@/components/resume/ResumePrint";
+import type { Locale } from "@/lib/useCurrentLocale";
+import type { Resume } from "@/types/resume";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-const A4_W = 794
-const A4_H = 1123
+const A4_W = 794;
+const A4_H = 1123;
+const CONTAINER_H = 180;
+const PADDING = 12;
+const DEFAULT_SCALE = 0.18;
 
-function useElementWidth<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null)
-  const [width, setWidth] = useState(0)
+function useElementSize<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    if (!ref.current) return
-    const el = ref.current
+    const el = ref.current;
+    if (!el) return;
 
     const ro = new ResizeObserver((entries) => {
-      const w = entries[0]?.contentRect?.width ?? 0
-      setWidth(w)
-    })
+      const w = entries[0]?.contentRect?.width ?? 0;
+      setWidth(w);
+    });
 
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
-  return { ref, width }
+  return { ref, width };
 }
 
-export function ResumePreviewThumb({
-  data,
-  locale,
-  className,
-}: {
-  data: Resume
-  locale: Locale
-  className?: string
-}) {
-  const { ref, width } = useElementWidth<HTMLDivElement>()
+type Props = {
+  data: Resume;
+  locale: Locale;
+  className?: string;
+};
+
+export function ResumePreviewThumb({ data, locale, className }: Props) {
+  const { ref, width } = useElementSize<HTMLDivElement>();
+
   const scale = useMemo(() => {
-    // небольшой padding “под рамку”
-    const inner = Math.max(0, width - 24)
-    return inner > 0 ? inner / A4_W : 0.18
-  }, [width])
+    const inner = Math.max(0, width - PADDING * 2);
+    return inner > 0 ? inner / A4_W : DEFAULT_SCALE;
+  }, [width]);
 
   return (
     <div
@@ -51,18 +52,15 @@ export function ResumePreviewThumb({
         "relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 shadow-sm " +
         (className ?? "")
       }
-      style={{
-        // фикс высоты “окна” под лист, чтобы карточки были ровные
-        height: 180,
-      }}
+      style={{ height: CONTAINER_H }}
     >
-      {/* лёгкий “глянец”, как у продуктовых превью */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/70 via-transparent to-transparent" />
 
-      {/* A4 лист */}
       <div
-        className="absolute left-3 top-3 origin-top-left pointer-events-none"
+        className="absolute pointer-events-none origin-top-left"
         style={{
+          left: PADDING,
+          top: PADDING,
           width: A4_W,
           height: A4_H,
           transform: `scale(${scale})`,
@@ -73,12 +71,10 @@ export function ResumePreviewThumb({
           background: "#fff",
         }}
       >
-        {/* важно: pointer-events-none, чтобы клики шли по карточке */}
         <ResumePrint data={data} locale={locale} />
       </div>
 
-      {/* лёгкое затемнение снизу для глубины */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-900/5 to-transparent" />
     </div>
-  )
+  );
 }

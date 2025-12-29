@@ -78,6 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               mode="horizontal"
               selectedKeys={[selectedKey]}
               items={items}
+              disabledOverflow
             />
           </div>
 
