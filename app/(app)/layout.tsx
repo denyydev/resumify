@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthButton } from "@/components/AuthButton";
+import { AuthNotice } from "@/components/AuthNotice";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { BrandLink } from "@/components/ui/BrandLink";
@@ -102,8 +103,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </Header>
-
-      {/* ВАЖНО: скролл только тут */}
+      <AuthNotice locale={currentLocale} />
       <Content className="flex-1 min-h-0 overflow-y-auto">
         <div className="mx-auto w-full max-w-[1440px]">{children}</div>
       </Content>

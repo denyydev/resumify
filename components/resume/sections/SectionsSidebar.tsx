@@ -118,7 +118,7 @@ export function SectionsSidebar() {
             href={item.href}
             ref={idx === 0 ? rowRef : undefined}
             className={[
-              "relative z-10 flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left",
+              "relative z-10 flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left!",
               "no-underline text-inherit",
               "transition",
               "hover:bg-black/5 active:scale-[0.99] cursor-pointer",

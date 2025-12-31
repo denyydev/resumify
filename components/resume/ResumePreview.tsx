@@ -10,7 +10,7 @@ export function ResumePreview() {
   const locale = useCurrentLocale();
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center w-full">
       <ResumePrint
         data={MOCK_RESUME}
         templateKey={resume.templateKey}

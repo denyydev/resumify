@@ -2,7 +2,7 @@
 
 import { type Locale } from "@/lib/useCurrentLocale";
 import { useResumeStore } from "@/store/useResumeStore";
-import { Button } from "antd";
+import { Button, Tooltip } from "antd";
 import { FileDown } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -16,11 +16,10 @@ export function DownloadPdfButton({ locale }: Props) {
   const resume = useResumeStore((s) => s.resume);
   const { data: session } = useSession();
 
+  const isAuthed = Boolean(session?.user?.email);
+
   const handleClick = async () => {
-    if (!session?.user?.email) {
-      console.warn("No user email in session, user is not authenticated");
-      return;
-    }
+    if (!isAuthed) return;
 
     try {
       setLoading(true);
@@ -32,17 +31,13 @@ export function DownloadPdfButton({ locale }: Props) {
           data: resume,
           locale,
           title: resume.position || resume.fullName || "Untitled resume",
-          userEmail: session.user.email,
+          userEmail: session!.user!.email!,
         }),
       });
 
-      if (!saveRes.ok) {
-        console.error("Failed to save resume", await saveRes.text());
-        return;
-      }
+      if (!saveRes.ok) return;
 
       const { id } = (await saveRes.json()) as { id: string };
-      console.log("Saved resume id:", id);
 
       const pdfRes = await fetch("/api/pdf", {
         method: "POST",
@@ -50,10 +45,7 @@ export function DownloadPdfButton({ locale }: Props) {
         body: JSON.stringify({ id, locale }),
       });
 
-      if (!pdfRes.ok) {
-        console.error("Failed to generate PDF", await pdfRes.text());
-        return;
-      }
+      if (!pdfRes.ok) return;
 
       const blob = await pdfRes.blob();
       const url = URL.createObjectURL(blob);
@@ -65,8 +57,6 @@ export function DownloadPdfButton({ locale }: Props) {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -77,16 +67,29 @@ export function DownloadPdfButton({ locale }: Props) {
     en: "Download PDF",
   };
 
-  return (
+  const tooltipByLocale: Record<Locale, string> = {
+    ru: "Войдите или зарегистрируйтесь, чтобы скачать PDF",
+    en: "Sign in to download your PDF",
+  };
+
+  const button = (
     <Button
       type="primary"
       className="rounded-full w-full"
-      disabled={!session?.user?.email || loading}
+      disabled={!isAuthed || loading}
       onClick={handleClick}
       icon={<FileDown className="w-4 h-4" />}
       loading={loading}
     >
       {labelByLocale[locale]}
     </Button>
+  );
+
+  return !isAuthed ? (
+    <Tooltip title={tooltipByLocale[locale]} placement="top">
+      <span className="inline-block w-full cursor-not-allowed">{button}</span>
+    </Tooltip>
+  ) : (
+    button
   );
 }

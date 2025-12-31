@@ -14,7 +14,6 @@ export function AuthButton() {
     return (
       <Button
         type="primary"
-        size="small"
         shape="round"
         onClick={() => signIn("google")}
         className="!h-8"

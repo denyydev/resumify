@@ -3,17 +3,10 @@
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Button, ConfigProvider } from "antd";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
-
-function cn(...xs: Array<string | false | null | undefined>) {
-  return xs.filter(Boolean).join(" ");
-}
 
 const container = {
   hidden: {},
-  show: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.04 },
-  },
+  show: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
 };
 
 const item = {
@@ -26,259 +19,123 @@ const item = {
   },
 };
 
-type Pill = {
-  text: string;
-  tone?: "violet" | "fuchsia" | "neutral";
-};
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/14 bg-white/[0.06] px-4 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+      <div className="text-sm font-semibold text-white">{value}</div>
+      <div className="mt-0.5 text-xs text-white/60">{label}</div>
+    </div>
+  );
+}
+
+function Tag({ children }: { children: string }) {
+  return (
+    <span className="rounded-full border border-white/14 bg-white/[0.07] px-3 py-1 text-xs text-white/75 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] hover:bg-white/[0.10]">
+      {children}
+    </span>
+  );
+}
 
 export default function Hero() {
-  const pills: Pill[] = useMemo(
-    () => [
-      { text: "ATS", tone: "violet" },
-      { text: "PDF", tone: "neutral" },
-      { text: "DOCX", tone: "neutral" },
-      { text: "FASTEST", tone: "fuchsia" },
-      { text: "Templates", tone: "neutral" },
-      { text: "Modern UI", tone: "neutral" },
-    ],
-    []
-  );
-
   return (
     <ConfigProvider
       theme={{
-        token: {
-          borderRadius: 14,
-          fontSize: 14,
-          colorPrimary: "#7c3aed",
-        },
+        token: { borderRadius: 14, fontSize: 14, colorPrimary: "#A78BFA" },
       }}
     >
-      <section className="relative min-h-screen w-full overflow-hidden bg-zinc-950 text-white flex items-center">
-        {/* background */}
+      <section className="relative w-full overflow-hidden bg-zinc-950 text-white">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-44 left-[-12%] h-[560px] w-[560px] rounded-full bg-violet-600/18 blur-3xl" />
-          <div className="absolute -bottom-44 right-[-12%] h-[640px] w-[640px] rounded-full bg-fuchsia-500/14 blur-3xl" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_55%)]" />
-          <div className="hero-grid absolute inset-0 opacity-[0.16]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.0),rgba(0,0,0,0.35))]" />
+          <div className="absolute -top-52 left-[-18%] h-[560px] w-[560px] rounded-full bg-violet-600/16 blur-3xl" />
+          <div className="absolute -bottom-56 right-[-18%] h-[640px] w-[640px] rounded-full bg-fuchsia-500/12 blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.07),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.0),rgba(0,0,0,0.45))]" />
         </div>
 
-        <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-5 pb-16 pt-16 md:grid-cols-2 md:gap-12 md:pt-24">
-          {/* left */}
+        <div className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:py-24">
           <motion.div
             variants={container}
             initial="hidden"
             animate="show"
             className="max-w-xl"
           >
-            <motion.div
-              variants={item}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-violet-300/80" />
-              <span className="font-medium tracking-wide">
-                IT Resume Builder
-              </span>
-              <span className="text-white/45">•</span>
-              <span className="text-white/60">PDF / DOCX</span>
-            </motion.div>
-
             <motion.h1
               variants={item}
-              className="mt-5 text-4xl font-semibold leading-[1.02] tracking-[-0.03em] md:text-6xl"
+              className="text-balance text-4xl font-bold leading-[1.02] tracking-[-0.04em] md:text-6xl"
             >
-              <span className="font-light text-white/85">Собери</span>{" "}
-              <span className="font-semibold">резюме</span>{" "}
-              <span className="font-light text-white/80">для</span>{" "}
-              <span className="bg-gradient-to-r from-violet-200 to-fuchsia-200 bg-clip-text font-semibold text-transparent">
-                найма
-              </span>
+              Резюме, которое{" "}
+              <span className="bg-gradient-to-r from-violet-200 to-fuchsia-200 bg-clip-text text-transparent">
+                проходит ATS
+              </span>{" "}
+              и читается как продукт.
             </motion.h1>
 
             <motion.p
               variants={item}
-              className="mt-4 text-base leading-relaxed text-white/60 md:text-lg"
+              className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-white/62 md:text-lg"
             >
-              Шаблоны под роли, ATS-friendly структура и экспорт за секунды.
+              ATS-совместимые шаблоны под роли, аккуратная структура и экспорт в
+              один клик. Без воды. Без визуального шума. Только смысл и сильная
+              типографика.
             </motion.p>
 
-            <motion.div
-              variants={item}
-              className="mt-7 flex flex-wrap items-center gap-3"
-            >
+            <motion.div variants={item} className="mt-8">
               <Button
                 type="primary"
                 size="large"
-                className="!h-11 !rounded-2xl !px-5"
+                className="!h-11 !rounded-2xl !border-0 !px-5 !text-zinc-950
+                           !bg-gradient-to-r !from-violet-200 !to-fuchsia-200
+                           hover:!from-violet-100 hover:!to-fuchsia-100
+                           active:!from-violet-300 active:!to-fuchsia-300
+                           !shadow-[0_10px_30px_-14px_rgba(168,85,247,0.65)]"
                 icon={<ArrowRightOutlined />}
+                href={"./ru/editor"}
               >
                 Создать резюме
               </Button>
-
-              <Button
-                size="large"
-                className="!h-11 !rounded-2xl !px-5 !border-white/15 !bg-white/5 !text-white hover:!bg-white/10"
-              >
-                Шаблоны
-              </Button>
-            </motion.div>
-
-            <motion.div
-              variants={item}
-              className="mt-7 flex flex-wrap gap-2 text-xs text-white/55"
-            >
-              {[
-                "ATS-ready",
-                "1-page layout",
-                "Clean typography",
-                "No clutter",
-              ].map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1"
-                >
-                  {t}
-                </span>
-              ))}
             </motion.div>
           </motion.div>
 
-          {/* right: animated tokens */}
-          <div className="relative mx-auto flex w-full max-w-[560px] items-center justify-center">
-            {/* base glow card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="relative h-[380px] w-full rounded-[32px] border border-white/10 bg-white/[0.03] backdrop-blur-xl"
-            >
-              {/* inner highlight */}
-              <div className="absolute inset-0 rounded-[32px] bg-[radial-gradient(ellipse_at_30%_20%,rgba(124,58,237,0.22),transparent_55%)]" />
-              <div className="absolute inset-0 rounded-[32px] bg-[radial-gradient(ellipse_at_70%_70%,rgba(236,72,153,0.18),transparent_55%)]" />
-
-              {/* big words */}
-              <motion.div
-                className="absolute left-6 top-6 select-none text-5xl font-semibold tracking-[-0.04em] text-white/90 md:text-6xl"
-                animate={{ y: [0, -8, 0] }}
-                transition={{
-                  duration: 6.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                FAST
-                <span className="font-light text-white/55">EST</span>
-              </motion.div>
-
-              <motion.div
-                className="absolute bottom-8 right-7 select-none text-5xl font-semibold tracking-[-0.04em] text-white/85 md:text-6xl"
-                animate={{ y: [0, 10, 0] }}
-                transition={{
-                  duration: 7.2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <span className="bg-gradient-to-r from-violet-200 to-fuchsia-200 bg-clip-text text-transparent">
-                  ATS
-                </span>
-              </motion.div>
-
-              {/* orbit pills */}
-              <Orbit pills={pills} />
-
-              {/* center micro line */}
-              <div className="absolute left-1/2 top-1/2 h-[1px] w-[62%] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-              <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/25" />
-
-              {/* subtle corner note */}
-              <div className="absolute bottom-4 left-5 text-xs text-white/45">
-                Export in seconds • clean output
+          <motion.div
+            initial={{ opacity: 0, y: 16, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative mx-auto w-full max-w-md"
+          >
+            <div className="absolute -inset-0.5 rounded-[28px] bg-[linear-gradient(135deg,rgba(167,139,250,0.22),rgba(236,72,153,0.14),rgba(255,255,255,0.06))] blur-xl" />
+            <div className="relative rounded-[28px] border border-white/12 bg-white/[0.035] p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-medium text-white/65">
+                  Output & Structure
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/[0.06] px-3 py-1 text-xs text-white/70">
+                  <span className="h-1.5 w-1.5 rounded-full bg-violet-300/80" />
+                  Ready to export
+                </div>
               </div>
-            </motion.div>
 
-            {/* outer floating dots */}
-            <FloatingDots />
-          </div>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3 md:grid-cols-1">
+                <Stat label="Экспорт" value="PDF + DOCX" />
+                <Stat label="Структура" value="ATS-friendly" />
+                <Stat label="Фокус" value="1-page, clean type" />
+              </div>
+
+              <div className="mt-5">
+                <div className="text-xs font-medium text-white/60">
+                  What you get
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Tag>No clutter</Tag>
+                  <Tag>Role templates</Tag>
+                  <Tag>Fast editing</Tag>
+                  <Tag>Clean hierarchy</Tag>
+                </div>
+              </div>
+
+              <div className="mt-5 h-px w-full bg-gradient-to-r from-transparent via-white/14 to-transparent" />
+            </div>
+          </motion.div>
         </div>
       </section>
     </ConfigProvider>
-  );
-}
-
-function Orbit({ pills }: { pills: Pill[] }) {
-  // positions around the card
-  const spots = [
-    "left-6 top-44",
-    "left-16 top-20",
-    "right-10 top-24",
-    "right-8 top-52",
-    "left-24 bottom-14",
-    "right-24 bottom-20",
-  ];
-
-  return (
-    <>
-      {pills.map((p, i) => (
-        <motion.div
-          key={p.text}
-          className={cn("absolute", spots[i % spots.length])}
-          initial={{ opacity: 0, y: 10, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{
-            duration: 0.6,
-            delay: 0.12 + i * 0.06,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        >
-          <motion.div
-            animate={{ y: [0, -10, 0], rotate: [0, 1.5, 0] }}
-            transition={{
-              duration: 5.2 + i * 0.35,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.2,
-            }}
-            className={cn(
-              "inline-flex items-center rounded-2xl border px-4 py-2 text-sm font-medium backdrop-blur-xl",
-              p.tone === "violet" &&
-                "border-violet-200/15 bg-violet-500/10 text-violet-50",
-              p.tone === "fuchsia" &&
-                "border-fuchsia-200/15 bg-fuchsia-500/10 text-fuchsia-50",
-              (!p.tone || p.tone === "neutral") &&
-                "border-white/10 bg-black/30 text-white/80"
-            )}
-          >
-            <span className="mr-2 inline-block h-2 w-2 rounded-full bg-white/35" />
-            <span className="tracking-wide">{p.text}</span>
-          </motion.div>
-        </motion.div>
-      ))}
-    </>
-  );
-}
-
-function FloatingDots() {
-  return (
-    <div className="pointer-events-none absolute inset-0">
-      {Array.from({ length: 10 }).map((_, i) => (
-        <motion.span
-          key={i}
-          className="absolute h-1.5 w-1.5 rounded-full bg-white/20"
-          style={{
-            left: `${10 + ((i * 8) % 80)}%`,
-            top: `${12 + ((i * 11) % 70)}%`,
-          }}
-          animate={{ y: [0, -10, 0], opacity: [0.18, 0.35, 0.18] }}
-          transition={{
-            duration: 4.5 + i * 0.25,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.12,
-          }}
-        />
-      ))}
-    </div>
   );
 }

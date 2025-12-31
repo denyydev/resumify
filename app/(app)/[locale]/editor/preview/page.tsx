@@ -31,7 +31,7 @@ export default function PreviewPage() {
   const t = messages[locale];
 
   const screens = useBreakpoint();
-  const isDesktop = useMemo(() => !!screens.lg, [screens.lg]);
+  const isMobile = useMemo(() => !screens.lg, [screens.lg]);
 
   const searchParams = useSearchParams();
   const resumeId = searchParams.get("resumeId");
@@ -66,37 +66,66 @@ export default function PreviewPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto w-full max-w-[1400px] px-4 py-5 sm:px-6">
-        <div className="flex flex-col gap-5 lg:flex-row">
-          <aside className="w-full lg:w-[320px] lg:shrink-0">
-            <Card>
+      <div className="flex gap-5 py-5">
+        {!isMobile && (
+          <aside className="w-[320px] shrink-0">
+            <div className="sticky top-5">
+              <Card>
+                <Button
+                  type="text"
+                  className="w-full"
+                  onClick={handleBack}
+                  icon={<ArrowLeft className="h-4 w-4" />}
+                >
+                  {t.backToEditor}
+                </Button>
+                <Divider />
+                <TemplateSelector />
+              </Card>
+            </div>
+          </aside>
+        )}
+
+        <main className="min-w-0 flex-1">
+          {isMobile && (
+            <Card className="mb-5">
               <Button
                 type="text"
-                className="w-full justify-start"
+                size="small"
                 onClick={handleBack}
                 icon={<ArrowLeft className="h-4 w-4" />}
               >
                 {t.backToEditor}
               </Button>
-              <Divider />
               <TemplateSelector />
             </Card>
-          </aside>
+          )}
 
-          <main className="min-w-0 flex-1">
-            <ResumePreview />
-          </main>
+          <ResumePreview />
+        </main>
 
-          <aside className="w-full lg:w-[320px] lg:shrink-0">
-            <Card>
-              <AccentColorPicker />
-              <Divider />
-              <PhotoExportToggle />
-              <Divider />
-              <DownloadPdfButton locale={locale} />
-            </Card>
+        {!isMobile && (
+          <aside className="w-[320px] shrink-0">
+            <div className="sticky top-5">
+              <Card>
+                <AccentColorPicker />
+                <Divider />
+                <PhotoExportToggle />
+                <Divider />
+                <DownloadPdfButton locale={locale} />
+              </Card>
+            </div>
           </aside>
-        </div>
+        )}
+
+        {isMobile && (
+          <Card className="mt-5">
+            <AccentColorPicker />
+            <Divider />
+            <PhotoExportToggle />
+            <DownloadPdfButton locale={locale} />
+          </Card>
+        )}
       </div>
     </div>
   );

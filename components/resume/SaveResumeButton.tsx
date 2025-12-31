@@ -1,33 +1,32 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "antd"
-import { SaveOutlined, LoadingOutlined } from "@ant-design/icons"
-import { useSession } from "next-auth/react"
-import { useSearchParams, useRouter, useParams } from "next/navigation"
-import { useResumeStore } from "@/store/useResumeStore"
-import type { Locale } from "@/lib/useCurrentLocale"
+import type { Locale } from "@/lib/useCurrentLocale";
+import { useResumeStore } from "@/store/useResumeStore";
+import { LoadingOutlined, SaveOutlined } from "@ant-design/icons";
+import { Button, Tooltip } from "antd";
+import { useSession } from "next-auth/react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export function SaveResumeButton() {
-  const { data: session } = useSession()
-  const { resume } = useResumeStore()
-  const [loading, setLoading] = useState(false)
+  const { data: session } = useSession();
+  const isAuthed = Boolean(session?.user?.email);
 
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const params = useParams() as { locale: Locale }
-  const locale: Locale = params?.locale === "en" ? "en" : "ru"
+  const { resume } = useResumeStore();
+  const [loading, setLoading] = useState(false);
 
-  const existingId = searchParams.get("resumeId")
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const params = useParams() as { locale: Locale };
+  const locale: Locale = params?.locale === "en" ? "en" : "ru";
+
+  const existingId = searchParams.get("resumeId");
 
   const handleClick = async () => {
-    if (!session?.user?.email) {
-      console.warn("No user email in session, user is not authenticated")
-      return
-    }
+    if (!isAuthed) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       const res = await fetch("/api/resumes", {
         method: "POST",
@@ -36,29 +35,23 @@ export function SaveResumeButton() {
           data: resume,
           locale,
           title: resume.position || resume.fullName || "Untitled resume",
-          userEmail: session.user.email,
+          userEmail: session!.user!.email!,
         }),
-      })
+      });
 
-      if (!res.ok) {
-        console.error("Failed to save resume", await res.text())
-        return
-      }
+      if (!res.ok) return;
 
-      const json = await res.json()
-      const newId: string = json.id
+      const { id: newId } = (await res.json()) as { id: string };
 
       if (newId && newId !== existingId) {
-        const usp = new URLSearchParams(searchParams.toString())
-        usp.set("resumeId", newId)
-        router.replace(`/${locale}/editor?${usp.toString()}`)
+        const usp = new URLSearchParams(searchParams.toString());
+        usp.set("resumeId", newId);
+        router.replace(`/${locale}/editor?${usp.toString()}`);
       }
-    } catch (e) {
-      console.error(e)
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const label =
     locale === "ru"
@@ -66,18 +59,31 @@ export function SaveResumeButton() {
         ? "Сохранить как новое"
         : "Сохранить резюме"
       : existingId
-        ? "Save as new"
-        : "Save resume"
+      ? "Save as new"
+      : "Save resume";
 
-  return (
+  const tooltipText =
+    locale === "ru"
+      ? "Войдите, чтобы сохранять резюме"
+      : "Sign in to save your resume";
+
+  const button = (
     <Button
       type="text"
       onClick={handleClick}
-      disabled={!session?.user?.email}
+      disabled={!isAuthed || loading}
       loading={loading}
       icon={loading ? <LoadingOutlined /> : <SaveOutlined />}
     >
       {label}
     </Button>
-  )
+  );
+
+  return !isAuthed ? (
+    <Tooltip title={tooltipText} placement="top">
+      <span className="inline-flex cursor-not-allowed">{button}</span>
+    </Tooltip>
+  ) : (
+    button
+  );
 }
