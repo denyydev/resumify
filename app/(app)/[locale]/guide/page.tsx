@@ -1,6 +1,7 @@
 "use client";
 
 import type { Locale } from "@/lib/useCurrentLocale";
+import type { MenuProps } from "antd";
 import {
   Alert,
   Card,
@@ -161,6 +162,8 @@ const messages = {
   },
 } as const;
 
+type SectionKey = keyof (typeof messages)["ru"]["nav"];
+
 function Pill({
   icon,
   title,
@@ -277,13 +280,11 @@ function RuleRow({
 }
 
 export default function RecommendationsFaqPage() {
-  const params = useParams<{ locale: Locale }>();
+  const params = useParams<{ locale?: string }>();
   const locale: Locale = params?.locale === "en" ? "en" : "ru";
   const t = messages[locale];
 
-  const [activeSection, setActiveSection] = useState<
-    "overview" | "faq" | "checklist"
-  >("overview");
+  const [activeSection, setActiveSection] = useState<SectionKey>("overview");
 
   const faqItems: FaqItem[] = useMemo(() => {
     const isRu = locale === "ru";
@@ -702,32 +703,25 @@ export default function RecommendationsFaqPage() {
     ];
   }, [locale, t]);
 
-  const navItems = useMemo(
-    () => [
+  const navItems = useMemo((): MenuProps["items"] => {
+    return [
       {
-        key: "overview" as const,
+        key: "overview",
         label: t.nav.overview,
         icon: <Sparkles size={16} />,
       },
-      { key: "faq" as const, label: t.nav.faq, icon: <BookOpen size={16} /> },
+      { key: "faq", label: t.nav.faq, icon: <BookOpen size={16} /> },
       {
-        key: "checklist" as const,
+        key: "checklist",
         label: t.nav.checklist,
         icon: <BadgeCheck size={16} />,
       },
-    ],
-    [t]
-  );
+    ];
+  }, [t]);
 
-  const menuItems = useMemo(
-    () =>
-      navItems.map((x) => ({
-        key: x.key,
-        icon: x.icon,
-        label: x.label,
-      })),
-    [navItems]
-  );
+  const onMenuClick: MenuProps["onClick"] = (e) => {
+    setActiveSection(e.key as SectionKey);
+  };
 
   return (
     <div className="w-full py-5">
@@ -752,8 +746,8 @@ export default function RecommendationsFaqPage() {
               <Menu
                 mode="inline"
                 selectedKeys={[activeSection]}
-                items={menuItems}
-                onClick={(e) => setActiveSection(e.key as any)}
+                items={navItems}
+                onClick={onMenuClick}
               />
             </div>
 

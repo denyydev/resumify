@@ -53,15 +53,39 @@ function normalizeLocale(value: unknown): Locale {
   return base === "en" ? "en" : "ru";
 }
 
+type CertificationDraft = {
+  name?: string;
+  issuer?: string;
+  year?: string;
+  link?: string;
+};
+
+type CertificationItem = CertificationDraft & { id: string };
+
+type ResumeStoreShape = {
+  resume: { certifications?: CertificationItem[] };
+  addCertification: () => void;
+  updateCertification: (id: string, patch: CertificationDraft) => void;
+  removeCertification: (id: string) => void;
+};
+
 export function CertificationsSection() {
   const rawLocale = useCurrentLocale();
-  const locale = normalizeLocale(rawLocale) satisfies Locale;
+  const locale: Locale = normalizeLocale(rawLocale);
   const t = messages[locale];
 
-  const list = useResumeStore((s) => s.resume.certifications ?? []);
-  const addCertification = useResumeStore((s) => s.addCertification);
-  const updateCertification = useResumeStore((s) => s.updateCertification);
-  const removeCertification = useResumeStore((s) => s.removeCertification);
+  const list = useResumeStore(
+    (s) => (s as unknown as ResumeStoreShape).resume.certifications ?? []
+  );
+  const addCertification = useResumeStore(
+    (s) => (s as unknown as ResumeStoreShape).addCertification
+  );
+  const updateCertification = useResumeStore(
+    (s) => (s as unknown as ResumeStoreShape).updateCertification
+  );
+  const removeCertification = useResumeStore(
+    (s) => (s as unknown as ResumeStoreShape).removeCertification
+  );
 
   return (
     <Card
@@ -138,11 +162,9 @@ export function CertificationsSection() {
 
                     <Form.Item label={t.year}>
                       <Input
-                        value={(item as any).year ?? ""}
+                        value={item.year ?? ""}
                         onChange={(e) =>
-                          updateCertification(item.id, {
-                            year: e.target.value,
-                          } as any)
+                          updateCertification(item.id, { year: e.target.value })
                         }
                         placeholder={t.yearPh}
                         prefix={<CalendarOutlined />}

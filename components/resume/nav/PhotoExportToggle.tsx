@@ -21,16 +21,21 @@ const messages = {
   },
 } as const;
 
+type ResumeStoreSlice = {
+  resume: { includePhoto?: boolean };
+  setIncludePhoto: (v: boolean) => void;
+};
+
 export function PhotoExportToggle({ className }: { className?: string }) {
   const localeRaw = useCurrentLocale();
   const locale: LocaleKey = localeRaw === "en" ? "en" : "ru";
   const t = messages[locale];
 
   const includePhoto = useResumeStore(
-    (s) => (s as any).resume.includePhoto as boolean | undefined
+    (s) => (s as unknown as ResumeStoreSlice).resume.includePhoto
   );
   const setIncludePhoto = useResumeStore(
-    (s) => (s as any).setIncludePhoto as (v: boolean) => void
+    (s) => (s as unknown as ResumeStoreSlice).setIncludePhoto
   );
 
   const checked = includePhoto ?? true;
@@ -45,7 +50,7 @@ export function PhotoExportToggle({ className }: { className?: string }) {
       </div>
 
       <Tooltip title={checked ? t.on : t.off} placement="top">
-        <Switch checked={checked} onChange={(v) => setIncludePhoto(v)} />
+        <Switch checked={checked} onChange={setIncludePhoto} />
       </Tooltip>
     </div>
   );

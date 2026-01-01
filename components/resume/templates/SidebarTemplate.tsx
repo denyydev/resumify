@@ -124,15 +124,15 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
   const hasSoft = softTags.length > 0 || softNote.length > 0;
 
   const hasPrimaryContacts = !!(
-    contacts.email ||
-    contacts.phone ||
-    contacts.location
+    contacts?.email ||
+    contacts?.phone ||
+    contacts?.location
   );
   const hasLinks = !!(
-    contacts.telegram ||
-    contacts.github ||
-    contacts.linkedin ||
-    contacts.website
+    contacts?.telegram ||
+    contacts?.github ||
+    contacts?.linkedin ||
+    contacts?.website
   );
 
   const pref = employmentPreferences;
@@ -162,17 +162,17 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
   };
 
   const contactLines = [
-    contacts.email,
-    contacts.phone,
-    contacts.location,
-  ].filter(Boolean) as string[];
+    contacts?.email,
+    contacts?.phone,
+    contacts?.location,
+  ].filter((v): v is string => typeof v === "string" && v.length > 0);
 
   const linkLines = [
-    contacts.telegram,
-    contacts.github,
-    contacts.linkedin,
-    contacts.website,
-  ].filter(Boolean) as string[];
+    contacts?.telegram,
+    contacts?.github,
+    contacts?.linkedin,
+    contacts?.website,
+  ].filter((v): v is string => typeof v === "string" && v.length > 0);
 
   return (
     <div
@@ -195,7 +195,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
           {photo && includePhoto !== false ? (
             <img
               src={photo}
-              alt={fullName}
+              alt={fullName || "Photo"}
               className="w-20 h-20 rounded-2xl object-cover border"
               style={{ borderColor: `${accent}55` }}
             />
@@ -257,7 +257,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
                     ? pref.relocation
                       ? "Yes"
                       : "No"
-                    : ""
+                    : undefined
                 }
                 tone="dark"
               />
@@ -323,7 +323,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
           </section>
         )}
 
-        {languages?.length > 0 && (
+        {languages?.length ? (
           <section className="space-y-2">
             <SectionTitle accentColor={accent} tone="dark">
               Languages
@@ -339,7 +339,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
               ))}
             </ul>
           </section>
-        )}
+        ) : null}
 
         {hasCerts && (
           <section className="space-y-2">
@@ -348,7 +348,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
             </SectionTitle>
 
             <div className="space-y-2">
-              {certifications!.slice(0, 4).map((c) => (
+              {certifications?.slice(0, 4).map((c) => (
                 <div
                   key={c.id}
                   className="rounded-2xl border border-white/10 bg-white/5 p-3"
@@ -357,7 +357,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
                     {c.name}
                   </p>
                   <p className="text-[10px] text-slate-300 leading-snug">
-                    {[c.issuer, (c as any).year].filter(Boolean).join(" · ")}
+                    {[c.issuer, c.year].filter(Boolean).join(" · ")}
                   </p>
                   {c.link && (
                     <p
@@ -371,9 +371,9 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
               ))}
             </div>
 
-            {certifications!.length > 4 && (
+            {(certifications?.length ?? 0) > 4 && (
               <p className="text-[10px] text-slate-400">
-                +{certifications!.length - 4} more
+                +{(certifications?.length ?? 0) - 4} more
               </p>
             )}
           </section>
@@ -393,7 +393,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
           </section>
         )}
 
-        {experience?.length > 0 && (
+        {experience?.length ? (
           <section className="space-y-3">
             <SectionTitle accentColor={accent}>Experience</SectionTitle>
 
@@ -427,9 +427,9 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
               </div>
             ))}
           </section>
-        )}
+        ) : null}
 
-        {projects?.length > 0 && (
+        {projects?.length ? (
           <section className="space-y-3">
             <SectionTitle accentColor={accent}>Projects</SectionTitle>
 
@@ -468,7 +468,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
               </div>
             ))}
           </section>
-        )}
+        ) : null}
 
         {hasActivities && (
           <section className="space-y-3">
@@ -476,7 +476,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
               Open Source & Volunteering
             </SectionTitle>
 
-            {activities!.map((a) => (
+            {activities?.map((a) => (
               <div
                 key={a.id}
                 className="space-y-1"
@@ -515,7 +515,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
           </section>
         )}
 
-        {education?.length > 0 && (
+        {education?.length ? (
           <section className="space-y-3">
             <SectionTitle accentColor={accent}>Education</SectionTitle>
 
@@ -540,7 +540,7 @@ export function SidebarTemplate({ data }: ResumeTemplateProps) {
               </div>
             ))}
           </section>
-        )}
+        ) : null}
       </main>
     </div>
   );
