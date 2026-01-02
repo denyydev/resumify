@@ -1,20 +1,18 @@
 "use client";
 
+import type { TemplateKey } from "@/components/resume/templates";
 import { templateMap } from "@/components/resume/templates";
 import { NeoTemplate } from "@/components/resume/templates/NeoTemplate";
-import { MOCK_RESUME } from "@/lib/mockResume";
 import type { Locale } from "@/lib/useCurrentLocale";
 import type { Resume } from "@/types/resume";
 
-export function ResumePrint({
-  data,
-  locale,
-  templateKey,
-}: {
+type Props = {
   data: Resume;
   locale: Locale;
-}) {
-  const Template = templateMap[templateKey] ?? NeoTemplate;
+  templateKey: TemplateKey;
+};
 
-  return <Template data={MOCK_RESUME} locale={locale} />;
+export function ResumePrint({ data, locale, templateKey }: Props) {
+  const Template = templateMap[templateKey] ?? NeoTemplate;
+  return <Template data={data} locale={locale} />;
 }
