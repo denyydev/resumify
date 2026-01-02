@@ -8,5 +8,20 @@
     "sectionSubtitle": "This information will appear in the header of your resume.",
     "fullName": "Full name",
     "position": "Desired position"
+  },
+  "landing": {
+    "hero": {
+      "trustSignal": "Free to start • No credit card required",
+      "headline": "Resumes that {highlight} in minutes, not hours.",
+      "headlineHighlight": "pass ATS",
+      "subheadline": "Create professional, ATS-friendly resumes with our editor. Export to PDF instantly. No design skills needed.",
+      "ctaPrimary": "Start building",
+      "ctaSecondary": "View templates",
+      "features": {
+        "atsOptimized": "ATS-optimized templates",
+        "instantExport": "Instant PDF export",
+        "noSignup": "No sign-up required"
+      }
+    }
   }
 }
