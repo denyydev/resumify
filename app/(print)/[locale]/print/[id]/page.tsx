@@ -39,6 +39,9 @@ export default async function PrintPage(props: PrintPageProps) {
   if (!resume) notFound();
 
   const locale: Locale = normalizeLocale(localeRaw);
+  const data = resume.data as ResumeData;
 
-  return <ResumePrint data={resume.data as ResumeData} locale={locale} />;
+  return (
+    <ResumePrint data={data} templateKey={data.templateKey} locale={locale} />
+  );
 }

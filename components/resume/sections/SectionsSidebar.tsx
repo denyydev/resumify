@@ -37,6 +37,7 @@ const ITEMS: Item[] = [
 
 const messages = {
   ru: {
+    photo: "Фото",
     summary: "О себе",
     contacts: "Контакты",
     experience: "Опыт",
@@ -50,6 +51,7 @@ const messages = {
     activities: "Активности",
   },
   en: {
+    photo: "Photo",
     summary: "Summary",
     contacts: "Contacts",
     experience: "Experience",
@@ -114,7 +116,7 @@ export function SectionsSidebar() {
         />
 
         {itemsWithLabels.map((item, idx) => (
-          <span
+          <a
             key={item.key}
             href={item.href}
             ref={idx === 0 ? rowRef : undefined}
@@ -132,7 +134,7 @@ export function SectionsSidebar() {
             <span className="min-w-0 flex-1 truncate text-sm">
               {item.label}
             </span>
-          </span>
+          </a>
         ))}
       </div>
     </Card>

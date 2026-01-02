@@ -71,7 +71,11 @@ export function ResumePreviewThumb({ data, locale, className }: Props) {
           background: "#fff",
         }}
       >
-        <ResumePrint data={data} locale={locale} />
+        <ResumePrint
+          data={data}
+          templateKey={data.templateKey}
+          locale={locale}
+        />
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-900/5 to-transparent" />

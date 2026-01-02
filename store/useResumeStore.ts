@@ -80,6 +80,7 @@ const DEFAULT_INCLUDE_PHOTO = true;
 const DEFAULT_SECTIONS_VISIBILITY: SectionsVisibility = {
   photo: true,
   summary: true,
+  contacts: true,
   experience: true,
   projects: true,
   techSkills: true,

@@ -38,15 +38,14 @@ function joinFullName(lastName: string, firstName: string, patronymic: string) {
     .join(" ");
 }
 
-function useVisible(
-  sectionKey: keyof ReturnType<
-    typeof useResumeStore
-  >["resume"]["sectionsVisibility"]
-) {
+type SectionsVisibility = NonNullable<
+  ReturnType<typeof useResumeStore.getState>["resume"]["sectionsVisibility"]
+>;
+
+function useVisible(sectionKey: keyof SectionsVisibility) {
   const sectionsVisibility = useResumeStore((s) => s.resume.sectionsVisibility);
   return sectionsVisibility?.[sectionKey] !== false;
 }
-
 function PhotoBlock({ t }: { t: LocaleMessages }) {
   const [msgApi, contextHolder] = message.useMessage();
   const [hover, setHover] = useState(false);
@@ -100,7 +99,6 @@ function PhotoBlock({ t }: { t: LocaleMessages }) {
           className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[var(--ant-colorBorderSecondary)] bg-[var(--ant-colorFillSecondary)]"
         >
           {photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={photo}
               alt="Avatar"

@@ -166,7 +166,7 @@ export const MOCK_RESUME: Resume = {
     },
     {
       id: "act_2",
-      type: "speaking",
+      type: "community",
       name: "Internal Frontend Guild",
       role: "Speaker",
       description:
@@ -190,6 +190,7 @@ export const MOCK_RESUME: Resume = {
   sectionsVisibility: {
     photo: true,
     summary: true,
+    contacts: true,
     experience: true,
     projects: true,
     techSkills: true,

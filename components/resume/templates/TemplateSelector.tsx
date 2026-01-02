@@ -7,11 +7,14 @@ import { theme } from "antd";
 import {
   AlignLeft,
   Check,
+  Columns,
   FileText,
   GitCommitHorizontal,
   Layout,
   LayoutGrid,
+  PanelLeft,
   ScanText,
+  Sparkles,
 } from "lucide-react";
 
 type LocaleKey = "ru" | "en";
@@ -24,6 +27,14 @@ const templateLabels: Record<
     subtitle: Record<LocaleKey, string>;
   }
 > = {
+  default: {
+    icon: <Sparkles size={20} />,
+    title: { ru: "По умолчанию", en: "Default" },
+    subtitle: {
+      ru: "Стандартный шаблон резюме",
+      en: "Default resume template",
+    },
+  },
   classic: {
     icon: <FileText size={20} />,
     title: { ru: "Классический", en: "Classic" },
@@ -43,6 +54,30 @@ const templateLabels: Record<
   modern: {
     icon: <Layout size={20} />,
     title: { ru: "Современный", en: "Modern" },
+    subtitle: {
+      ru: "Компактный двухколоночный макет",
+      en: "Compact two-column layout",
+    },
+  },
+  neo: {
+    icon: <Sparkles size={20} />,
+    title: { ru: "Нео", en: "Neo" },
+    subtitle: {
+      ru: "Современный минималистичный дизайн",
+      en: "Modern minimalist design",
+    },
+  },
+  sidebar: {
+    icon: <PanelLeft size={20} />,
+    title: { ru: "Сайдбар", en: "Sidebar" },
+    subtitle: {
+      ru: "Макет с боковой панелью",
+      en: "Layout with sidebar",
+    },
+  },
+  compact: {
+    icon: <Columns size={20} />,
+    title: { ru: "Компактный", en: "Compact" },
     subtitle: {
       ru: "Компактный двухколоночный макет",
       en: "Compact two-column layout",

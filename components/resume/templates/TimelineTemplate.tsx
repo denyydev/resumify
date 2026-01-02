@@ -1,7 +1,7 @@
 "use client";
 
 import type { Locale } from "@/lib/useCurrentLocale";
-import type { Resume } from "@/types/resume";
+import type { Resume, ResumeSectionKey } from "@/types/resume";
 
 type ResumeTemplateProps = {
   data: Resume;
@@ -36,7 +36,7 @@ export function TimelineTemplate({ data }: ResumeTemplateProps) {
     sectionsVisibility,
   } = data;
 
-  const visible = (key: keyof typeof sectionsVisibility) =>
+  const visible = (key: ResumeSectionKey) =>
     sectionsVisibility?.[key] !== false;
 
   return (
