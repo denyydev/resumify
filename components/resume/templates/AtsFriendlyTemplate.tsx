@@ -122,8 +122,7 @@ export function AtsFriendlyTemplate({ data }: ResumeTemplateProps) {
             <img
               src={photo}
               alt=""
-              className="h-16 w-16 object-cover"
-              style={{ borderRadius: 2 }}
+              className="h-16 w-16 rounded-sm object-cover"
             />
           )}
         </div>

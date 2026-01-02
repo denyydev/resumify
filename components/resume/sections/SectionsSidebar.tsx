@@ -120,14 +120,11 @@ export function SectionsSidebar() {
             key={item.key}
             href={item.href}
             ref={idx === 0 ? rowRef : undefined}
-            className={[
-              "relative z-10 flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left!",
-              "no-underline transition cursor-pointer",
-              "hover:bg-slate-100 active:scale-[0.99] dark:hover:bg-slate-800",
+            className={`relative z-10 flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-left no-underline transition active:scale-[0.99] hover:bg-slate-100 dark:hover:bg-slate-800 ${
               item.isActive
                 ? "font-medium text-blue-600 dark:text-blue-400"
-                : "text-slate-700 dark:text-slate-400",
-            ].join(" ")}
+                : "text-slate-700 dark:text-slate-400"
+            }`}
             aria-current={item.isActive ? "true" : undefined}
           >
             <span className="flex shrink-0 items-center">{item.icon}</span>

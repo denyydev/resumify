@@ -10,11 +10,7 @@ export function ThemeSwitcher() {
     <button
       type="button"
       onClick={toggleTheme}
-      className={[
-        "flex h-6 w-6 items-center justify-center",
-        "text-text2 hover:text-text",
-        "transition-colors duration-150 cursor-pointer",
-      ].join(" ")}
+      className="flex h-6 w-6 cursor-pointer items-center justify-center text-text2 transition-colors duration-150 hover:text-text"
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (

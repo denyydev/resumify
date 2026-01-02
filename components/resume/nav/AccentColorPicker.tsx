@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Tooltip } from "antd"
-import { useResumeStore } from "@/store/useResumeStore"
-import { useCurrentLocale } from "@/lib/useCurrentLocale"
+import React from "react";
+import { Tooltip } from "antd";
+import { useResumeStore } from "@/store/useResumeStore";
+import { useCurrentLocale } from "@/lib/useCurrentLocale";
 
-type LocaleKey = "ru" | "en"
+type LocaleKey = "ru" | "en";
 
 type AccentColor = {
-  value: string
-  name: Record<LocaleKey, string>
-}
+  value: string;
+  name: Record<LocaleKey, string>;
+};
 
 const COLORS: AccentColor[] = [
   { value: "#1677ff", name: { ru: "Синий", en: "Blue" } },
@@ -19,7 +19,7 @@ const COLORS: AccentColor[] = [
   { value: "#f5222d", name: { ru: "Красный", en: "Red" } },
   { value: "#fa8c16", name: { ru: "Оранжевый", en: "Orange" } },
   { value: "#52c41a", name: { ru: "Зелёный", en: "Green" } },
-]
+];
 
 const messages = {
   ru: {
@@ -32,36 +32,36 @@ const messages = {
     subtitle: "This color will be used for PDF export",
     aria: "Select accent color",
   },
-} as const
+} as const;
 
 export type AccentColorPickerProps = {
-  disabled?: boolean
-  className?: string
-}
+  disabled?: boolean;
+  className?: string;
+};
 
 export default function AccentColorPicker({
   disabled,
   className,
 }: AccentColorPickerProps) {
-  const localeRaw = useCurrentLocale()
-  const locale: LocaleKey = localeRaw === "en" ? "en" : "ru"
-  const t = messages[locale]
+  const localeRaw = useCurrentLocale();
+  const locale: LocaleKey = localeRaw === "en" ? "en" : "ru";
+  const t = messages[locale];
 
-  const accentColor = useResumeStore((s) => s.resume.accentColor)
-  const setAccentColor = useResumeStore((s) => s.setAccentColor)
+  const accentColor = useResumeStore((s) => s.resume.accentColor);
+  const setAccentColor = useResumeStore((s) => s.setAccentColor);
 
-  const current = accentColor ?? COLORS[0].value
+  const current = accentColor ?? COLORS[0].value;
 
   return (
     <div>
-      <div className="flex-1 min-w-0 mb-5">
-        <span className="text-sm font-semibold block">{t.title}</span>
+      <div className="mb-5 min-w-0 flex-1">
+        <span className="block text-sm font-semibold">{t.title}</span>
         <span className="text-xs leading-relaxed">{t.subtitle}</span>
       </div>
 
-      <div className={"flex items-center justify-center gap-3 " + (className ?? "")}>
+      <div className={`flex items-center justify-center gap-3 ${className ?? ""}`}>
         {COLORS.map((c) => {
-          const selected = current === c.value
+          const selected = current === c.value;
 
           return (
             <Tooltip key={c.value} title={c.name[locale]} placement="top">
@@ -71,12 +71,11 @@ export default function AccentColorPicker({
                 onClick={() => setAccentColor(c.value)}
                 aria-label={`${t.aria}: ${c.name[locale]}`}
                 aria-pressed={selected}
-                className={
-                  "relative h-8 w-8 rounded-full transition " +
-                  (disabled
+                className={`relative h-8 w-8 rounded-full transition ${
+                  disabled
                     ? "cursor-not-allowed opacity-50"
-                    : "cursor-pointer hover:scale-[1.06] active:scale-[0.98]")
-                }
+                    : "cursor-pointer active:scale-[0.98] hover:scale-[1.06]"
+                }`}
                 style={{
                   backgroundColor: c.value,
                   boxShadow: selected
@@ -96,9 +95,9 @@ export default function AccentColorPicker({
                 )}
               </button>
             </Tooltip>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

@@ -83,11 +83,7 @@ export default function Hero() {
               <Button
                 type="primary"
                 size="large"
-                className="!h-11 !rounded-2xl !border-0 !px-5 !text-zinc-950
-                           !bg-gradient-to-r !from-violet-200 !to-fuchsia-200
-                           hover:!from-violet-100 hover:!to-fuchsia-100
-                           active:!from-violet-300 active:!to-fuchsia-300
-                           !shadow-[0_10px_30px_-14px_rgba(168,85,247,0.65)]"
+                className="!h-11 !rounded-2xl !border-0 !bg-gradient-to-r !from-violet-200 !to-fuchsia-200 !px-5 !text-zinc-950 !shadow-[0_10px_30px_-14px_rgba(168,85,247,0.65)] active:!from-violet-300 active:!to-fuchsia-300 hover:!from-violet-100 hover:!to-fuchsia-100"
                 icon={<ArrowRightOutlined />}
                 href="/ru/editor"
               >

@@ -51,8 +51,7 @@ export function AuthNotice({ locale }: Props) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setClosed(true)}
-            className="rounded-full px-2 py-1 text-xs text-slate-500 hover:text-slate-900
-                       dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
+            className="cursor-pointer rounded-full px-2 py-1 text-xs text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
             aria-label="Close"
           >
             ✕
