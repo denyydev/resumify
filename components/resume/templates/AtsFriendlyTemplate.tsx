@@ -72,10 +72,10 @@ export function AtsFriendlyTemplate({ data }: ResumeTemplateProps) {
   const visible = (key: ResumeSectionKey) =>
     sectionsVisibility?.[key] !== false;
 
-  const githubLink = normalizeGithubLink(contacts.github);
-  const telegramLink = normalizeTelegramLink(contacts.telegram);
-  const linkedinLink = normalizeLinkedinLink(contacts.linkedin);
-  const websiteLink = normalizeGenericUrl(contacts.website);
+  const githubLink = normalizeGithubLink(contacts.github) ?? undefined;
+  const telegramLink = normalizeTelegramLink(contacts.telegram) ?? undefined;
+  const linkedinLink = normalizeLinkedinLink(contacts.linkedin) ?? undefined;
+  const websiteLink = normalizeGenericUrl(contacts.website) ?? undefined;
 
   const headerLine = joinNonEmpty([
     lineOrDash(contacts.location),
