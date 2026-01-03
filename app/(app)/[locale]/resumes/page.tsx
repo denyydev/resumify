@@ -1,6 +1,7 @@
 "use client";
 
 import { ResumePreviewThumb } from "@/components/resume/ResumePreviewThumb";
+import { UnauthorizedResumesView } from "@/components/resume/UnauthorizedResumesView";
 import type { ResumeData } from "@/types/resume";
 import {
   Button,
@@ -12,7 +13,7 @@ import {
   Skeleton,
   Tooltip,
 } from "antd";
-import { Clock, File, FileText, Plus, Search, Trash2 } from "lucide-react";
+import { Clock, File, Plus, Search, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -34,8 +35,6 @@ const messages = {
     empty: "Нет сохранённых резюме",
     emptySubtext: "Создайте своё первое резюме, чтобы начать карьеру мечты",
     createResume: "Создать резюме",
-    unauthorized: "Войдите, чтобы управлять резюме",
-    goHome: "На главную",
     confirmDeleteTitle: "Удалить резюме?",
     confirmDeleteText: "Это действие нельзя отменить.",
     deleteOk: "Удалить",
@@ -54,8 +53,6 @@ const messages = {
     empty: "No resumes found",
     emptySubtext: "Create your first resume to kickstart your career",
     createResume: "New Resume",
-    unauthorized: "Sign in to manage your resumes",
-    goHome: "Go Home",
     confirmDeleteTitle: "Delete resume?",
     confirmDeleteText: "This action cannot be undone.",
     deleteOk: "Delete",
@@ -283,81 +280,7 @@ export default function MyResumesPage() {
   };
 
   if (isUnauthed) {
-    return (
-      <div className="min-h-screen w-full p-4 pb-14 md:p-6 md:pb-14 grid place-items-center">
-        <Card className="w-full max-w-[720px] rounded-2xl">
-          <div className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-start gap-4">
-                <div className="grid h-12 w-12 place-items-center rounded-2xl border border-[var(--ant-colorBorder)] bg-[var(--ant-colorFillTertiary)]">
-                  <FileText size={20} className="text-[var(--ant-colorText)]" />
-                </div>
-
-                <div className="min-w-0">
-                  <div className="text-xl md:text-2xl font-semibold text-[var(--ant-colorText)]">
-                    {t.unauthorized}
-                  </div>
-                  <div className="mt-1 text-sm text-[var(--ant-colorTextSecondary)]">
-                    {locale === "ru"
-                      ? "Сохраняйте версии, экспортируйте PDF и управляйте шаблонами в одном месте."
-                      : "Save versions, export PDFs, and manage templates in one place."}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-[var(--ant-colorBorder)] bg-[var(--ant-colorBgContainer)] p-4">
-                  <div className="text-xs font-semibold text-[var(--ant-colorText)]">
-                    {locale === "ru" ? "Версии" : "Versions"}
-                  </div>
-                  <div className="mt-1 text-xs text-[var(--ant-colorTextSecondary)]">
-                    {locale === "ru"
-                      ? "Храните несколько вариантов под разные вакансии."
-                      : "Keep multiple variants for different jobs."}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-[var(--ant-colorBorder)] bg-[var(--ant-colorBgContainer)] p-4">
-                  <div className="text-xs font-semibold text-[var(--ant-colorText)]">
-                    {locale === "ru" ? "Экспорт" : "Export"}
-                  </div>
-                  <div className="mt-1 text-xs text-[var(--ant-colorTextSecondary)]">
-                    {locale === "ru"
-                      ? "PDF без сюрпризов: кликабельные ссылки и текстовый слой."
-                      : "No-surprise PDFs: clickable links and real text layer."}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-[var(--ant-colorBorder)] bg-[var(--ant-colorBgContainer)] p-4">
-                  <div className="text-xs font-semibold text-[var(--ant-colorText)]">
-                    {locale === "ru" ? "Шаблоны" : "Templates"}
-                  </div>
-                  <div className="mt-1 text-xs text-[var(--ant-colorTextSecondary)]">
-                    {locale === "ru"
-                      ? "Выбирайте стиль под роль: ATS или дизайн."
-                      : "Choose ATS-safe or modern styles."}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <Button onClick={() => router.push(`/${locale}`)}>
-                  {t.goHome}
-                </Button>
-
-                <Button
-                  type="primary"
-                  icon={<Plus size={16} />}
-                  onClick={() => router.push(createHref)}
-                >
-                  {t.createResume}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
+    return <UnauthorizedResumesView locale={locale} />;
   }
 
   return (

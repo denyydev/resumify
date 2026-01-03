@@ -1,0 +1,150 @@
+import type { Locale } from "./types";
+
+export const messages = {
+  ru: {
+    pageTitle: "Рекомендации и FAQ (ATS-friendly резюме)",
+    intro:
+      "Эта страница помогает собрать резюме так, чтобы оно хорошо читалось и людьми, и ATS (системами отбора резюме).",
+    disclaimer:
+      "Нет «идеального» резюме для всех. Цель — сделать документ понятным, структурированным и машиночитаемым.",
+    sectionsTitle: "Коротко: что работает",
+    checklistTitle: "Чеклист перед отправкой",
+    quickToolsTitle: "Быстрые инструменты",
+    patternsTitle: "Готовые формулировки",
+    atsScoreTitle: "ATS-проверка глазами рекрутера",
+    exportTitle: "Экспорт без сюрпризов",
+    atsVsHumanTitle: "ATS vs Человек: что одинаково, что различается",
+    keywordsWorkflowTitle: "Keyword workflow: как работать с ключевыми словами",
+    formattingRulesTitle: "Правила форматирования",
+    linksPortfolioTitle: "Ссылки и портфолио",
+    redFlagsTitle: "Red flags: что режет конверсию",
+    exportQaTitle: "Export QA: проверка после экспорта",
+    commonWinsTitle: "Самые частые улучшения",
+    items: {
+      ats: { title: "Что такое ATS и почему это важно?" },
+      length: { title: "Длина: 1 страница (2 — если опыта реально много)" },
+      format: { title: "Формат: PDF, без фото и декоративной графики" },
+      links: { title: "Ссылки: кликабельные и «живые»" },
+      structure: {
+        title:
+          "Структура: шапка → контекст → достижения → образование → доп. инфо",
+      },
+      summary: { title: "Summary / «О себе»: 3–5 строк, по делу" },
+      xyz: { title: "Опыт по формуле XYZ: не обязанности, а эффект" },
+      keywords: { title: "Ключевые слова: для ATS и для людей" },
+      mistakes: { title: "Частые ошибки, из-за которых резюме «умирает»" },
+      export: { title: "Как экспортировать из билдера лучше всего" },
+      atsVsHuman: { title: "ATS vs Человек: различия и общее" },
+      keywordsWorkflow: { title: "Как извлекать и размещать ключевые слова" },
+      formatting: { title: "Форматирование: шрифты, отступы, даты" },
+      linksPortfolio: { title: "Ссылки и портфолио: что обязательно" },
+      redFlags: { title: "Red flags: что убивает конверсию" },
+    },
+    checklist: [
+      "Есть Summary 3–5 строк",
+      "Опыт описан через достижения, а не обязанности",
+      "Есть цифры/метрики хотя бы в части буллетов",
+      "Ссылки начинаются с https:// и кликабельны в PDF",
+      "Включён ATS-friendly шаблон (если откликаешься через сайты/формы)",
+      "Резюме помещается на 1 страницу (или 2 при большом опыте)",
+      "Секции включены по смыслу (лишнее скрыто)",
+    ],
+    nav: {
+      overview: "Обзор",
+      faq: "FAQ",
+      checklist: "Чеклист",
+    },
+    micro: {
+      good: "Хорошо",
+      risky: "Рискованно",
+      fix: "Как исправить",
+      example: "Пример",
+      patterns: {
+        summary: "Шаблон Summary",
+        bullets: "Шаблоны буллетов",
+        skills: "Шаблон Skills",
+      },
+      tools: {
+        jobMatch: "Сверка с вакансией",
+        linkCheck: "Проверка ссылок",
+        pageFit: "Укладывание в 1 страницу",
+        export: "Экспорт",
+      },
+    },
+  },
+  en: {
+    pageTitle: "Recommendations & FAQ (ATS-friendly resume)",
+    intro:
+      "This page helps you build a resume that works for both humans and ATS (Applicant Tracking Systems).",
+    disclaimer:
+      "There's no single perfect resume for everyone. The goal is clarity, structure, and machine-readable formatting.",
+    sectionsTitle: "TL;DR: what works",
+    checklistTitle: "Pre-send checklist",
+    quickToolsTitle: "Quick tools",
+    patternsTitle: "Ready-to-use wording",
+    atsScoreTitle: "ATS check like a recruiter",
+    exportTitle: "Export without surprises",
+    atsVsHumanTitle: "ATS vs Human: what's the same, what differs",
+    keywordsWorkflowTitle: "Keyword workflow: how to work with keywords",
+    formattingRulesTitle: "Formatting rules",
+    linksPortfolioTitle: "Links & portfolio",
+    redFlagsTitle: "Red flags: what kills conversion",
+    exportQaTitle: "Export QA: post-export checklist",
+    commonWinsTitle: "Most common wins",
+    items: {
+      ats: { title: "What is ATS and why does it matter?" },
+      length: {
+        title: "Length: 1 page (2 only if you truly have lots of experience)",
+      },
+      format: { title: "Format: PDF, no photo and no decorative graphics" },
+      links: { title: "Links: clickable and valid" },
+      structure: {
+        title: "Structure: header → context → achievements → education → extra",
+      },
+      summary: { title: "Summary: 3–5 focused lines" },
+      xyz: { title: "XYZ bullet formula: impact over duties" },
+      keywords: { title: "Keywords: for ATS and humans" },
+      mistakes: { title: "Common mistakes that kill resumes" },
+      export: { title: "Best export settings in the builder" },
+      atsVsHuman: { title: "ATS vs Human: differences and common ground" },
+      keywordsWorkflow: { title: "How to extract and place keywords" },
+      formatting: { title: "Formatting: fonts, spacing, dates" },
+      linksPortfolio: { title: "Links & portfolio: what's required" },
+      redFlags: { title: "Red flags: what kills conversion" },
+    },
+    checklist: [
+      "Summary is 3–5 lines",
+      "Experience is written as achievements, not duties",
+      "Some bullets include numbers/metrics",
+      "Links start with https:// and are clickable in PDF",
+      "ATS-friendly template is enabled (for online applications)",
+      "Fits on 1 page (or 2 if necessary)",
+      "Only relevant sections are enabled (hide noise)",
+    ],
+    nav: {
+      overview: "Overview",
+      faq: "FAQ",
+      checklist: "Checklist",
+    },
+    micro: {
+      good: "Good",
+      risky: "Risky",
+      fix: "Fix",
+      example: "Example",
+      patterns: {
+        summary: "Summary template",
+        bullets: "Bullet templates",
+        skills: "Skills template",
+      },
+      tools: {
+        jobMatch: "Match to job post",
+        linkCheck: "Link check",
+        pageFit: "Fit to 1 page",
+        export: "Export",
+      },
+    },
+  },
+} as const;
+
+export type Messages = typeof messages[Locale];
+

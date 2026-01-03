@@ -7,12 +7,10 @@ import { ResumePreview } from "@/components/resume/ResumePreview";
 import { TemplateSelector } from "@/components/resume/templates/TemplateSelector";
 import type { Locale } from "@/lib/useCurrentLocale";
 import { useResumeStore } from "@/store/useResumeStore";
-import { Button, Card, Divider, Grid } from "antd";
+import { Button, Card, Divider } from "antd";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
-
-const { useBreakpoint } = Grid;
+import { useEffect } from "react";
 
 const messages = {
   ru: {
@@ -29,9 +27,6 @@ export default function PreviewPage() {
   const params = useParams<{ locale: Locale }>();
   const locale: Locale = params?.locale === "en" ? "en" : "ru";
   const t = messages[locale];
-
-  const screens = useBreakpoint();
-  const isMobile = useMemo(() => !screens.lg, [screens.lg]);
 
   const searchParams = useSearchParams();
   const resumeId = searchParams.get("resumeId");
@@ -66,66 +61,66 @@ export default function PreviewPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="flex gap-5 py-5">
-        {!isMobile && (
-          <aside className="w-[320px] shrink-0">
-            <div className="sticky top-5">
-              <Card>
-                <Button
-                  type="text"
-                  className="w-full"
-                  onClick={handleBack}
-                  icon={<ArrowLeft className="h-4 w-4" />}
-                >
-                  {t.backToEditor}
-                </Button>
-                <Divider />
-                <TemplateSelector />
-              </Card>
-            </div>
-          </aside>
-        )}
-
-        <main className="min-w-0 flex-1">
-          {isMobile && (
-            <Card className="mb-5">
+      <div className="flex flex-col gap-5 py-5 lg:flex-row">
+        {/* Desktop: Left Aside - Back + TemplateSelector */}
+        <aside className="hidden w-[320px] shrink-0 lg:block">
+          <div className="sticky top-5">
+            <Card>
               <Button
                 type="text"
-                size="small"
+                className="w-full"
                 onClick={handleBack}
                 icon={<ArrowLeft className="h-4 w-4" />}
               >
                 {t.backToEditor}
               </Button>
+              <Divider />
               <TemplateSelector />
             </Card>
-          )}
+          </div>
+        </aside>
 
+        {/* Mobile: Top Card - Back + TemplateSelector */}
+        <Card className="mb-5 block lg:hidden">
+          <Button
+            type="text"
+            size="small"
+            className="w-full"
+            onClick={handleBack}
+            icon={<ArrowLeft className="h-4 w-4" />}
+          >
+            {t.backToEditor}
+          </Button>
+          <Divider />
+          <TemplateSelector />
+        </Card>
+
+        {/* Main Content - ResumePreview */}
+        <main className="min-w-0 flex-1 overflow-x-hidden">
           <ResumePreview />
         </main>
 
-        {!isMobile && (
-          <aside className="w-[320px] shrink-0">
-            <div className="sticky top-5">
-              <Card>
-                <AccentColorPicker />
-                <Divider />
-                <PhotoExportToggle />
-                <Divider />
-                <DownloadPdfButton locale={locale} />
-              </Card>
-            </div>
-          </aside>
-        )}
+        {/* Desktop: Right Aside - AccentColorPicker + Toggles + Download */}
+        <aside className="hidden w-[320px] shrink-0 lg:block">
+          <div className="sticky top-5">
+            <Card>
+              <AccentColorPicker />
+              <Divider />
+              <PhotoExportToggle />
+              <Divider />
+              <DownloadPdfButton locale={locale} />
+            </Card>
+          </div>
+        </aside>
 
-        {isMobile && (
-          <Card className="mt-5">
-            <AccentColorPicker />
-            <Divider />
-            <PhotoExportToggle />
-            <DownloadPdfButton locale={locale} />
-          </Card>
-        )}
+        {/* Mobile: Bottom Card - AccentColorPicker + Toggles + Download */}
+        <Card className="mt-5 block lg:hidden">
+          <AccentColorPicker />
+          <Divider />
+          <PhotoExportToggle />
+          <Divider />
+          <DownloadPdfButton locale={locale} />
+        </Card>
       </div>
     </div>
   );
