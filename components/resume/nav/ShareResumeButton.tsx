@@ -2,11 +2,10 @@
 
 import { useResumeSave } from "@/hooks/useResumeSave";
 import type { Locale } from "@/lib/useCurrentLocale";
-import type { MenuProps } from "antd";
-import { Button, Dropdown, Input, Modal, Tooltip, message } from "antd";
+import { Button, Input, Modal, Tooltip, message } from "antd";
 import { Check, Copy, Share2, X } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type ShareStatus = {
   shareId: string | null;
@@ -14,19 +13,62 @@ type ShareStatus = {
   shareUrl: string | null;
 };
 
+const messages = {
+  ru: {
+    tooltip: "Войдите, чтобы поделиться резюме",
+    share: "Share",
+    modalTitle: "Поделиться резюме",
+    hint: "Скопируйте ссылку и поделитесь ею с другими:",
+    close: "Закрыть",
+    copy: "Копировать",
+    copied: "Скопировано",
+    linkCopied: "Ссылка скопирована",
+    copyFailed: "Не удалось скопировать",
+    anyone: "Любой, у кого есть эта ссылка, может просмотреть ваше резюме.",
+    createLinkFailed: "Не удалось создать ссылку, попробуйте ещё раз",
+    saveFailed: "Не удалось сохранить резюме, попробуйте ещё раз",
+    createLinkError: "Ошибка при создании ссылки",
+    disable: "Выключить share",
+    disableOk: "Share выключен",
+    disableFailed: "Не удалось выключить share",
+    disableError: "Ошибка при выключении share",
+  },
+  en: {
+    tooltip: "Sign in to share your resume",
+    share: "Share",
+    modalTitle: "Share Resume",
+    hint: "Copy the link and share it with others:",
+    close: "Close",
+    copy: "Copy",
+    copied: "Copied",
+    linkCopied: "Link copied",
+    copyFailed: "Failed to copy",
+    anyone: "Anyone with this link can view your resume.",
+    createLinkFailed: "Failed to create share link, please try again",
+    saveFailed: "Failed to save resume, please try again",
+    createLinkError: "Error creating share link",
+    disable: "Disable share",
+    disableOk: "Share disabled",
+    disableFailed: "Failed to disable share",
+    disableError: "Error disabling share",
+  },
+} as const;
+
 export default function ShareResumeButton() {
   const params = useParams() as { locale: Locale };
   const locale: Locale = params?.locale === "en" ? "en" : "ru";
+  const t = messages[locale];
+
   const { ensureResumeSaved, isAuthed, currentResumeId } =
     useResumeSave(locale);
 
   const resumeId = currentResumeId;
+
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [shareStatus, setShareStatus] = useState<ShareStatus | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Загружаем статус share при изменении resumeId
   useEffect(() => {
     if (!resumeId || !isAuthed) {
       setShareStatus(null);
@@ -40,8 +82,8 @@ export default function ShareResumeButton() {
           const data = (await res.json()) as ShareStatus;
           setShareStatus(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch share status:", error);
+      } catch {
+        setShareStatus(null);
       }
     };
 
@@ -58,22 +100,13 @@ export default function ShareResumeButton() {
 
       if (!res.ok) {
         const error = (await res.json()) as { error?: string };
-        message.error(
-          locale === "ru"
-            ? error.error || "Не удалось создать ссылку, попробуйте ещё раз"
-            : error.error || "Failed to create share link, please try again"
-        );
+        message.error(error.error || t.createLinkFailed);
         return null;
       }
 
-      const data = (await res.json()) as ShareStatus;
-      return data;
-    } catch (error) {
-      message.error(
-        locale === "ru"
-          ? "Не удалось создать ссылку, попробуйте ещё раз"
-          : "Failed to create share link, please try again"
-      );
+      return (await res.json()) as ShareStatus;
+    } catch {
+      message.error(t.createLinkFailed);
       return null;
     }
   };
@@ -90,11 +123,7 @@ export default function ShareResumeButton() {
 
       if (!res.ok) {
         const error = (await res.json()) as { error?: string };
-        message.error(
-          locale === "ru"
-            ? error.error || "Не удалось выключить share"
-            : error.error || "Failed to disable share"
-        );
+        message.error(error.error || t.disableFailed);
         return;
       }
 
@@ -102,26 +131,18 @@ export default function ShareResumeButton() {
       setShareStatus((prev) =>
         prev ? { ...prev, isShared: data.isShared } : null
       );
-      message.success(locale === "ru" ? "Share выключен" : "Share disabled");
+      message.success(t.disableOk);
       setModalOpen(false);
-    } catch (error) {
-      message.error(
-        locale === "ru"
-          ? "Ошибка при выключении share"
-          : "Error disabling share"
-      );
+    } catch {
+      message.error(t.disableError);
     } finally {
       setLoading(false);
     }
   };
 
   const handleShareClick = async () => {
-    if (!isAuthed) {
-      // Не авторизован - не должно происходить, т.к. кнопка disabled
-      return;
-    }
+    if (!isAuthed) return;
 
-    // Если share уже включен, просто показываем модал с ссылкой
     if (shareStatus?.isShared && shareStatus.shareUrl) {
       setModalOpen(true);
       return;
@@ -130,32 +151,19 @@ export default function ShareResumeButton() {
     try {
       setLoading(true);
 
-      // Если резюме не сохранено, сначала сохраняем
       const saveResult = await ensureResumeSaved();
       if (!saveResult.success) {
-        message.error(
-          locale === "ru"
-            ? saveResult.error ||
-                "Не удалось сохранить резюме, попробуйте ещё раз"
-            : saveResult.error || "Failed to save resume, please try again"
-        );
+        message.error(saveResult.error || t.saveFailed);
         return;
       }
 
-      const resumeIdToUse = saveResult.resumeId;
-
-      // Включаем share и получаем статус
-      const shareData = await enableShare(resumeIdToUse);
+      const shareData = await enableShare(saveResult.resumeId);
       if (shareData) {
         setShareStatus(shareData);
         setModalOpen(true);
       }
-    } catch (error) {
-      message.error(
-        locale === "ru"
-          ? "Ошибка при создании ссылки"
-          : "Error creating share link"
-      );
+    } catch {
+      message.error(t.createLinkError);
     } finally {
       setLoading(false);
     }
@@ -167,51 +175,48 @@ export default function ShareResumeButton() {
     try {
       await navigator.clipboard.writeText(shareStatus.shareUrl);
       setCopied(true);
-      message.success(locale === "ru" ? "Ссылка скопирована" : "Link copied");
+      message.success(t.linkCopied);
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      message.error(
-        locale === "ru" ? "Не удалось скопировать" : "Failed to copy"
-      );
+    } catch {
+      message.error(t.copyFailed);
     }
   };
 
-  // Tooltip только для неавторизованных пользователей
-  const tooltipText =
-    locale === "ru"
-      ? "Войдите, чтобы поделиться резюме"
-      : "Sign in to share your resume";
+  const footer = useMemo(() => {
+    const items = [
+      <Button key="close" onClick={() => setModalOpen(false)}>
+        {t.close}
+      </Button>,
+    ];
 
-  const menuItems: MenuProps["items"] = shareStatus?.isShared
-    ? [
-        {
-          key: "unshare",
-          label: locale === "ru" ? "Выключить share" : "Disable share",
-          icon: <X className="w-4 h-4" />,
-          onClick: disableShare,
-          danger: true,
-        },
-      ]
-    : [];
+    if (shareStatus?.isShared) {
+      items.unshift(
+        <Button key="disable" danger onClick={disableShare} loading={loading}>
+          {t.disable}
+        </Button>
+      );
+    }
+
+    return items;
+  }, [t.close, t.disable, shareStatus?.isShared, loading]);
 
   const button = (
-    <Dropdown.Button
+    <Button
       type="primary"
       className="font-medium!"
-      menu={menuItems.length > 0 ? { items: menuItems } : undefined}
       onClick={handleShareClick}
       disabled={!isAuthed || loading}
       loading={loading}
       icon={<Share2 className="w-4 h-4" />}
     >
-      {locale === "ru" ? "Share" : "Share"}
-    </Dropdown.Button>
+      {t.share}
+    </Button>
   );
 
   return (
     <>
       {!isAuthed ? (
-        <Tooltip title={tooltipText} placement="top">
+        <Tooltip title={t.tooltip} placement="top">
           <span className="inline-block cursor-not-allowed">{button}</span>
         </Tooltip>
       ) : (
@@ -219,56 +224,84 @@ export default function ShareResumeButton() {
       )}
 
       <Modal
-        title={locale === "ru" ? "Поделиться резюме" : "Share Resume"}
+        title={null}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
-        footer={[
-          <Button key="close" onClick={() => setModalOpen(false)}>
-            {locale === "ru" ? "Закрыть" : "Close"}
-          </Button>,
-        ]}
+        footer={null}
+        centered
+        width={520}
+        destroyOnClose
+        closable={false}
       >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            {locale === "ru"
-              ? "Скопируйте ссылку и поделитесь ею с другими:"
-              : "Copy the link and share it with others:"}
-          </p>
+        <div className="space-y-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/5">
+                <Share2 className="h-5 w-5" />
+              </span>
 
-          <Input.Group compact>
-            <Input
-              value={shareStatus?.shareUrl || ""}
-              readOnly
-              className="flex-1"
-            />
+              <div className="min-w-0">
+                <div className="text-base font-semibold leading-6">
+                  {t.modalTitle}
+                </div>
+                <div className="mt-1 text-sm text-black/60">{t.hint}</div>
+              </div>
+            </div>
+
             <Button
-              type="primary"
-              icon={
-                copied ? (
-                  <Check className="w-4 h-4" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )
-              }
-              onClick={handleCopy}
-            >
-              {copied
-                ? locale === "ru"
-                  ? "Скопировано"
-                  : "Copied"
-                : locale === "ru"
-                ? "Копировать"
-                : "Copy"}
-            </Button>
-          </Input.Group>
+              type="text"
+              size="small"
+              onClick={() => setModalOpen(false)}
+              icon={<X className="h-4 w-4" />}
+            />
+          </div>
 
-          {shareStatus?.isShared && (
-            <p className="text-xs text-gray-500">
-              {locale === "ru"
-                ? "Любой, у кого есть эта ссылка, может просмотреть ваше резюме."
-                : "Anyone with this link can view your resume."}
-            </p>
-          )}
+          <div className="rounded-2xl border border-black/10 bg-black/[0.02] p-4">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2">
+                <Input
+                  value={shareStatus?.shareUrl || ""}
+                  readOnly
+                  bordered={false}
+                  className="flex-1 !p-0"
+                  placeholder="—"
+                  onFocus={(e) => e.target.select()}
+                />
+
+                <Button
+                  type="primary"
+                  onClick={handleCopy}
+                  disabled={!shareStatus?.shareUrl}
+                  icon={
+                    copied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )
+                  }
+                />
+              </div>
+
+              {shareStatus?.isShared ? (
+                <div className="flex items-start gap-2 text-xs text-black/55">
+                  <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-black/40" />
+                  </span>
+                  <span className="leading-5">{t.anyone}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2">
+            {shareStatus?.isShared ? (
+              <Button danger onClick={disableShare} loading={loading}>
+                {t.disable}
+              </Button>
+            ) : null}
+
+            <Button onClick={() => setModalOpen(false)}>{t.close}</Button>
+          </div>
         </div>
       </Modal>
     </>
