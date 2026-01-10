@@ -21,6 +21,7 @@ const messages = {
     sectionTitle: "Контакты и заголовок",
     sectionSubtitle:
       "Должность, контакты и короткое summary — это первое, что читают рекрутеры.",
+    maxLenError: "Максимум 30 символов",
 
     email: "Email",
     emailPlaceholder: "you@example.com",
@@ -39,6 +40,7 @@ const messages = {
     sectionTitle: "Contacts & header",
     sectionSubtitle:
       "Title, contacts and a short summary are the first things recruiters read.",
+    maxLenError: "Max 30 characters",
 
     email: "Email",
     emailPlaceholder: "you@example.com",
@@ -63,14 +65,26 @@ function normalizeLocale(value: unknown): Locale {
   return base === "en" ? "en" : "ru";
 }
 
+const MAX_LEN = 30;
+
 export function BasicContactsSection() {
   const rawLocale = useCurrentLocale();
   const locale = normalizeLocale(rawLocale) satisfies Locale;
   const t = messages[locale];
 
-  // ✅ перф: не берём весь resume, только contacts
   const contacts = useResumeStore((s) => s.resume.contacts);
   const setContacts = useResumeStore((s) => s.setContacts);
+
+  const maxLenRule = useMemo(
+    () => ({
+      validator(_: unknown, value: string) {
+        if (!value) return Promise.resolve();
+        if (value.length <= MAX_LEN) return Promise.resolve();
+        return Promise.reject(new Error(t.maxLenError));
+      },
+    }),
+    [t.maxLenError]
+  );
 
   const contactItems = useMemo(
     () => [
@@ -80,7 +94,7 @@ export function BasicContactsSection() {
         placeholder: t.emailPlaceholder,
         value: contacts.email,
         icon: <Mail size={16} />,
-        onChange: (v: string) => setContacts({ email: v }),
+        onChange: (v: string) => setContacts({ email: v.slice(0, MAX_LEN) }),
       },
       {
         key: "phone",
@@ -88,7 +102,7 @@ export function BasicContactsSection() {
         placeholder: t.phonePlaceholder,
         value: contacts.phone,
         icon: <Phone size={16} />,
-        onChange: (v: string) => setContacts({ phone: v }),
+        onChange: (v: string) => setContacts({ phone: v.slice(0, MAX_LEN) }),
       },
       {
         key: "location",
@@ -96,7 +110,7 @@ export function BasicContactsSection() {
         placeholder: t.cityPlaceholder,
         value: contacts.location,
         icon: <MapPin size={16} />,
-        onChange: (v: string) => setContacts({ location: v }),
+        onChange: (v: string) => setContacts({ location: v.slice(0, MAX_LEN) }),
       },
       {
         key: "telegram",
@@ -104,7 +118,7 @@ export function BasicContactsSection() {
         placeholder: t.telegramPlaceholder,
         value: contacts.telegram ?? "",
         icon: <Send size={16} />,
-        onChange: (v: string) => setContacts({ telegram: v }),
+        onChange: (v: string) => setContacts({ telegram: v.slice(0, MAX_LEN) }),
       },
       {
         key: "github",
@@ -112,7 +126,7 @@ export function BasicContactsSection() {
         placeholder: t.githubPlaceholder,
         value: contacts.github ?? "",
         icon: <Github size={16} />,
-        onChange: (v: string) => setContacts({ github: v }),
+        onChange: (v: string) => setContacts({ github: v.slice(0, MAX_LEN) }),
       },
       {
         key: "linkedin",
@@ -120,7 +134,7 @@ export function BasicContactsSection() {
         placeholder: t.linkedinPlaceholder,
         value: contacts.linkedin ?? "",
         icon: <Linkedin size={16} />,
-        onChange: (v: string) => setContacts({ linkedin: v }),
+        onChange: (v: string) => setContacts({ linkedin: v.slice(0, MAX_LEN) }),
       },
     ],
     [contacts, setContacts, t]
@@ -148,20 +162,27 @@ export function BasicContactsSection() {
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto p-5">
-        <Space direction="vertical" size={12} className="w-full">
+        <Space orientation="vertical" size={12} className="w-full">
           <Form
             layout="vertical"
             colon={false}
             className="grid grid-cols-1 gap-4"
           >
             {contactItems.map((f) => (
-              <Form.Item key={f.key} label={f.label} className="mb-0">
+              <Form.Item
+                key={f.key}
+                label={f.label}
+                className="mb-0"
+                rules={[maxLenRule]}
+              >
                 <Input
                   prefix={f.icon}
                   placeholder={f.placeholder}
                   value={f.value}
                   onChange={(e) => f.onChange(e.target.value)}
                   allowClear
+                  maxLength={MAX_LEN}
+                  showCount
                 />
               </Form.Item>
             ))}

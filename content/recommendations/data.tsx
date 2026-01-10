@@ -1,30 +1,19 @@
-import type { Locale, FaqItem, Rule, Tool, Pattern } from "./types";
-import type { Messages } from "./messages";
-import {
-  Alert,
-  Card,
-  Divider,
-  List,
-  Space,
-  Tag,
-  Typography,
-} from "antd";
+import { Alert, Card, Divider, List, Space, Tag, Typography } from "antd";
 import {
   BadgeCheck,
-  BookOpen,
   FileDown,
   FileText,
   Link as LinkIcon,
   ScanText,
   Search,
   ShieldCheck,
-  Sparkles,
   Target,
   TriangleAlert,
   Users,
   Wand2,
 } from "lucide-react";
-import React from "react";
+import type { Messages } from "./messages";
+import type { FaqItem, Locale, Pattern, Rule, Tool } from "./types";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -37,7 +26,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.ats.title,
       tags: ["ATS"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             <Text strong>ATS</Text>{" "}
             {isRu
@@ -62,7 +51,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.length.title,
       tags: [isRu ? "1 страница" : "1 page"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "1 страница — идеальный стандарт. 2 страницы допустимы, если опыта реально много и каждая строка несёт пользу."
@@ -93,7 +82,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.format.title,
       tags: ["PDF", "ATS"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "Для ATS важны простая структура, один столбец и отсутствие декоративных элементов. Фото и графика часто мешают парсингу."
@@ -118,7 +107,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.links.title,
       tags: [isRu ? "ссылки" : "links"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "LinkedIn / GitHub / портфолио должны быть кликабельными и корректными. Правило: всегда добавляй https://"
@@ -146,7 +135,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.structure.title,
       tags: [isRu ? "структура" : "structure"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "Читаемость важнее креатива. Стандартные заголовки секций помогают и ATS, и рекрутеру."
@@ -164,7 +153,9 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
               <Tag>Projects</Tag>
               <Tag>Skills</Tag>
               <Tag>Education</Tag>
-              <Tag>{isRu ? "Certifications/Extras" : "Certifications/Extras"}</Tag>
+              <Tag>
+                {isRu ? "Certifications/Extras" : "Certifications/Extras"}
+              </Tag>
             </Space>
           </Card>
         </Space>
@@ -176,7 +167,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.summary.title,
       tags: ["Summary"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "Summary — один из самых важных блоков. 3–5 строк: кто ты, сильные стороны, стек/домены, какую задачу ищешь."
@@ -188,7 +179,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
             dataSource={[
               isRu
                 ? "Пиши конкретно: «Frontend (React/TS), 3+ years, performance & DX»."
-                : "Be concrete: \"Frontend (React/TS), 3+ years, performance & DX\".",
+                : 'Be concrete: "Frontend (React/TS), 3+ years, performance & DX".',
               isRu
                 ? "Не повторяй опыт целиком — только тезисы."
                 : "Don't restate the whole experience — only highlights.",
@@ -204,11 +195,11 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.xyz.title,
       tags: ["XYZ"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "Вместо «что делал» — «что изменил». XYZ: достижение → действие → результат (цифры/эффект)."
-              : "Replace \"what I did\" with \"what changed\". XYZ: achievement → action → result (numbers/impact)."}
+              : 'Replace "what I did" with "what changed". XYZ: achievement → action → result (numbers/impact).'}
           </Paragraph>
           <Card size="small">
             <Text strong>{isRu ? "Примеры:" : "Examples:"}</Text>
@@ -238,7 +229,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.keywords.title,
       tags: [isRu ? "ключевые слова" : "keywords"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "Ключевые слова должны быть в резюме текстом: технологии, инструменты, домены. Идеально — и в Skills, и в Experience."
@@ -274,7 +265,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
               : "Long walls of text instead of bullets.",
             isRu
               ? "«Отвечал за / занимался» без результата и метрик."
-              : "\"Responsible for\" without results or metrics.",
+              : '"Responsible for" without results or metrics.',
             isRu
               ? "Ссылки без https:// или не кликабельные в PDF."
               : "Links without https:// or not clickable in PDF.",
@@ -292,7 +283,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.export.title,
       tags: [isRu ? "экспорт" : "export"],
       content: (
-        <Space direction="vertical" size={12}>
+        <Space orientation="vertical" size={12}>
           <Paragraph style={{ margin: 0 }}>
             {isRu
               ? "Делай отдельный ATS-friendly шаблон: 1 колонка, минимум декора, нормальные заголовки секций."
@@ -323,7 +314,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.atsVsHuman.title,
       tags: [isRu ? "ATS vs Человек" : "ATS vs Human"],
       content: (
-        <Space direction="vertical" size={16}>
+        <Space orientation="vertical" size={16}>
           <div>
             <Title level={5} style={{ margin: 0 }}>
               {isRu ? "Что одинаково:" : "What's the same:"}
@@ -373,7 +364,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.keywordsWorkflow.title,
       tags: [isRu ? "ключевые слова" : "keywords"],
       content: (
-        <Space direction="vertical" size={16}>
+        <Space orientation="vertical" size={16}>
           <div>
             <Title level={5} style={{ margin: 0 }}>
               {isRu ? "Шаг 1: Извлечение" : "Step 1: Extraction"}
@@ -422,7 +413,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.formatting.title,
       tags: [isRu ? "форматирование" : "formatting"],
       content: (
-        <Space direction="vertical" size={16}>
+        <Space orientation="vertical" size={16}>
           <div>
             <Title level={5} style={{ margin: 0 }}>
               {isRu ? "Шрифты и размеры" : "Fonts and sizes"}
@@ -486,7 +477,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.linksPortfolio.title,
       tags: [isRu ? "ссылки" : "links"],
       content: (
-        <Space direction="vertical" size={16}>
+        <Space orientation="vertical" size={16}>
           <div>
             <Title level={5} style={{ margin: 0 }}>
               {isRu ? "Обязательно:" : "Required:"}
@@ -542,7 +533,7 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
       title: t.items.redFlags.title,
       tags: [isRu ? "red flags" : "red flags"],
       content: (
-        <Space direction="vertical" size={16}>
+        <Space orientation="vertical" size={16}>
           <List
             bordered
             size="small"
@@ -574,7 +565,9 @@ export function getFaqItems(locale: Locale, t: Messages): FaqItem[] {
 export function getTldrItems(locale: Locale): string[] {
   const isRu = locale === "ru";
   return [
-    isRu ? "1 страница (2 — если реально нужно)" : "1 page (2 only if necessary)",
+    isRu
+      ? "1 страница (2 — если реально нужно)"
+      : "1 page (2 only if necessary)",
     isRu ? "PDF, без фото/графики для ATS" : "PDF, no photo/graphics for ATS",
     isRu ? "Кликабельные ссылки (https://)" : "Clickable links (https://)",
     isRu ? "Стандартная структура секций" : "Standard section structure",
@@ -624,8 +617,8 @@ export function getAtsRules(locale: Locale): Rule[] {
         ? "Experience, Skills, Education — стандартные названия."
         : "Use standard headings: Experience, Skills, Education.",
       risky: isRu
-        ? "Креативные заголовки (\"My Journey\", \"What I did\")."
-        : "Creative headings (\"My Journey\", \"What I did\").",
+        ? 'Креативные заголовки ("My Journey", "What I did").'
+        : 'Creative headings ("My Journey", "What I did").',
       fix: isRu
         ? "Верни стандартные названия секций."
         : "Switch back to standard section titles.",
@@ -639,7 +632,7 @@ export function getAtsRules(locale: Locale): Rule[] {
         ? "Полные URL с https://, кликабельные."
         : "Full https:// URLs, clickable.",
       risky: isRu
-        ? "\"github.com/me\" без схемы, не кликается."
+        ? '"github.com/me" без схемы, не кликается.'
         : "Naked domains without scheme, not clickable.",
       fix: isRu
         ? "Добавь https:// и проверь в PDF."
@@ -652,8 +645,8 @@ export function getAtsRules(locale: Locale): Rule[] {
         ? "3–6 буллетов, акцент на результат."
         : "3–6 bullets per role, impact-focused.",
       risky: isRu
-        ? "Полотна текста, \"responsible for\"."
-        : "Paragraph walls, \"Responsible for\".",
+        ? 'Полотна текста, "responsible for".'
+        : 'Paragraph walls, "Responsible for".',
       fix: isRu
         ? "Перепиши в XYZ, добавь метрики."
         : "Rewrite using XYZ and add metrics.",
@@ -748,4 +741,3 @@ export function getExportQaChecklist(locale: Locale): string[] {
       : "Photo (if present) is not distorted or cropped",
   ];
 }
-

@@ -109,7 +109,7 @@ function SkillsBlock({
 
   return (
     <section id={linkId} style={{ scrollMarginTop: 96 }}>
-      <Space direction="vertical" size={10} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={10} style={{ width: "100%" }}>
         <Flex align="center" gap={10} wrap>
           <span style={{ fontSize: 18, lineHeight: 1 }}>{icon}</span>
           <Title level={3} style={{ margin: 0 }}>
@@ -123,7 +123,7 @@ function SkillsBlock({
 
         <Divider style={{ margin: "8px 0 14px" }} />
 
-        <Space direction="vertical" size={12} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={12} style={{ width: "100%" }}>
           {tags.length > 0 && (
             <Flex wrap gap={8}>
               <AnimatePresence initial={false}>
@@ -226,7 +226,7 @@ export function SkillsSection() {
   );
 
   return (
-    <Space direction="vertical" size={22} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={22} style={{ width: "100%" }}>
       <SkillsBlock
         linkId="techSkills"
         kind="tech"

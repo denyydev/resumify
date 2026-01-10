@@ -300,7 +300,7 @@ export function BasicIdentitySection() {
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto p-5">
-        <Space direction="vertical" size={12} className="w-full">
+        <Space orientation="vertical" size={12} className="w-full">
           {photoVisible ? <PhotoBlock t={t} /> : null}
           <NameInputsBlock t={t} />
         </Space>
