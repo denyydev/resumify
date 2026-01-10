@@ -29,5 +29,5 @@ Built as a public project to showcase production-level skills when commercial wo
 - Focus on usability and maintainability
 
 ---
-
+Deployed: [https://resumify.space](resumify.space)
 Author: [@denyydev](https://github.com/denyydev)
