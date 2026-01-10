@@ -1,11 +1,10 @@
 "use client";
 
-import { ArrowRightOutlined, PlayCircleOutlined } from "@ant-design/icons";
-import { Button, ConfigProvider } from "antd";
-import { motion, type Variants } from "framer-motion";
-import React from "react";
 import type { Locale } from "@/app/i18n";
 import { getLandingMessages } from "@/lib/getLandingMessages";
+import { ArrowRightOutlined } from "@ant-design/icons";
+import { Button, ConfigProvider } from "antd";
+import { motion, type Variants } from "framer-motion";
 
 const container: Variants = {
   hidden: {},
@@ -110,17 +109,9 @@ export default function Hero({ locale }: Props) {
                   size="large"
                   icon={<ArrowRightOutlined />}
                   href={`/${locale}/editor`}
-                  className="!h-12 !px-8 !text-base !font-semibold shadow-lg shadow-indigo-500/25 hover:!shadow-xl hover:!shadow-indigo-500/30 active:!scale-[0.98] active:!opacity-90 transition-all duration-200 cursor-pointer"
+                  className="!h-14 !w-[400px] !px-8 !text-base !font-semibold shadow-lg shadow-indigo-500/25 hover:!shadow-xl hover:!shadow-indigo-500/30 active:!scale-[0.98] active:!opacity-90 transition-all duration-200 cursor-pointer"
                 >
                   {t.hero.ctaPrimary}
-                </Button>
-                <Button
-                  size="large"
-                  icon={<PlayCircleOutlined />}
-                  href={`/${locale}/editor`}
-                  className="!h-12 !px-8 !text-base !font-medium !border-slate-300 hover:!bg-slate-50 hover:!border-slate-400 active:!scale-[0.98] active:!opacity-90 !text-slate-700 transition-all duration-200 cursor-pointer"
-                >
-                  {t.hero.ctaSecondary}
                 </Button>
               </motion.div>
 
@@ -142,7 +133,9 @@ export default function Hero({ locale }: Props) {
                       d="M4.5 12.75l6 6 9-13.5"
                     />
                   </svg>
-                  <span className="font-medium">{t.hero.features.atsOptimized}</span>
+                  <span className="font-medium">
+                    {t.hero.features.atsOptimized}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <svg
@@ -158,7 +151,9 @@ export default function Hero({ locale }: Props) {
                       d="M4.5 12.75l6 6 9-13.5"
                     />
                   </svg>
-                  <span className="font-medium">{t.hero.features.instantExport}</span>
+                  <span className="font-medium">
+                    {t.hero.features.instantExport}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <svg
@@ -174,7 +169,9 @@ export default function Hero({ locale }: Props) {
                       d="M4.5 12.75l6 6 9-13.5"
                     />
                   </svg>
-                  <span className="font-medium">{t.hero.features.noSignup}</span>
+                  <span className="font-medium">
+                    {t.hero.features.noSignup}
+                  </span>
                 </div>
               </motion.div>
             </motion.div>
