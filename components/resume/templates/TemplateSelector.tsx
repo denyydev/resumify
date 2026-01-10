@@ -4,13 +4,15 @@ import { useCurrentLocale } from "@/lib/useCurrentLocale";
 import { useResumeStore } from "@/store/useResumeStore";
 import type { TemplateKey } from "@/types/resume";
 import type { MenuProps } from "antd";
-import { Button, Dropdown, theme } from "antd";
+import { Button, Dropdown } from "antd";
+import { Check, ChevronDown, LayoutTemplate } from "lucide-react";
+import { useMemo } from "react";
 
 type LocaleKey = "ru" | "en";
 
 const messages = {
-  ru: { title: "Выберите шаблон" },
-  en: { title: "Select template" },
+  ru: { title: "Шаблон" },
+  en: { title: "Template" },
 } as const;
 
 const templateTitles: Record<TemplateKey, Record<LocaleKey, string>> = {
@@ -26,9 +28,17 @@ const templateTitles: Record<TemplateKey, Record<LocaleKey, string>> = {
   grid: { ru: "Сетка", en: "Grid" },
 };
 
-export function TemplateSelector() {
-  const { token } = theme.useToken();
+// (опционально) микро-подписи как в SaaS меню
+const templateHints: Partial<Record<TemplateKey, Record<LocaleKey, string>>> = {
+  simple: { ru: "Максимум ATS", en: "Most ATS-friendly" },
+  minimal: { ru: "Чисто и просто", en: "Clean & simple" },
+  modern: { ru: "Акценты и воздух", en: "Airy with accents" },
+  classic: { ru: "Традиционный вид", en: "Traditional look" },
+  timeline: { ru: "Хронология", en: "Timeline layout" },
+  grid: { ru: "Сетка секций", en: "Grid sections" },
+};
 
+export function TemplateSelector() {
   const localeRaw = useCurrentLocale();
   const locale: LocaleKey = localeRaw === "en" ? "en" : "ru";
   const t = messages[locale];
@@ -45,14 +55,40 @@ export function TemplateSelector() {
     "grid",
   ];
 
-  const items: MenuProps["items"] = options.map((key) => ({
-    key,
-    label: templateTitles[key][locale],
-  }));
+  const items: MenuProps["items"] = useMemo(
+    () =>
+      options.map((key) => {
+        const title = templateTitles[key][locale];
+        const hint = templateHints[key]?.[locale];
+
+        return {
+          key,
+          label: (
+            <div className="flex items-start gap-3 py-1">
+              <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center">
+                {templateKey === key ? (
+                  <Check size={16} />
+                ) : (
+                  <span className="h-4 w-4" />
+                )}
+              </span>
+
+              <div className="min-w-0">
+                <div className="text-sm font-medium leading-5">{title}</div>
+                {hint ? (
+                  <div className="text-xs leading-4 opacity-70">{hint}</div>
+                ) : null}
+              </div>
+            </div>
+          ),
+        };
+      }),
+    [options, locale, templateKey]
+  );
 
   return (
     <Dropdown
-      placement="topLeft"
+      placement="bottomLeft"
       trigger={["click"]}
       menu={{
         items,
@@ -61,7 +97,26 @@ export function TemplateSelector() {
         onClick: ({ key }) => setTemplateKey(key as TemplateKey),
       }}
     >
-      <Button>{templateTitles[templateKey][locale]}</Button>
+      {/* pill trigger */}
+      <Button
+        type="default"
+        className="
+          !h-10
+          !rounded-full
+          !border-slate-200/80
+          !bg-white/80
+          hover:!bg-white
+          !px-3
+          shadow-sm
+          backdrop-blur
+          flex items-center gap-2
+        "
+      >
+        <LayoutTemplate size={16} className="opacity-80" />
+        <span className="text-sm font-medium">{t.title}:</span>
+        <span className="text-sm">{templateTitles[templateKey][locale]}</span>
+        <ChevronDown size={16} className="opacity-70" />
+      </Button>
     </Dropdown>
   );
 }

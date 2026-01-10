@@ -2,7 +2,9 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 import type { MenuProps } from "antd";
-import { Dropdown } from "antd";
+import { Button, Dropdown } from "antd";
+import { Check, ChevronDown, Palette } from "lucide-react";
+import { useMemo } from "react";
 
 const COLORS = [
   "#1677ff",
@@ -27,40 +29,112 @@ export default function AccentColorPicker({
 
   const current = accentColor ?? COLORS[0];
 
-  const items: MenuProps["items"] = COLORS.map((color) => ({
-    key: color,
-    label: (
-      <div className="flex items-center justify-center py-1">
-        <span
-          className="h-4 w-4 rounded-full"
-          style={{ backgroundColor: color }}
-        />
-      </div>
-    ),
-  }));
+  const items: MenuProps["items"] = useMemo(() => {
+    return [
+      {
+        key: "palette",
+        label: (
+          <div className="py-1">
+            <div className="text-xs font-medium opacity-70 mb-2">Accent</div>
+
+            <div className="grid grid-cols-6 gap-2">
+              {COLORS.map((color) => {
+                const active = color === current;
+                return (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setAccentColor(color);
+                    }}
+                    className={[
+                      "relative h-7 w-7 rounded-full",
+                      "ring-1 ring-black/10",
+                      "transition-transform",
+                      disabled
+                        ? "opacity-60"
+                        : "hover:scale-[1.06] active:scale-[0.98]",
+                      active ? "ring-2 ring-black/20" : "",
+                    ].join(" ")}
+                    style={{
+                      backgroundColor: color,
+                      boxShadow: active
+                        ? `0 0 0 4px ${hexToRgba(color, 0.18)}`
+                        : undefined,
+                    }}
+                    aria-label={`Set accent color ${color}`}
+                  >
+                    {active ? (
+                      <span className="absolute inset-0 grid place-items-center text-white">
+                        <Check size={14} />
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-2 text-[11px] opacity-60">
+              {disabled ? "Disabled" : "Pick a color"}
+            </div>
+          </div>
+        ),
+        // Чтобы AntD не пытался “выделять” этот псевдо-элемент как пункт меню
+        disabled: true,
+      },
+    ];
+  }, [current, disabled, setAccentColor]);
 
   return (
     <Dropdown
-      placement="topLeft"
+      placement="bottomLeft"
       trigger={["click"]}
       disabled={disabled}
       menu={{
         items,
-        selectable: true,
-        selectedKeys: [current],
-        onClick: ({ key }) => setAccentColor(String(key)),
       }}
     >
-      <button
-        type="button"
+      <Button
+        type="default"
         disabled={disabled}
-        className={`h-8 w-8 rounded-full border bg-white flex items-center justify-center cursor-pointer ${
-          disabled
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:scale-105 active:scale-95"
-        } ${className ?? ""}`}
-        style={{ backgroundColor: current }}
-      />
+        className={[
+          "!h-10 !rounded-full",
+          "!border-slate-200/80 !bg-white/80 hover:!bg-white",
+          "shadow-sm backdrop-blur",
+          "!px-3 flex items-center gap-2",
+          className ?? "",
+        ].join(" ")}
+      >
+        <Palette size={16} className="opacity-80" />
+        <span className="text-sm font-medium">Accent</span>
+
+        {/* color swatch */}
+        <span
+          className="ml-1 inline-flex h-4 w-4 rounded-full ring-1 ring-black/10"
+          style={{ backgroundColor: current }}
+        />
+
+        <ChevronDown size={16} className="opacity-70" />
+      </Button>
     </Dropdown>
   );
+}
+
+// utils
+function hexToRgba(hex: string, alpha: number) {
+  const h = hex.replace("#", "").trim();
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
+  const n = parseInt(full, 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }

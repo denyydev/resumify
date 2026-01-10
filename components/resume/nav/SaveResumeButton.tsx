@@ -154,9 +154,9 @@ export function SaveResumeButton() {
 
   const baseButton = (
     <Button
-      type="dashed"
+      type="default"
+      className="!h-10 !rounded-full !px-3 font-medium"
       size="small"
-      className="font-medium! rounded-sm!"
       disabled={!isAuthed || loading}
       loading={loading}
       icon={icon}

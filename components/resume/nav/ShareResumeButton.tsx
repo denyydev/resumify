@@ -202,9 +202,8 @@ export default function ShareResumeButton() {
 
   const button = (
     <Button
-      type="dashed"
-      size="small"
-      className="font-medium! rounded-sm!"
+      type="text"
+      className="!h-10 !rounded-full !px-3 font-medium"
       onClick={handleShareClick}
       disabled={!isAuthed || loading}
       loading={loading}

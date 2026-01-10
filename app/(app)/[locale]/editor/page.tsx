@@ -69,28 +69,35 @@ export default function EditorPage() {
           {/* RIGHT: content */}
           <main className="min-w-0 min-h-0">
             {/* Toolbar: sticky только на lg+ */}
-            <div
-              className="
-              z-20 pt-4 pb-3
-              bg-[#f3f5f9]
-              lg:bg-[#f3f5f9]/70 lg:backdrop-blur-md lg:supports-[backdrop-filter]:bg-[#f3f5f9]/55
-              lg:sticky lg:top-0
-            "
-            >
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <TemplateSelector />
-                  <AccentColorPicker />
+            <div className="z-20 pt-4 pb-3 relative lg:sticky lg:top-0">
+              {/* glass layer */}
+              <div
+                className="
+      pointer-events-none absolute
+      -inset-x-4 -inset-y-3
+      hidden lg:block
+      bg-[#f3f5f9]/70 backdrop-blur-md
+      supports-[backdrop-filter]:bg-[#f3f5f9]/55
+    "
+              />
+
+              <div className="relative">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <TemplateSelector />
+                    <AccentColorPicker />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <ShareResumeButton />
+                    <SaveResumeButton />
+                    <div className="mx-1 h-6 w-px bg-slate-300/70" />
+                    <DownloadPdfButton />
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <ShareResumeButton />
-                  <SaveResumeButton />
-                  <DownloadPdfButton />
-                </div>
+                <div className="mt-3 h-px w-full bg-slate-200/80" />
               </div>
-
-              <div className="mt-3 h-px w-full bg-slate-200/80" />
             </div>
 
             {/* Content */}

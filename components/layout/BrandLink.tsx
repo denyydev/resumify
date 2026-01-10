@@ -8,56 +8,27 @@ export function BrandLink({ href }: { href: string }) {
       href={href}
       aria-label="ResumeCraft"
       className="
-        group relative flex h-8 w-24 select-none items-center justify-center
+        group inline-flex items-center
+        h-10 px-3 rounded-full
+        border border-white/10
+        bg-white/[0.03]
+        backdrop-blur
+        shadow-[0_8px_20px_rgba(0,0,0,0.35)]
+        transition-all duration-200
+
+        select-none no-underline
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25
       "
     >
-      {/* outer glow (air) */}
+      <span className="text-sm font-semibold tracking-tight text-white/90">
+        ResumeCraft
+      </span>
       <span
         className="
-          pointer-events-none absolute -inset-2 rounded-2xl
-          bg-black/40 blur-xl
-          opacity-0 transition-opacity duration-300
-          group-hover:opacity-100
+          ml-2 h-1.5 w-1.5 rounded-full bg-[#0A84FF]
+          shadow-[0_0_0_4px_rgba(10,132,255,0.14)]
         "
       />
-
-      {/* body */}
-      <div
-        className="
-          relative z-10 flex h-full w-full items-center justify-center
-          rounded-xl p-[1px]
-          border border-white/10
-
-          /* same gradient as nav */
-          bg-gradient-to-b
-          from-[#0b0b0e]
-          via-[#0f1117]
-          to-[#0b0b0e]
-
-          backdrop-blur
-          shadow-[0_8px_20px_rgba(0,0,0,0.45)]
-          transition-all duration-300
-          group-hover:-translate-y-0.5
-        "
-      >
-        {/* inner surface */}
-        <div
-          className="
-            relative flex h-full w-full items-center justify-center
-            rounded-[10px]
-
-            /* subtle inner highlight */
-            bg-gradient-to-b
-            from-white/10
-            to-transparent
-          "
-        >
-          {/* letters */}
-          <span className="text-[13px] font-semibold tracking-tight text-white/90">
-            ResumeCraft
-          </span>
-        </div>
-      </div>
     </Link>
   );
 }
