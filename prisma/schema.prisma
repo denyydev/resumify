@@ -6,6 +6,16 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id         String   @id @default(cuid())
+  googleSub  String   @unique
+  email      String?  @unique
+  name       String?
+  image      String?
+  createdAt  DateTime @default(now())
+  lastLoginAt DateTime @updatedAt
+}
+
 model Resume {
   id        String   @id @default(cuid())
   userEmail String
