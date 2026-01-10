@@ -129,7 +129,7 @@ export default function EditorPage() {
 
             <div className="py-5">
               <div className="flex min-h-0 flex-col gap-5 xl:flex-row">
-                <div className="min-w-0 xl:flex-[0_0_420px]">
+                <div className="min-w-0 xl:flex-[0_0_520px]">
                   <Card className="h-fit">
                     <EditorShell selected={selected} />
                   </Card>

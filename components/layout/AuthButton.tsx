@@ -1,53 +1,70 @@
 "use client";
 
 import type { MenuProps } from "antd";
-import { Avatar, Dropdown, Spin } from "antd";
+import {
+  Avatar,
+  Button,
+  ConfigProvider,
+  Dropdown,
+  Space,
+  Spin,
+  Typography,
+} from "antd";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
+
+const { Text } = Typography;
 
 export function AuthButton() {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
-    return (
-      <div className="flex items-center">
-        <Spin size="small" />
-      </div>
-    );
+    return <Spin size="small" />;
   }
 
-  const capsuleBase = `
-    relative inline-flex items-center
-    rounded-full p-[1px]
-    border border-white/10
-    bg-gradient-to-b from-[#0b0b0e] via-[#0f1117] to-[#0b0b0e]
-    backdrop-blur
-    shadow-[0_10px_30px_rgba(0,0,0,0.45)]
-    transition-all duration-300
-    hover:-translate-y-0.5
-    before:absolute before:inset-0 before:rounded-full
-    before:bg-gradient-to-b before:from-white/10 before:to-transparent
-    before:opacity-30 before:pointer-events-none
-  `;
-
-  const capsuleInner = `
-    relative z-10 inline-flex items-center gap-2
-    h-8 rounded-full
-    px-3
-    text-sm font-medium
-    text-white/80 hover:text-white
-    transition-colors
-  `;
+  const baseTheme = {
+    token: {
+      borderRadius: 14,
+      borderRadiusLG: 16,
+      controlHeight: 36,
+    },
+    components: {
+      Button: {
+        borderRadius: 999,
+        controlHeight: 36,
+        paddingInline: 12,
+        fontWeight: 600,
+      },
+      Dropdown: {
+        borderRadiusLG: 16,
+      },
+      Menu: {
+        itemBorderRadius: 12,
+        activeBarBorderWidth: 0,
+        itemHeight: 38,
+      },
+      Avatar: {
+        borderRadius: 999,
+      },
+    },
+  } as const;
 
   if (!session) {
     return (
-      <button
-        type="button"
-        onClick={() => signIn("google")}
-        className={`${capsuleBase} group`}
-      >
-        <span className={capsuleInner}>Войти</span>
-      </button>
+      <ConfigProvider theme={baseTheme}>
+        <Button
+          type="primary"
+          onClick={() => signIn("google")}
+          style={{
+            borderRadius: 999,
+            height: 36,
+            paddingInline: 14,
+            boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
+          }}
+        >
+          Войти
+        </Button>
+      </ConfigProvider>
     );
   }
 
@@ -58,27 +75,49 @@ export function AuthButton() {
       key: "profile",
       disabled: true,
       label: (
-        <div className="flex items-center gap-3 px-2 py-1 max-w-[260px]">
-          <Avatar
-            size={32}
-            src={image || undefined}
-            icon={!image ? <User className="h-4 w-4" /> : undefined}
-          />
-          <div className="min-w-0 leading-tight">
-            <div className="font-medium truncate text-white/90">{name}</div>
-            {email ? (
-              <div className="text-xs text-white/60 truncate">{email}</div>
-            ) : null}
-          </div>
+        <div style={{ padding: 8, maxWidth: 280 }}>
+          <Space align="center" size={12}>
+            <Avatar
+              size={32}
+              src={image || undefined}
+              icon={!image ? <User size={16} /> : undefined}
+            />
+            <div style={{ minWidth: 0, lineHeight: 1.2 }}>
+              <div
+                style={{
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {name}
+              </div>
+              {email ? (
+                <Text
+                  type="secondary"
+                  style={{
+                    fontSize: 12,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "block",
+                  }}
+                >
+                  {email}
+                </Text>
+              ) : null}
+            </div>
+          </Space>
         </div>
       ),
     },
     { type: "divider" },
     {
       key: "logout",
-      icon: <LogOut className="h-4 w-4" />,
-      label: <span className="text-red-400">Выйти</span>,
+      icon: <LogOut size={16} />,
       danger: true,
+      label: "Выйти",
     },
   ];
 
@@ -87,51 +126,58 @@ export function AuthButton() {
   };
 
   return (
-    <Dropdown
-      trigger={["click"]}
-      placement="bottomRight"
-      menu={{
-        items,
-        onClick: onMenuClick,
-        className: `
-          !rounded-2xl !p-1 shadow-xl
-          !bg-[#0b0b0e] !border !border-white/10
-        `,
-      }}
-      dropdownRender={(menu) => (
-        <div
-          className="
-            overflow-hidden rounded-2xl
-            border border-white/10
-            bg-[#0b0b0e]/95
-            shadow-xl backdrop-blur
-          "
+    <ConfigProvider theme={baseTheme}>
+      <Dropdown
+        trigger={["click"]}
+        placement="bottomRight"
+        menu={{ items, onClick: onMenuClick }}
+        overlayStyle={{ minWidth: 260 }}
+        dropdownRender={(menu) => (
+          <div
+            style={{
+              borderRadius: 16,
+              overflow: "hidden",
+              background: "rgba(255,255,255,0.92)",
+              border: "1px solid rgba(0,0,0,0.06)",
+              boxShadow: "0 18px 50px rgba(0,0,0,0.12)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            {menu}
+          </div>
+        )}
+      >
+        <Button
+          type="default"
+          style={{
+            borderRadius: 999,
+            height: 36,
+            paddingInline: 10,
+            boxShadow: "0 10px 24px rgba(0,0,0,0.10)",
+          }}
         >
-          {menu}
-        </div>
-      )}
-    >
-      <button type="button" className={`${capsuleBase} group`}>
-        <span
-          className={`
-            ${capsuleInner}
-            pl-1 pr-2
-          `}
-        >
-          <Avatar
-            size={24}
-            src={image || undefined}
-            icon={!image ? <User className="h-3.5 w-3.5" /> : undefined}
-            className="!bg-white/10"
-          />
-
-          <span className="hidden md:inline max-w-[140px] truncate">
-            {name}
-          </span>
-
-          <ChevronDown className="h-3.5 w-3.5 text-white/45 group-hover:text-white/70 transition-colors" />
-        </span>
-      </button>
-    </Dropdown>
+          <Space size={8}>
+            <Avatar
+              size={24}
+              src={image || undefined}
+              icon={!image ? <User size={14} /> : undefined}
+              style={{ background: "rgba(0,0,0,0.04)" }}
+            />
+            <span
+              style={{
+                maxWidth: 160,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+              className="hidden md:inline"
+            >
+              {name}
+            </span>
+            <ChevronDown size={16} style={{ opacity: 0.55 }} />
+          </Space>
+        </Button>
+      </Dropdown>
+    </ConfigProvider>
   );
 }

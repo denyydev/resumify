@@ -25,12 +25,12 @@ const dyn = (loader: () => Promise<SectionComponent>) =>
     loading: SectionLoader,
   });
 
-const BasicIdentitySection = dyn(() =>
-  import("./sections/BasicIdentitySection").then((m) => m.BasicIdentitySection)
+const SummarySection = dyn(() =>
+  import("./sections/SummarySection").then((m) => m.SummarySection)
 );
 
-const BasicContactsSection = dyn(() =>
-  import("./sections/BasicContactsSection").then((m) => m.BasicContactsSection)
+const ContactsSection = dyn(() =>
+  import("./sections/ContactsSection").then((m) => m.ContactsSection)
 );
 
 const ExperienceSection = dyn(() =>
@@ -57,10 +57,8 @@ const LanguagesSection = dyn(() =>
   import("./sections/LanguagesSection").then((m) => m.LanguagesSection)
 );
 
-const EmploymentPreferencesSection = dyn(() =>
-  import("./sections/EmploymentPreferencesSection").then(
-    (m) => m.EmploymentPreferencesSection
-  )
+const PreferencesSection = dyn(() =>
+  import("./sections/PreferencesSection").then((m) => m.PreferencesSection)
 );
 
 const CertificationsSection = dyn(() =>
@@ -74,15 +72,15 @@ const ActivitiesSection = dyn(() =>
 );
 
 const sections: Partial<Record<ResumeSectionKey, SectionComponent>> = {
-  summary: BasicIdentitySection,
-  contacts: BasicContactsSection,
+  summary: SummarySection,
+  contacts: ContactsSection,
   experience: ExperienceSection,
   techSkills: TechSkillsSection,
   softSkills: SoftSkillsSection,
   projects: ProjectsSection,
   education: EducationSection,
   languages: LanguagesSection,
-  employmentPreferences: EmploymentPreferencesSection,
+  employmentPreferences: PreferencesSection,
   certifications: CertificationsSection,
   activities: ActivitiesSection,
 };

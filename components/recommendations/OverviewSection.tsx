@@ -1,13 +1,16 @@
 "use client";
 
 import {
-  Alert,
-  Card,
-  List,
-  Space,
-  Tag,
-  Typography,
-} from "antd";
+  getAtsRules,
+  getCommonWins,
+  getExportQaChecklist,
+  getPatterns,
+  getQuickTools,
+  getTldrItems,
+} from "@/content/recommendations/data";
+import { messages } from "@/content/recommendations/messages";
+import type { Locale } from "@/content/recommendations/types";
+import { Alert, Card, List, Space, Typography } from "antd";
 import {
   FileDown,
   ScanText,
@@ -18,16 +21,6 @@ import {
   TriangleAlert,
   Wand2,
 } from "lucide-react";
-import type { Locale } from "@/content/recommendations/types";
-import { messages } from "@/content/recommendations/messages";
-import {
-  getAtsRules,
-  getCommonWins,
-  getExportQaChecklist,
-  getPatterns,
-  getQuickTools,
-  getTldrItems,
-} from "@/content/recommendations/data";
 import { Pill } from "./components/Pill";
 import { RuleRow } from "./components/RuleRow";
 import { SectionHeader } from "./components/SectionHeader";
@@ -46,14 +39,12 @@ export function OverviewSection({ locale }: { locale: Locale }) {
   const exportQa = getExportQaChecklist(locale);
 
   return (
-    <Space direction="vertical" size={20} className="w-full">
+    <Space orientation="vertical" size={20} className="w-full">
       <Card>
         <Title level={2} style={{ margin: 0, marginBottom: 12 }}>
           {t.pageTitle}
         </Title>
-        <Paragraph style={{ margin: 0, fontSize: 15 }}>
-          {t.intro}
-        </Paragraph>
+        <Paragraph style={{ margin: 0, fontSize: 15 }}>{t.intro}</Paragraph>
 
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <Pill
@@ -108,7 +99,10 @@ export function OverviewSection({ locale }: { locale: Locale }) {
             renderItem={(x) => (
               <List.Item>
                 <Space size={8}>
-                  <Target size={14} className="text-[var(--ant-colorPrimary)]" />
+                  <Target
+                    size={14}
+                    className="text-[var(--ant-colorPrimary)]"
+                  />
                   <span className="text-sm">{x}</span>
                 </Space>
               </List.Item>
@@ -213,7 +207,11 @@ export function OverviewSection({ locale }: { locale: Locale }) {
             <div className="mb-3 text-sm font-semibold text-[var(--ant-colorText)]">
               {t.micro.patterns.skills}
             </div>
-            <Card size="small" styles={{ body: { padding: 12 } }} className="mb-3">
+            <Card
+              size="small"
+              styles={{ body: { padding: 12 } }}
+              className="mb-3"
+            >
               <div className="text-xs text-[var(--ant-colorText)] leading-relaxed">
                 {patterns.skills}
               </div>
@@ -279,7 +277,10 @@ export function OverviewSection({ locale }: { locale: Locale }) {
             renderItem={(x) => (
               <List.Item>
                 <Space size={8}>
-                  <ShieldCheck size={14} className="text-[var(--ant-colorSuccess)]" />
+                  <ShieldCheck
+                    size={14}
+                    className="text-[var(--ant-colorSuccess)]"
+                  />
                   <span className="text-sm">{x}</span>
                 </Space>
               </List.Item>
@@ -290,4 +291,3 @@ export function OverviewSection({ locale }: { locale: Locale }) {
     </Space>
   );
 }
-

@@ -230,7 +230,7 @@ export default function ShareResumeButton() {
         footer={null}
         centered
         width={520}
-        destroyOnClose
+        destroyOnHidden
         closable={false}
       >
         <div className="space-y-5">

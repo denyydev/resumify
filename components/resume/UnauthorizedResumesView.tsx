@@ -1,9 +1,10 @@
 "use client";
 
-import { Button, Card } from "antd";
-import { FileText, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import type { Locale } from "@/lib/useCurrentLocale";
+import { Button, Card } from "antd";
+import { FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AuthButton } from "../layout/AuthButton";
 
 type Props = {
   locale: Locale;
@@ -12,7 +13,8 @@ type Props = {
 const messages = {
   ru: {
     title: "Войдите, чтобы управлять резюме",
-    subtitle: "Сохраняйте версии, экспортируйте PDF и управляйте шаблонами в одном месте.",
+    subtitle:
+      "Сохраняйте версии, экспортируйте PDF и управляйте шаблонами в одном месте.",
     versions: "Версии",
     versionsDesc: "Храните несколько вариантов под разные вакансии.",
     export: "Экспорт",
@@ -96,13 +98,7 @@ export function UnauthorizedResumesView({ locale }: Props) {
                 {t.goHome}
               </Button>
 
-              <Button
-                type="primary"
-                icon={<Plus size={16} />}
-                onClick={() => router.push(createHref)}
-              >
-                {t.createResume}
-              </Button>
+              <AuthButton />
             </div>
           </div>
         </div>
@@ -110,4 +106,3 @@ export function UnauthorizedResumesView({ locale }: Props) {
     </div>
   );
 }
-

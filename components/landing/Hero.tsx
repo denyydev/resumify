@@ -1,7 +1,6 @@
 "use client";
 
-import type { Locale } from "@/app/i18n";
-import { getLandingMessages } from "@/lib/getLandingMessages";
+import { useCurrentLocale } from "@/lib/useCurrentLocale";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Button, ConfigProvider } from "antd";
 import { motion, type Variants } from "framer-motion";
@@ -10,7 +9,6 @@ import { Inter } from "next/font/google";
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
   display: "swap",
-  // variable-версия сама подтянется, но weight можно оставить явным
   weight: ["400", "500", "600", "700"],
 });
 
@@ -34,10 +32,54 @@ const item: Variants = {
   },
 };
 
-type Props = { locale: Locale };
+const messages = {
+  ru: {
+    hero: {
+      trustSignal: "Бесплатно · Без регистрации · Без карты",
+      headline: "Резюме, которые {highlight} — без лишних шагов.",
+      headlineHighlight: "проходят ATS",
+      subheadline:
+        "Заполните данные, выберите шаблон и получите готовое резюме для откликов.",
+      ctaPrimary: "Создать резюме",
+      ctaSecondary: "Посмотреть шаблоны",
+      features: {
+        atsOptimized: "Готово для ATS",
+        instantExport: "Экспорт в PDF за секунду",
+        noSignup: "Без регистрации",
+      },
+    },
+  },
+  en: {
+    hero: {
+      trustSignal: "Free · No signup · No card",
+      headline: "Resumes that {highlight} — without extra steps.",
+      headlineHighlight: "pass ATS",
+      subheadline:
+        "Fill in your details, choose a template, and get a resume ready to apply.",
+      ctaPrimary: "Build resume",
+      ctaSecondary: "View templates",
+      features: {
+        atsOptimized: "ATS-ready",
+        instantExport: "Instant PDF export",
+        noSignup: "No signup required",
+      },
+    },
+  },
+} as const;
 
-export default function Hero({ locale }: Props) {
-  const t = getLandingMessages(locale);
+type Locale = keyof typeof messages;
+
+function normalizeLocale(value: unknown): Locale {
+  if (typeof value !== "string" || value.length === 0) return "ru";
+  const base = value.split("-")[0]?.toLowerCase();
+  return base === "en" ? "en" : "ru";
+}
+
+export default function Hero() {
+  const rawLocale = useCurrentLocale();
+  const locale = normalizeLocale(rawLocale) satisfies Locale;
+  const t = messages[locale];
+
   const headlineParts = t.hero.headline.split("{highlight}");
 
   return (
@@ -52,12 +94,8 @@ export default function Hero({ locale }: Props) {
       }}
     >
       <section
-        className={[
-          inter.className,
-          "relative w-full overflow-hidden bg-white min-h-[100svh] flex items-center",
-        ].join(" ")}
+        className={`${inter.className} relative w-full overflow-hidden bg-white min-h-[100svh] flex items-center`}
       >
-        {/* BACKDROP (white + glass + dark gloss) */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[860px] w-[860px] rounded-full bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.07),transparent_60%)] blur-2xl" />
           <div className="absolute right-[-180px] top-[8%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.055),transparent_60%)] blur-3xl" />
@@ -89,7 +127,6 @@ export default function Hero({ locale }: Props) {
               animate="show"
               className="text-center"
             >
-              {/* TRUST CHIP */}
               <motion.div variants={item} className="mb-8 flex justify-center">
                 <div className="relative inline-flex">
                   <span className="absolute -inset-[1px] rounded-full bg-black/10 blur-[2px]" />
@@ -102,14 +139,9 @@ export default function Hero({ locale }: Props) {
                 </div>
               </motion.div>
 
-              {/* HEADLINE (weights + tracking) */}
               <motion.h1
                 variants={item}
-                className="
-                  text-[44px] leading-[1.04] sm:text-[60px]
-                  font-semibold tracking-[-0.03em]
-                  text-slate-900 mb-6
-                "
+                className="text-[44px] leading-[1.04] sm:text-[60px] font-semibold tracking-[-0.03em] text-slate-900 mb-6"
               >
                 <span className="font-medium text-slate-900/90">
                   {headlineParts[0]}
@@ -123,23 +155,13 @@ export default function Hero({ locale }: Props) {
                 </span>
               </motion.h1>
 
-              {/* SUBHEAD (lighter) */}
               <motion.p
                 variants={item}
-                className="
-                  mx-auto max-w-2xl
-                  text-[18px] sm:text-[19px]
-                  leading-relaxed
-                  text-slate-600
-                  font-normal
-                  tracking-[-0.01em]
-                  mb-10
-                "
+                className="mx-auto max-w-2xl text-[18px] sm:text-[19px] leading-relaxed text-slate-600 font-normal tracking-[-0.01em] mb-10"
               >
                 {t.hero.subheadline}
               </motion.p>
 
-              {/* CTA ONLY (dark gloss) */}
               <motion.div variants={item} className="mb-12 flex justify-center">
                 <div className="relative w-full max-w-[460px]">
                   <div className="pointer-events-none absolute -inset-6 rounded-[28px] bg-black/10 blur-2xl opacity-60" />
@@ -149,39 +171,14 @@ export default function Hero({ locale }: Props) {
                     size="large"
                     icon={<ArrowRightOutlined />}
                     href={`/${locale}/editor`}
-                    className={[
-                      "!h-14 !w-full !px-8",
-                      "!rounded-2xl",
-                      "!border !border-white/10",
-                      "!bg-[#0b0b0e] !text-white",
-                      "!text-[15px] !font-semibold",
-                      "shadow-[0_18px_45px_rgba(0,0,0,0.38)]",
-                      "hover:shadow-[0_24px_60px_rgba(0,0,0,0.48)]",
-                      "transition-all duration-200",
-                      "hover:-translate-y-0.5",
-                      "active:!scale-[0.99]",
-                      "focus-visible:!ring-2 focus-visible:!ring-black/20",
-                      "relative overflow-hidden",
-                      // чуть tighter, чтобы выглядело “дороже”
-                      "tracking-[-0.01em]",
-                    ].join(" ")}
+                    className="!h-14 !w-full !px-8 !rounded-2xl !border !border-white/10 !bg-[#0b0b0e] !text-white !text-[15px] !font-semibold shadow-[0_18px_45px_rgba(0,0,0,0.38)] hover:shadow-[0_24px_60px_rgba(0,0,0,0.48)] transition-all duration-200 hover:-translate-y-0.5 active:!scale-[0.99] focus-visible:!ring-2 focus-visible:!ring-black/20 relative overflow-hidden tracking-[-0.01em]"
                   >
                     <span className="relative z-10">{t.hero.ctaPrimary}</span>
-
-                    {/* gloss */}
-                    <span
-                      className="
-                        pointer-events-none absolute inset-0
-                        before:absolute before:inset-0
-                        before:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22),transparent_45%)]
-                        before:opacity-80
-                      "
-                    />
+                    <span className="pointer-events-none absolute inset-0 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22),transparent_45%)] before:opacity-80" />
                   </Button>
                 </div>
               </motion.div>
 
-              {/* FEATURE CHIPS */}
               <motion.div
                 variants={item}
                 className="flex flex-wrap items-center justify-center gap-3 text-[12px] text-slate-600"
@@ -193,12 +190,7 @@ export default function Hero({ locale }: Props) {
                 ].map((label) => (
                   <span
                     key={label}
-                    className="
-                      inline-flex items-center gap-2
-                      rounded-full border border-black/10
-                      bg-white/70 px-3 py-1.5
-                      backdrop-blur
-                    "
+                    className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 backdrop-blur"
                   >
                     <span className="h-2 w-2 rounded-full bg-slate-900" />
                     <span className="font-medium tracking-[-0.01em]">

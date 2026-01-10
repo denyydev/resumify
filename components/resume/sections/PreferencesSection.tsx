@@ -46,7 +46,7 @@ function normalizeLocale(value: unknown): Locale {
   return base === "en" ? "en" : "ru";
 }
 
-export function EmploymentPreferencesSection() {
+export function PreferencesSection() {
   const rawLocale = useCurrentLocale();
   const locale = normalizeLocale(rawLocale) satisfies Locale;
   const t = messages[locale];

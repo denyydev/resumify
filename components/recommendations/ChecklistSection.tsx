@@ -1,14 +1,9 @@
 "use client";
 
-import { Alert, Card, List, Space } from "antd";
-import {
-  BadgeCheck,
-  ShieldCheck,
-  TriangleAlert,
-  Wand2,
-} from "lucide-react";
-import type { Locale } from "@/content/recommendations/types";
 import { messages } from "@/content/recommendations/messages";
+import type { Locale } from "@/content/recommendations/types";
+import { Alert, Card, List, Space } from "antd";
+import { BadgeCheck, ShieldCheck, TriangleAlert, Wand2 } from "lucide-react";
 import { SectionHeader } from "./components/SectionHeader";
 
 export function ChecklistSection({ locale }: { locale: Locale }) {
@@ -30,7 +25,10 @@ export function ChecklistSection({ locale }: { locale: Locale }) {
             renderItem={(x) => (
               <List.Item>
                 <Space size={10}>
-                  <BadgeCheck size={16} className="text-[var(--ant-colorSuccess)]" />
+                  <BadgeCheck
+                    size={16}
+                    className="text-[var(--ant-colorSuccess)]"
+                  />
                   <span className="text-sm">{x}</span>
                 </Space>
               </List.Item>
@@ -38,7 +36,7 @@ export function ChecklistSection({ locale }: { locale: Locale }) {
           />
         </Card>
 
-        <Space direction="vertical" size={12} className="w-full">
+        <Space orientation="vertical" size={12} className="w-full">
           <Alert
             type="warning"
             showIcon
@@ -79,4 +77,3 @@ export function ChecklistSection({ locale }: { locale: Locale }) {
     </Card>
   );
 }
-

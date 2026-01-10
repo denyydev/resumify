@@ -67,7 +67,7 @@ function normalizeLocale(value: unknown): Locale {
 
 const MAX_LEN = 30;
 
-export function BasicContactsSection() {
+export function ContactsSection() {
   const rawLocale = useCurrentLocale();
   const locale = normalizeLocale(rawLocale) satisfies Locale;
   const t = messages[locale];
