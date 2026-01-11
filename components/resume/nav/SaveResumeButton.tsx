@@ -1,7 +1,7 @@
 "use client";
 
 import type { Locale } from "@/lib/useCurrentLocale";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { LoadingOutlined, SaveOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Button, Dropdown, Tooltip, message } from "antd";

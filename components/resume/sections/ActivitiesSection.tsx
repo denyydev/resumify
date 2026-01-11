@@ -1,7 +1,7 @@
 "use client";
 
 import { useCurrentLocale } from "@/lib/useCurrentLocale";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { DeleteOutlined, LinkOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Divider, Empty, Form, Input, Select, Typography } from "antd";
 import { Briefcase, Building2, Github, HandHeart, Users } from "lucide-react";

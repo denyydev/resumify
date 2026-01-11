@@ -1,7 +1,7 @@
 "use client";
 
 import { useCurrentLocale } from "@/lib/useCurrentLocale";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { Switch, Tooltip } from "antd";
 
 type LocaleKey = "ru" | "en";

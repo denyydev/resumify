@@ -1,10 +1,9 @@
 "use client";
 
 import type { Locale } from "@/lib/useCurrentLocale";
-import { useResumeStore } from "@/store/useResumeStore";
-import { message } from "antd";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type SaveResult =
   | { success: true; resumeId: string }
@@ -95,4 +94,3 @@ export function useResumeSave(locale: Locale) {
     currentResumeId: searchParams.get("resumeId"),
   };
 }
-

@@ -9,7 +9,7 @@ import ShareResumeButton from "@/components/resume/nav/ShareResumeButton";
 import { ResumePreview } from "@/components/resume/ResumePreview";
 import { SectionsSidebar } from "@/components/resume/sections/SectionsSidebar";
 import { TemplateSelector } from "@/components/resume/templates/ui/TemplateSelector";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import type { Resume, ResumeSectionKey } from "@/types/resume";
 import { Card, Spin } from "antd";
 import { useSearchParams } from "next/navigation";

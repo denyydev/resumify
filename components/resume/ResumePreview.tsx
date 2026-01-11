@@ -2,7 +2,7 @@
 
 import { ResumePrint } from "@/components/resume/ResumePrint";
 import { useCurrentLocale } from "@/lib/useCurrentLocale";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import type { Resume } from "@/types/resume";
 import { FileText } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";

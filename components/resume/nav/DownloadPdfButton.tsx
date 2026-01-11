@@ -1,7 +1,7 @@
 "use client";
 
 import { type Locale } from "@/lib/useCurrentLocale";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { Button, Tooltip } from "antd";
 import { FileDown } from "lucide-react";
 import { useSession } from "next-auth/react";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import type { MenuProps } from "antd";
 import { Button, Dropdown } from "antd";
 import { Check, ChevronDown, Palette } from "lucide-react";

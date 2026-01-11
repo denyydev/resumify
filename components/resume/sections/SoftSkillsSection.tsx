@@ -1,7 +1,7 @@
 "use client";
 
 import { useCurrentLocale } from "@/lib/useCurrentLocale";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { MessageOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Divider, Flex, Input, Space, Typography } from "antd";
 import { AnimatePresence } from "framer-motion";
