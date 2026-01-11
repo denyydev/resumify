@@ -122,7 +122,12 @@ export function AuthButton() {
   ];
 
   const onMenuClick: MenuProps["onClick"] = ({ key }) => {
-    if (key === "logout") signOut();
+    if (key === "logout") {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("resume-draft");
+      }
+      signOut();
+    }
   };
 
   return (
