@@ -14,7 +14,6 @@ type Props = {
 
 export function DownloadPdfButton() {
   const [loading, setLoading] = useState(false);
-  const resume = useResumeStore((s) => s.resume);
   const params = useParams() as { locale: Locale };
   const locale: Locale = params?.locale === "en" ? "en" : "ru";
   const { data: session } = useSession();
@@ -27,18 +26,19 @@ export function DownloadPdfButton() {
     try {
       setLoading(true);
 
+      const resume = useResumeStore.getState().resume;
+      const fullName = [resume.lastName, resume.firstName, resume.patronymic]
+        .filter(Boolean)
+        .join(" ");
+      const title = resume.position || fullName || "Untitled resume";
+
       const saveRes = await fetch("/api/resumes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           data: resume,
           locale,
-          title:
-            resume.position ||
-            [resume.lastName, resume.firstName, resume.patronymic]
-              .filter(Boolean)
-              .join(" ") ||
-            "Untitled resume",
+          title,
           userEmail: session!.user!.email!,
         }),
       });

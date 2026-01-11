@@ -11,7 +11,7 @@ import { SectionsSidebar } from "@/components/resume/sections/SectionsSidebar";
 import { TemplateSelector } from "@/components/resume/templates/ui/TemplateSelector";
 import { useResumeStore } from "@/store/useResumeStore";
 import type { Resume, ResumeSectionKey } from "@/types/resume";
-import { Card } from "antd";
+import { Card, Spin } from "antd";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -53,7 +53,6 @@ function isAbortError(err: unknown): boolean {
 
 export default function EditorPage() {
   const searchParams = useSearchParams();
-
   const resumeId = searchParams.get("resumeId") || undefined;
 
   const selected = useMemo(
@@ -62,11 +61,16 @@ export default function EditorPage() {
   );
 
   const loadResume = useResumeStore((s) => s.loadResume);
+  const [loading, setLoading] = useState<boolean>(!!resumeId);
 
   useEffect(() => {
-    if (!resumeId) return;
+    if (!resumeId) {
+      setLoading(false);
+      return;
+    }
 
     const controller = new AbortController();
+    setLoading(true);
 
     (async () => {
       try {
@@ -82,6 +86,8 @@ export default function EditorPage() {
         loadResume(data);
       } catch (err) {
         if (isAbortError(err)) return;
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
       }
     })();
 
@@ -132,19 +138,19 @@ export default function EditorPage() {
                 <div className="min-w-0 xl:flex-[0_0_520px]">
                   <Card
                     className="h-fit"
-                    styles={{
-                      body: {
-                        padding: "10px",
-                      },
-                    }}
+                    styles={{ body: { padding: "10px" } }}
                   >
-                    <EditorShell selected={selected} />
+                    <Spin spinning={loading}>
+                      <EditorShell selected={selected} />
+                    </Spin>
                   </Card>
                 </div>
 
                 <div className="min-w-0 xl:flex-1">
                   <A4PreviewFrame>
-                    <ResumePreview />
+                    <Spin spinning={loading}>
+                      <ResumePreview />
+                    </Spin>
                   </A4PreviewFrame>
                 </div>
               </div>

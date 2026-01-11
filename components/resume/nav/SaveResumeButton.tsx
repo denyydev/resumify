@@ -42,7 +42,6 @@ export function SaveResumeButton() {
   const { data: session } = useSession();
   const isAuthed = Boolean(session?.user?.email);
 
-  const { resume } = useResumeStore();
   const [loading, setLoading] = useState(false);
 
   const searchParams = useSearchParams();
@@ -53,18 +52,17 @@ export function SaveResumeButton() {
 
   const existingId = searchParams.get("resumeId");
 
-  const getTitle = () => {
-    const fullName = [resume.lastName, resume.firstName, resume.patronymic]
-      .filter(Boolean)
-      .join(" ");
-    return resume.position || fullName || "Untitled resume";
-  };
-
   const createResume = async () => {
     if (!isAuthed) return;
 
     try {
       setLoading(true);
+
+      const resume = useResumeStore.getState().resume;
+      const fullName = [resume.lastName, resume.firstName, resume.patronymic]
+        .filter(Boolean)
+        .join(" ");
+      const title = resume.position || fullName || "Untitled resume";
 
       const res = await fetch("/api/resumes", {
         method: "POST",
@@ -72,7 +70,7 @@ export function SaveResumeButton() {
         body: JSON.stringify({
           data: resume,
           locale,
-          title: getTitle(),
+          title,
         }),
       });
 
@@ -104,13 +102,19 @@ export function SaveResumeButton() {
     try {
       setLoading(true);
 
+      const resume = useResumeStore.getState().resume;
+      const fullName = [resume.lastName, resume.firstName, resume.patronymic]
+        .filter(Boolean)
+        .join(" ");
+      const title = resume.position || fullName || "Untitled resume";
+
       const res = await fetch(`/api/resumes?resumeId=${resumeId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           data: resume,
           locale,
-          title: getTitle(),
+          title,
         }),
       });
 

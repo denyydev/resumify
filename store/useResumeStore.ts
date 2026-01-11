@@ -16,12 +16,13 @@ import {
 } from "@/types/resume";
 import { nanoid } from "nanoid";
 import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
 import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
 type ResumeState = {
   resume: Resume;
   hasHydrated: boolean;
+  isDraft: boolean;
 
   setPhoto: (photo?: string) => void;
   loadResume: (resume: Resume) => void;
@@ -163,6 +164,11 @@ function uniq(list: string[]) {
   return [...new Set(list.map((x) => x.trim()).filter(Boolean))];
 }
 
+type PersistedResumeState = {
+  resume: Omit<Resume, "photo">;
+  isDraft: boolean;
+};
+
 const createEmptyResume = (): Resume => ({
   lastName: "",
   firstName: "",
@@ -216,10 +222,7 @@ function normalizeResume(resume: Partial<Resume>): Resume {
     softSkills: resume.softSkills ?? base.softSkills,
     employmentPreferences:
       resume.employmentPreferences ?? base.employmentPreferences,
-    certifications: ensureAtLeastOne(
-      resume.certifications,
-      emptyCertification
-    ),
+    certifications: ensureAtLeastOne(resume.certifications, emptyCertification),
     activities: ensureAtLeastOne(resume.activities, () =>
       emptyActivity("open-source")
     ),
@@ -235,322 +238,328 @@ export const useResumeStore = create<ResumeState>()(
     immer((set) => ({
       resume: createEmptyResume(),
       hasHydrated: false,
+      isDraft: true,
 
-    setPhoto: (photo) =>
-      set((state) => {
-        state.resume.photo = photo;
-      }),
+      setPhoto: (photo) =>
+        set((state) => {
+          state.resume.photo = photo;
+        }),
 
-    setLastName: (lastName) =>
-      set((state) => {
-        state.resume.lastName = lastName;
-      }),
+      setLastName: (lastName) =>
+        set((state) => {
+          state.resume.lastName = lastName;
+        }),
 
-    setFirstName: (firstName) =>
-      set((state) => {
-        state.resume.firstName = firstName;
-      }),
+      setFirstName: (firstName) =>
+        set((state) => {
+          state.resume.firstName = firstName;
+        }),
 
-    setPatronymic: (patronymic) =>
-      set((state) => {
-        state.resume.patronymic = patronymic;
-      }),
+      setPatronymic: (patronymic) =>
+        set((state) => {
+          state.resume.patronymic = patronymic;
+        }),
 
-    setPosition: (position) =>
-      set((state) => {
-        state.resume.position = position;
-      }),
+      setPosition: (position) =>
+        set((state) => {
+          state.resume.position = position;
+        }),
 
-    setContacts: (contacts) =>
-      set((state) => {
-        state.resume.contacts = { ...state.resume.contacts, ...contacts };
-      }),
+      setContacts: (contacts) =>
+        set((state) => {
+          state.resume.contacts = { ...state.resume.contacts, ...contacts };
+        }),
 
-    setSummary: (summary) =>
-      set((state) => {
-        state.resume.summary = summary;
-      }),
+      setSummary: (summary) =>
+        set((state) => {
+          state.resume.summary = summary;
+        }),
 
-    setTemplateKey: (templateKey) =>
-      set((state) => {
-        state.resume.templateKey = templateKey;
-      }),
+      setTemplateKey: (templateKey) =>
+        set((state) => {
+          state.resume.templateKey = templateKey;
+        }),
 
-    setAccentColor: (accentColor) =>
-      set((state) => {
-        state.resume.accentColor = accentColor;
-      }),
+      setAccentColor: (accentColor) =>
+        set((state) => {
+          state.resume.accentColor = accentColor;
+        }),
 
-    setIncludePhoto: (includePhoto) =>
-      set((state) => {
-        state.resume.includePhoto = includePhoto;
-      }),
+      setIncludePhoto: (includePhoto) =>
+        set((state) => {
+          state.resume.includePhoto = includePhoto;
+        }),
 
-    setEmploymentPreferences: (patch) =>
-      set((state) => {
-        state.resume.employmentPreferences = {
-          ...state.resume.employmentPreferences,
-          ...patch,
-        };
-      }),
+      setEmploymentPreferences: (patch) =>
+        set((state) => {
+          state.resume.employmentPreferences = {
+            ...state.resume.employmentPreferences,
+            ...patch,
+          };
+        }),
 
-    setSectionVisible: (key, value) =>
-      set((state) => {
-        // нормализуем, чтобы не тащить undefined
-        state.resume.sectionsVisibility = {
-          ...DEFAULT_SECTIONS_VISIBILITY,
-          ...(state.resume.sectionsVisibility ?? {}),
-          [key]: value,
-        };
-      }),
-
-    toggleSection: (key) =>
-      set((state) => {
-        const current =
-          state.resume.sectionsVisibility?.[key] ??
-          DEFAULT_SECTIONS_VISIBILITY[key];
-
-        state.resume.sectionsVisibility = {
-          ...DEFAULT_SECTIONS_VISIBILITY,
-          ...(state.resume.sectionsVisibility ?? {}),
-          [key]: !current,
-        };
-      }),
-
-    showAllSections: () =>
-      set((state) => {
-        state.resume.sectionsVisibility = { ...DEFAULT_SECTIONS_VISIBILITY };
-      }),
-
-    loadResume: (resume) =>
-      set((state) => {
-        const base = createEmptyResume();
-
-        state.resume = {
-          ...base,
-          ...resume,
-          accentColor: resume.accentColor ?? DEFAULT_ACCENT_COLOR,
-          includePhoto: resume.includePhoto ?? DEFAULT_INCLUDE_PHOTO,
-          experience: ensureAtLeastOne(resume.experience, emptyExperience),
-          projects: ensureAtLeastOne(resume.projects, emptyProject),
-          education: ensureAtLeastOne(resume.education, emptyEducation),
-          languages: ensureAtLeastOne(resume.languages, emptyLanguage),
-          techSkills: resume.techSkills ?? base.techSkills,
-          softSkills: resume.softSkills ?? base.softSkills,
-          employmentPreferences:
-            resume.employmentPreferences ?? base.employmentPreferences,
-          certifications: ensureAtLeastOne(
-            resume.certifications,
-            emptyCertification
-          ),
-          activities: ensureAtLeastOne(resume.activities, () =>
-            emptyActivity("open-source")
-          ),
-          sectionsVisibility: {
+      setSectionVisible: (key, value) =>
+        set((state) => {
+          state.resume.sectionsVisibility = {
             ...DEFAULT_SECTIONS_VISIBILITY,
-            ...(resume.sectionsVisibility ?? {}),
-          },
-        };
-      }),
+            ...(state.resume.sectionsVisibility ?? {}),
+            [key]: value,
+          };
+        }),
 
-    reset: () =>
-      set((state) => {
-        state.resume = createEmptyResume();
-      }),
+      toggleSection: (key) =>
+        set((state) => {
+          const current =
+            state.resume.sectionsVisibility?.[key] ??
+            DEFAULT_SECTIONS_VISIBILITY[key];
 
-    addTechSkillTag: (tag) =>
-      set((state) => {
-        const value = tag.trim();
-        if (!value) return;
+          state.resume.sectionsVisibility = {
+            ...DEFAULT_SECTIONS_VISIBILITY,
+            ...(state.resume.sectionsVisibility ?? {}),
+            [key]: !current,
+          };
+        }),
 
-        const prev = state.resume.techSkills.tags;
-        if (prev.includes(value)) return;
+      showAllSections: () =>
+        set((state) => {
+          state.resume.sectionsVisibility = { ...DEFAULT_SECTIONS_VISIBILITY };
+        }),
 
-        state.resume.techSkills.tags.push(value);
-      }),
+      loadResume: (resume) =>
+        set((state) => {
+          const base = createEmptyResume();
 
-    removeTechSkillTag: (tag) =>
-      set((state) => {
-        state.resume.techSkills.tags = state.resume.techSkills.tags.filter(
-          (t) => t !== tag
-        );
-      }),
+          state.resume = {
+            ...base,
+            ...resume,
+            accentColor: resume.accentColor ?? DEFAULT_ACCENT_COLOR,
+            includePhoto: resume.includePhoto ?? DEFAULT_INCLUDE_PHOTO,
+            experience: ensureAtLeastOne(resume.experience, emptyExperience),
+            projects: ensureAtLeastOne(resume.projects, emptyProject),
+            education: ensureAtLeastOne(resume.education, emptyEducation),
+            languages: ensureAtLeastOne(resume.languages, emptyLanguage),
+            techSkills: resume.techSkills ?? base.techSkills,
+            softSkills: resume.softSkills ?? base.softSkills,
+            employmentPreferences:
+              resume.employmentPreferences ?? base.employmentPreferences,
+            certifications: ensureAtLeastOne(
+              resume.certifications,
+              emptyCertification
+            ),
+            activities: ensureAtLeastOne(resume.activities, () =>
+              emptyActivity("open-source")
+            ),
+            sectionsVisibility: {
+              ...DEFAULT_SECTIONS_VISIBILITY,
+              ...(resume.sectionsVisibility ?? {}),
+            },
+          };
+          state.isDraft = false;
+        }),
 
-    setTechSkillsTags: (tags) =>
-      set((state) => {
-        state.resume.techSkills.tags = uniq(tags);
-      }),
-
-    setTechSkillsNote: (note) =>
-      set((state) => {
-        state.resume.techSkills.note = note;
-      }),
-
-    addSoftSkillTag: (tag) =>
-      set((state) => {
-        const value = tag.trim();
-        if (!value) return;
-
-        const prev = state.resume.softSkills.tags;
-        if (prev.includes(value)) return;
-
-        state.resume.softSkills.tags.push(value);
-      }),
-
-    removeSoftSkillTag: (tag) =>
-      set((state) => {
-        state.resume.softSkills.tags = state.resume.softSkills.tags.filter(
-          (t) => t !== tag
-        );
-      }),
-
-    setSoftSkillsTags: (tags) =>
-      set((state) => {
-        state.resume.softSkills.tags = uniq(tags);
-      }),
-
-    setSoftSkillsNote: (note) =>
-      set((state) => {
-        state.resume.softSkills.note = note;
-      }),
-
-    addExperience: () =>
-      set((state) => {
-        state.resume.experience.push(emptyExperience());
-      }),
-
-    updateExperience: (id, patch) =>
-      set((state) => {
-        const item = state.resume.experience.find((x) => x.id === id);
-        if (!item) return;
-        Object.assign(item, patch);
-      }),
-
-    removeExperience: (id) =>
-      set((state) => {
-        state.resume.experience = state.resume.experience.filter(
-          (x) => x.id !== id
-        );
-        if (state.resume.experience.length === 0) {
-          state.resume.experience = [emptyExperience()];
+      reset: () => {
+        set((state) => {
+          state.resume = createEmptyResume();
+          state.isDraft = true;
+        });
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("resume-draft");
         }
-      }),
+      },
 
-    addProject: () =>
-      set((state) => {
-        state.resume.projects.push(emptyProject());
-      }),
+      addTechSkillTag: (tag) =>
+        set((state) => {
+          const value = tag.trim();
+          if (!value) return;
 
-    updateProject: (id, patch) =>
-      set((state) => {
-        const item = state.resume.projects.find((x) => x.id === id);
-        if (!item) return;
-        Object.assign(item, patch);
-      }),
+          const prev = state.resume.techSkills.tags;
+          if (prev.includes(value)) return;
 
-    removeProject: (id) =>
-      set((state) => {
-        state.resume.projects = state.resume.projects.filter(
-          (x) => x.id !== id
-        );
-        if (state.resume.projects.length === 0) {
-          state.resume.projects = [emptyProject()];
-        }
-      }),
+          state.resume.techSkills.tags.push(value);
+        }),
 
-    addEducation: () =>
-      set((state) => {
-        state.resume.education.push(emptyEducation());
-      }),
+      removeTechSkillTag: (tag) =>
+        set((state) => {
+          state.resume.techSkills.tags = state.resume.techSkills.tags.filter(
+            (t) => t !== tag
+          );
+        }),
 
-    updateEducation: (id, patch) =>
-      set((state) => {
-        const item = state.resume.education.find((x) => x.id === id);
-        if (!item) return;
-        Object.assign(item, patch);
-      }),
+      setTechSkillsTags: (tags) =>
+        set((state) => {
+          state.resume.techSkills.tags = uniq(tags);
+        }),
 
-    removeEducation: (id) =>
-      set((state) => {
-        state.resume.education = state.resume.education.filter(
-          (x) => x.id !== id
-        );
-        if (state.resume.education.length === 0) {
-          state.resume.education = [emptyEducation()];
-        }
-      }),
+      setTechSkillsNote: (note) =>
+        set((state) => {
+          state.resume.techSkills.note = note;
+        }),
 
-    addLanguage: () =>
-      set((state) => {
-        state.resume.languages.push(emptyLanguage());
-      }),
+      addSoftSkillTag: (tag) =>
+        set((state) => {
+          const value = tag.trim();
+          if (!value) return;
 
-    updateLanguage: (id, patch) =>
-      set((state) => {
-        const item = state.resume.languages.find((x) => x.id === id);
-        if (!item) return;
-        Object.assign(item, patch);
-      }),
+          const prev = state.resume.softSkills.tags;
+          if (prev.includes(value)) return;
 
-    removeLanguage: (id) =>
-      set((state) => {
-        state.resume.languages = state.resume.languages.filter(
-          (x) => x.id !== id
-        );
-        if (state.resume.languages.length === 0) {
-          state.resume.languages = [emptyLanguage()];
-        }
-      }),
+          state.resume.softSkills.tags.push(value);
+        }),
 
-    addCertification: () =>
-      set((state) => {
-        state.resume.certifications ??= [];
-        state.resume.certifications.push(emptyCertification());
-      }),
+      removeSoftSkillTag: (tag) =>
+        set((state) => {
+          state.resume.softSkills.tags = state.resume.softSkills.tags.filter(
+            (t) => t !== tag
+          );
+        }),
 
-    updateCertification: (id, patch) =>
-      set((state) => {
-        state.resume.certifications ??= [];
-        const item = state.resume.certifications.find((x) => x.id === id);
-        if (!item) return;
-        Object.assign(item, patch);
-      }),
+      setSoftSkillsTags: (tags) =>
+        set((state) => {
+          state.resume.softSkills.tags = uniq(tags);
+        }),
 
-    removeCertification: (id) =>
-      set((state) => {
-        state.resume.certifications ??= [];
-        state.resume.certifications = state.resume.certifications.filter(
-          (x) => x.id !== id
-        );
-        if (state.resume.certifications.length === 0) {
-          state.resume.certifications = [emptyCertification()];
-        }
-      }),
+      setSoftSkillsNote: (note) =>
+        set((state) => {
+          state.resume.softSkills.note = note;
+        }),
 
-    addActivity: (type = "open-source") =>
-      set((state) => {
-        state.resume.activities ??= [];
-        state.resume.activities.push(emptyActivity(type));
-      }),
+      addExperience: () =>
+        set((state) => {
+          state.resume.experience.push(emptyExperience());
+        }),
 
-    updateActivity: (id, patch) =>
-      set((state) => {
-        state.resume.activities ??= [];
-        const item = state.resume.activities.find((x) => x.id === id);
-        if (!item) return;
-        Object.assign(item, patch);
-      }),
+      updateExperience: (id, patch) =>
+        set((state) => {
+          const item = state.resume.experience.find((x) => x.id === id);
+          if (!item) return;
+          Object.assign(item, patch);
+        }),
 
-    removeActivity: (id) =>
-      set((state) => {
-        state.resume.activities ??= [];
-        state.resume.activities = state.resume.activities.filter(
-          (x) => x.id !== id
-        );
-        if (state.resume.activities.length === 0) {
-          state.resume.activities = [emptyActivity("open-source")];
-        }
-      }),
+      removeExperience: (id) =>
+        set((state) => {
+          state.resume.experience = state.resume.experience.filter(
+            (x) => x.id !== id
+          );
+          if (state.resume.experience.length === 0) {
+            state.resume.experience = [emptyExperience()];
+          }
+        }),
+
+      addProject: () =>
+        set((state) => {
+          state.resume.projects.push(emptyProject());
+        }),
+
+      updateProject: (id, patch) =>
+        set((state) => {
+          const item = state.resume.projects.find((x) => x.id === id);
+          if (!item) return;
+          Object.assign(item, patch);
+        }),
+
+      removeProject: (id) =>
+        set((state) => {
+          state.resume.projects = state.resume.projects.filter(
+            (x) => x.id !== id
+          );
+          if (state.resume.projects.length === 0) {
+            state.resume.projects = [emptyProject()];
+          }
+        }),
+
+      addEducation: () =>
+        set((state) => {
+          state.resume.education.push(emptyEducation());
+        }),
+
+      updateEducation: (id, patch) =>
+        set((state) => {
+          const item = state.resume.education.find((x) => x.id === id);
+          if (!item) return;
+          Object.assign(item, patch);
+        }),
+
+      removeEducation: (id) =>
+        set((state) => {
+          state.resume.education = state.resume.education.filter(
+            (x) => x.id !== id
+          );
+          if (state.resume.education.length === 0) {
+            state.resume.education = [emptyEducation()];
+          }
+        }),
+
+      addLanguage: () =>
+        set((state) => {
+          state.resume.languages.push(emptyLanguage());
+        }),
+
+      updateLanguage: (id, patch) =>
+        set((state) => {
+          const item = state.resume.languages.find((x) => x.id === id);
+          if (!item) return;
+          Object.assign(item, patch);
+        }),
+
+      removeLanguage: (id) =>
+        set((state) => {
+          state.resume.languages = state.resume.languages.filter(
+            (x) => x.id !== id
+          );
+          if (state.resume.languages.length === 0) {
+            state.resume.languages = [emptyLanguage()];
+          }
+        }),
+
+      addCertification: () =>
+        set((state) => {
+          state.resume.certifications ??= [];
+          state.resume.certifications.push(emptyCertification());
+        }),
+
+      updateCertification: (id, patch) =>
+        set((state) => {
+          state.resume.certifications ??= [];
+          const item = state.resume.certifications.find((x) => x.id === id);
+          if (!item) return;
+          Object.assign(item, patch);
+        }),
+
+      removeCertification: (id) =>
+        set((state) => {
+          state.resume.certifications ??= [];
+          state.resume.certifications = state.resume.certifications.filter(
+            (x) => x.id !== id
+          );
+          if (state.resume.certifications.length === 0) {
+            state.resume.certifications = [emptyCertification()];
+          }
+        }),
+
+      addActivity: (type = "open-source") =>
+        set((state) => {
+          state.resume.activities ??= [];
+          state.resume.activities.push(emptyActivity(type));
+        }),
+
+      updateActivity: (id, patch) =>
+        set((state) => {
+          state.resume.activities ??= [];
+          const item = state.resume.activities.find((x) => x.id === id);
+          if (!item) return;
+          Object.assign(item, patch);
+        }),
+
+      removeActivity: (id) =>
+        set((state) => {
+          state.resume.activities ??= [];
+          state.resume.activities = state.resume.activities.filter(
+            (x) => x.id !== id
+          );
+          if (state.resume.activities.length === 0) {
+            state.resume.activities = [emptyActivity("open-source")];
+          }
+        }),
     })),
     {
       name: "resume-draft",
@@ -559,26 +568,37 @@ export const useResumeStore = create<ResumeState>()(
         const { photo, ...resumeWithoutPhoto } = state.resume;
         return {
           resume: resumeWithoutPhoto,
+          isDraft: state.isDraft,
         };
       },
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: unknown, version: number) => {
         if (version === 0) {
+          const state = persistedState as
+            | { resume?: Partial<Resume>; isDraft?: boolean }
+            | null
+            | undefined;
           const normalized = normalizeResume(
-            persistedState?.resume ?? createEmptyResume()
+            state?.resume ?? createEmptyResume()
           );
           return {
             resume: normalized,
             hasHydrated: false,
+            isDraft: state?.isDraft ?? true,
           };
         }
-        return persistedState;
+        return persistedState as PersistedResumeState;
       },
-      merge: (persistedState: any, currentState: ResumeState) => {
-        if (persistedState?.resume) {
-          const normalized = normalizeResume(persistedState.resume);
+      merge: (persistedState: unknown, currentState: ResumeState) => {
+        if (currentState.isDraft === false) {
+          return currentState;
+        }
+        const state = persistedState as PersistedResumeState | null | undefined;
+        if (state?.resume) {
+          const normalized = normalizeResume(state.resume);
           return {
             ...currentState,
             resume: normalized,
+            isDraft: state.isDraft ?? true,
           };
         }
         return currentState;

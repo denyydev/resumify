@@ -20,14 +20,8 @@ type SaveResult =
 export function useResumeSave(locale: Locale) {
   const { data: session } = useSession();
   const isAuthed = Boolean(session?.user?.email);
-  const { resume } = useResumeStore();
   const searchParams = useSearchParams();
   const router = useRouter();
-
-  const getTitle = () => {
-    const fullName = [resume.lastName, resume.firstName, resume.patronymic].filter(Boolean).join(" ");
-    return resume.position || fullName || "Untitled resume";
-  };
 
   /**
    * Обеспечивает, что резюме сохранено в БД
@@ -47,13 +41,19 @@ export function useResumeSave(locale: Locale) {
     }
 
     try {
+      const resume = useResumeStore.getState().resume;
+      const fullName = [resume.lastName, resume.firstName, resume.patronymic]
+        .filter(Boolean)
+        .join(" ");
+      const title = resume.position || fullName || "Untitled resume";
+
       const res = await fetch("/api/resumes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           data: resume,
           locale,
-          title: getTitle(),
+          title,
         }),
       });
 
