@@ -262,7 +262,7 @@ export default function ShareResumeButton() {
                 <Input
                   value={shareStatus?.shareUrl || ""}
                   readOnly
-                  bordered={false}
+                  variant="borderless"
                   className="flex-1 !p-0"
                   placeholder="—"
                   onFocus={(e) => e.target.select()}

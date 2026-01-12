@@ -45,7 +45,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             headerBg: "#ffffff",
             footerBg: "transparent",
             siderBg: "#ffffff",
-            bodyBg: "#f1f5f9",
+            bodyBg: "#FFFFFF",
           },
           Menu: {
             itemColor: "#0f172a",

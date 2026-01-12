@@ -34,5 +34,9 @@ export function LanguageSwitcher({
     router.push(qs ? `${nextPath}?${qs}` : nextPath);
   };
 
-  return <Button onClick={toggle}>{locale === "ru" ? "RU" : "EN"}</Button>;
+  return (
+    <Button size="small" onClick={toggle}>
+      {locale === "ru" ? "RU" : "EN"}
+    </Button>
+  );
 }

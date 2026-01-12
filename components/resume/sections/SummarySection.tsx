@@ -279,10 +279,10 @@ export function SummarySection() {
           {t.sectionSubtitle}
         </Text>
 
-        <Divider className="my-4" />
+        <Divider />
       </div>
 
-      <div className="flex-1 overflow-auto p-5">
+      <div className="flex-1 overflow-auto px-5">
         <Space orientation="vertical" size={12} className="w-full">
           {photoVisible && <PhotoBlock t={t} />}
           <NameInputsBlock t={t} />

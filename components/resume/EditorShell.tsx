@@ -13,7 +13,7 @@ type SectionComponent = React.ComponentType<Record<string, never>>;
 
 function SectionLoader() {
   return (
-    <div className="flex min-h-[120px] w-full items-center justify-center">
+    <div className="flex min-h-[420px] w-full items-center justify-center">
       <Spin />
     </div>
   );

@@ -11,7 +11,7 @@ import { SectionsSidebar } from "@/components/resume/sections/SectionsSidebar";
 import { TemplateSelector } from "@/components/resume/templates/ui/TemplateSelector";
 import { useResumeStore } from "@/store/resume/useResumeStore";
 import type { Resume, ResumeSectionKey } from "@/types/resume";
-import { Card, Spin } from "antd";
+import { Spin } from "antd";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -95,11 +95,11 @@ export default function EditorPage() {
   }, [resumeId, loadResume]);
 
   return (
-    <div className="h-full min-h-0 overflow-auto">
+    <div className="min-h-screen">
       <div className="px-5 h-full min-h-0">
         <div className="h-full min-h-0 grid gap-5 grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)]">
           <aside className="hidden lg:block min-h-0">
-            <div className="sticky top-20 h-[calc(100dvh-5rem)]">
+            <div className="sticky top-5">
               <SectionsSidebar />
             </div>
           </aside>
@@ -111,7 +111,7 @@ export default function EditorPage() {
           </div>
 
           <main className="min-w-0 min-h-0">
-            <div className="z-20 pt-4 pb-3 relative lg:sticky lg:top-0">
+            <div className="z-20 pt-5 relative lg:sticky lg:top-0">
               <div className="pointer-events-none absolute -inset-x-4 -inset-y-3 hidden lg:block bg-[#f3f5f9]/70 backdrop-blur-md supports-[backdrop-filter]:bg-[#f3f5f9]/55" />
               <div className="relative">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -136,14 +136,9 @@ export default function EditorPage() {
             <div className="py-5">
               <div className="flex min-h-0 flex-col gap-5 xl:flex-row">
                 <div className="min-w-0 xl:flex-[0_0_520px]">
-                  <Card
-                    className="h-fit"
-                    styles={{ body: { padding: "10px" } }}
-                  >
-                    <Spin spinning={loading}>
-                      <EditorShell selected={selected} />
-                    </Spin>
-                  </Card>
+                  <Spin spinning={loading}>
+                    <EditorShell selected={selected} />
+                  </Spin>
                 </div>
 
                 <div className="min-w-0 xl:flex-1">
